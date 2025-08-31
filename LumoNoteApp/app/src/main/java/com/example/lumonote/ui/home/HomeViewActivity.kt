@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.lumonote.R
 import com.example.lumonote.databinding.ActivityHomeViewBinding
 import com.example.lumonote.ui.home.calendar.CalendarViewFragment
-import com.example.lumonote.ui.home.notepreview.NotePreviewViewFragment
+import com.example.lumonote.ui.home.notepreview.view.NotePreviewViewFragment
 import com.example.lumonote.ui.home.settings.SettingsViewFragment
 import com.example.lumonote.utils.general.GeneralUIHelper
 

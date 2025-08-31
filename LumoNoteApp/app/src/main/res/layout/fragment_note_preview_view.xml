@@ -11,7 +11,7 @@
 
     android:id="@+id/notePreviewViewRL"
 
-    tools:context=".ui.home.notepreview.NotePreviewViewFragment">
+    tools:context=".ui.home.notepreview.view.NotePreviewViewFragment">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout

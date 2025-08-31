@@ -1,6 +1,5 @@
-package com.example.lumonote.ui.home.notepreview
+package com.example.lumonote.ui.home.notepreview.view
 
-import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -19,11 +18,12 @@ import com.example.lumonote.utils.general.GeneralUIHelper
 
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
-class NotePreviewAdapter(private var notesList: List<Note>, context: Context)
-    : RecyclerView.Adapter<NotePreviewAdapter.NotePreviewViewHolder>() {
+class NotePreviewAdapter() : RecyclerView.Adapter<NotePreviewAdapter.NotePreviewViewHolder>() {
 
+    private val notesList = mutableListOf<Note>()
     private val generalTextHelper: GeneralTextHelper = GeneralTextHelper()
     private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
+
 
     // The layout from which this view data is accessed is passed into this later
     class NotePreviewViewHolder (notePreviewView: View) : RecyclerView.ViewHolder(notePreviewView) {
@@ -32,6 +32,7 @@ class NotePreviewAdapter(private var notesList: List<Note>, context: Context)
         val contentPreview: TextView = notePreviewView.findViewById(R.id.contentPreviewTV)
         val pinPreview: ImageView = notePreviewView.findViewById(R.id.previewPinIV)
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotePreviewViewHolder {
         val notePreviewView = LayoutInflater.from(parent.context).inflate(R.layout.item_note,
@@ -89,10 +90,12 @@ class NotePreviewAdapter(private var notesList: List<Note>, context: Context)
         }
     }
 
+
     // Ensure UI stays up-to-date with notes list
     fun refreshData(newNotes: List<Note>) {
-        notesList = newNotes
-
+        notesList.clear()
+        notesList.addAll(newNotes)
         notifyDataSetChanged()
     }
+
 }

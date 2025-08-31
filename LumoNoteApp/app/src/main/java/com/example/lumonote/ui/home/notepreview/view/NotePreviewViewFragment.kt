@@ -1,4 +1,4 @@
-package com.example.lumonote.ui.home.notepreview
+package com.example.lumonote.ui.home.notepreview.view
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,11 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.lumonote.data.database.DatabaseHelper
 import com.example.lumonote.databinding.FragmentNotePreviewViewBinding
+import com.example.lumonote.ui.home.notepreview.other.NotePreviewViewFactory
+import com.example.lumonote.ui.home.notepreview.other.TagViewModelFactory
+import com.example.lumonote.ui.home.notepreview.viewmodel.NotePreviewViewModel
+import com.example.lumonote.ui.home.notepreview.viewmodel.TagViewModel
 import com.example.lumonote.ui.noteview.view.NoteViewActivity
 
 class NotePreviewViewFragment : Fragment() {
@@ -25,11 +30,11 @@ class NotePreviewViewFragment : Fragment() {
     // The "!!" means it assumes _notePrevViewBinding is not null between onCreateView & onDestroyView
     private val notePrevViewBinding get() = _notePrevViewBinding!!
 
-    private lateinit var dbConnection: DatabaseHelper
     private lateinit var notePreviewAdapter: NotePreviewAdapter
     private lateinit var tagDisplayAdapter: TagDisplayAdapter
 
-    private val inserted = false
+    private lateinit var notePreviewViewModel: NotePreviewViewModel
+    private lateinit var tagViewModel: TagViewModel
 
 
     // Called when the Fragment creates its view
@@ -46,17 +51,17 @@ class NotePreviewViewFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        dbConnection = DatabaseHelper(requireContext())
+        val dbConnection = DatabaseHelper(requireContext()) // DB
+        val tagViewModelConstructor = TagViewModelFactory(dbConnection)  // Factory
+        val notePreviewViewModelConstructor = NotePreviewViewFactory(dbConnection)  // Factory
 
+        // Custom ViewModelProviders know how to build viewmodels w/ dbconnection dependency
+        tagViewModel = ViewModelProvider(this, tagViewModelConstructor).get(TagViewModel::class.java)
 
-//        dbConnection.insertTag(Tag(1, "All Notes"))
-//        dbConnection.insertTag(Tag(2, "School"))
-//        dbConnection.insertTag(Tag(3, "Work"))
-//        dbConnection.insertTag(Tag(4, "Korean"))
-//        dbConnection.insertTag(Tag(5, "Japanese"))
-//        dbConnection.insertTag(Tag(6, "Italian"))
-
+        notePreviewViewModel = ViewModelProvider(this,
+            notePreviewViewModelConstructor).get(NotePreviewViewModel::class.java)
     }
+
 
     // Called when the view is created (safe place to interact with UI)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,24 +77,19 @@ class NotePreviewViewFragment : Fragment() {
         * requireContext() → safe way to get the Context (will throw if Fragment isn’t attached).
         */
 
+        // Initialize adapters
+        notePreviewAdapter = NotePreviewAdapter()
 
-        notePreviewAdapter = NotePreviewAdapter(dbConnection.getAllNotes(), requireContext())
-
-        // Define layout and adapter to use for notes display
-        notePrevViewBinding.notesPreviewRV.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        notePrevViewBinding.notesPreviewRV.adapter = notePreviewAdapter
-
-
-        tagDisplayAdapter = TagDisplayAdapter(dbConnection.getAllTags(), requireContext())
-
-        // Define layout and adapter to use for tag display
-        notePrevViewBinding.tagsHolderRV.layoutManager = LinearLayoutManager(requireContext(),
-            LinearLayoutManager.HORIZONTAL, false)
-        //notePrevViewBinding.tagsHolderRV.setHasFixedSize(true) // optional but avoids measurement issues
-        notePrevViewBinding.tagsHolderRV.adapter = tagDisplayAdapter
+        tagDisplayAdapter = TagDisplayAdapter { position ->
+            // When clicked, delegate to ViewModel
+            tagViewModel.setCurrentTagPosition(position)
+        }
 
 
-        // Log.d("DatePrint", LocalDate.now().toString())
+        setupAdapterDisplay()
+
+        observeViewModels()
+
 
         // Calls reference to the create note floating button
         notePrevViewBinding.createButtonIV.setOnClickListener {
@@ -107,16 +107,7 @@ class NotePreviewViewFragment : Fragment() {
                     -recyclerView.computeHorizontalScrollOffset().toFloat()
             }
         })
-    }
 
-    override fun onResume() {
-        super.onResume()
-
-        // This ensures that when new notes are added or notes are edited in the database, the
-        // notes displayed are up-to-date
-        notePreviewAdapter.refreshData(dbConnection.getAllNotes())
-
-        tagDisplayAdapter.refreshData(dbConnection.getAllTags())
     }
 
 
@@ -125,4 +116,35 @@ class NotePreviewViewFragment : Fragment() {
         super.onDestroyView()
         _notePrevViewBinding = null // prevent memory leaks by clearing reference
     }
+
+
+    private fun observeViewModels() {
+        // Observe changes
+        notePreviewViewModel.notes.observe(viewLifecycleOwner) { notes ->
+            notePreviewAdapter.refreshData(notes)
+        }
+
+        // Observe changes
+        tagViewModel.tags.observe(viewLifecycleOwner) { tags ->
+            tagDisplayAdapter.refreshData(tags)
+        }
+
+        // Observe selection
+        tagViewModel.selectedTagPosition.observe(viewLifecycleOwner) { position ->
+            tagDisplayAdapter.setSelectedPosition(position)
+        }
+    }
+
+    private fun setupAdapterDisplay() {
+        // Define layout and adapter to use for notes display
+        notePrevViewBinding.notesPreviewRV.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        notePrevViewBinding.notesPreviewRV.adapter = notePreviewAdapter
+
+        // Define layout and adapter to use for tag display
+        notePrevViewBinding.tagsHolderRV.layoutManager = LinearLayoutManager(requireContext(),
+            LinearLayoutManager.HORIZONTAL, false)
+        //notePrevViewBinding.tagsHolderRV.setHasFixedSize(true) // optional but avoids measurement issues
+        notePrevViewBinding.tagsHolderRV.adapter = tagDisplayAdapter
+    }
+
 }
