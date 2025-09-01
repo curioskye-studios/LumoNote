@@ -9,6 +9,7 @@ import com.example.lumonote.data.models.Tag
 import kotlinx.coroutines.launch
 
 class TagViewModel(private val dbConnection: DatabaseHelper) : ViewModel() {
+
     private val _tags = MutableLiveData<List<Tag>>()
     val tags: LiveData<List<Tag>> = _tags
 
@@ -19,6 +20,7 @@ class TagViewModel(private val dbConnection: DatabaseHelper) : ViewModel() {
     val selectedTagPosition: LiveData<Int> = _selectedTagPosition
 
     init {
+
 //        dbConnection.insertTag(Tag(1, "All Notes"))
 //        dbConnection.insertTag(Tag(2, "School"))
 //        dbConnection.insertTag(Tag(3, "Work"))
@@ -29,12 +31,14 @@ class TagViewModel(private val dbConnection: DatabaseHelper) : ViewModel() {
     }
 
     private fun loadAllTags() {
+
         viewModelScope.launch {
             _tags.value = dbConnection.getAllTags()
         }
     }
 
     fun setCurrentTagPosition(newPosition: Int) {
+
         _selectedTagPosition.value = newPosition
     }
 

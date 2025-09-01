@@ -9,14 +9,17 @@ import com.example.lumonote.data.models.Note
 import kotlinx.coroutines.launch
 
 class NotePreviewViewModel(private val dbConnection: DatabaseHelper) : ViewModel() {
+
     private val _notes = MutableLiveData<List<Note>>()
     val notes: LiveData<List<Note>> = _notes
 
     init {
+
         loadAllNotes()
     }
 
     fun loadAllNotes() {
+
         viewModelScope.launch {
             _notes.value = dbConnection.getAllNotes()
         }

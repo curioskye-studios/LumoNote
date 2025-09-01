@@ -41,7 +41,8 @@ class NotePreviewViewFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ) : View? {
+
         // Inflate the layout using ViewBinding
         _notePrevViewBinding = FragmentNotePreviewViewBinding.inflate(inflater, container, false)
         return notePrevViewBinding.root // return the root view for the fragment
@@ -49,6 +50,7 @@ class NotePreviewViewFragment : Fragment() {
 
     // Called when the Fragment is created (before the UI exists)
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
         val dbConnection = DatabaseHelper(requireContext()) // DB
@@ -65,6 +67,7 @@ class NotePreviewViewFragment : Fragment() {
 
     // Called when the view is created (safe place to interact with UI)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
 
         /*
@@ -77,28 +80,22 @@ class NotePreviewViewFragment : Fragment() {
         * requireContext() → safe way to get the Context (will throw if Fragment isn’t attached).
         */
 
-        // Initialize adapters
-        notePreviewAdapter = NotePreviewAdapter()
+        initializeAdapters()
 
-        tagDisplayAdapter = TagDisplayAdapter { position ->
-            // When clicked, delegate to ViewModel
-            tagViewModel.setCurrentTagPosition(position)
-        }
-
-
-        setupAdapterDisplay()
+        setupAdapterDisplays()
 
         observeViewModels()
 
-
         // Calls reference to the create note floating button
         notePrevViewBinding.createButtonIV.setOnClickListener {
+
             var intent = Intent(requireContext(), NoteViewActivity::class.java)
             startActivity(intent)
         }
 
         // Add scroll listener to ensure add tag button scrolls with the tags
         notePrevViewBinding.tagsHolderRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
@@ -113,12 +110,66 @@ class NotePreviewViewFragment : Fragment() {
 
     // Called when the view is destroyed (e.g. when navigating away)
     override fun onDestroyView() {
+
         super.onDestroyView()
         _notePrevViewBinding = null // prevent memory leaks by clearing reference
     }
 
+    private fun initializeAdapters() {
+
+        notePreviewAdapter = NotePreviewAdapter (
+            setNoteIDToOpen =
+            { noteID ->
+                // notePreviewAdapter takes in a function as a parameter
+                // this is the functionality assigned whenever this runs in the adapter
+
+                openNoteViewActivity(noteID)
+            },
+            shouldHighlightNotePin =
+            {
+
+            }
+        )
+
+        tagDisplayAdapter = TagDisplayAdapter (
+            onTagClickedFunction =
+            { position ->
+                tagViewModel.setCurrentTagPosition(position)
+            }
+        )
+    }
+
+    private fun openNoteViewActivity(noteID: Int) {
+
+        // Open Note View of note by clicking on one
+        val intent = Intent(requireContext(), NoteViewActivity::class.java).apply {
+            // Also pass in the id of the note interacted w/ for later retrieval in update note
+            putExtra("note_id", noteID)
+        }
+
+        // Starts the update note activity
+        requireContext().startActivity(intent)
+    }
+
+    private fun setupAdapterDisplays() {
+
+        // Define layout and adapter to use for notes display
+        notePrevViewBinding.notesPreviewRV.layoutManager = StaggeredGridLayoutManager(2,
+            StaggeredGridLayoutManager.VERTICAL)
+
+        notePrevViewBinding.notesPreviewRV.adapter = notePreviewAdapter
+
+
+        // Define layout and adapter to use for tag display
+        notePrevViewBinding.tagsHolderRV.layoutManager = LinearLayoutManager(requireContext(),
+            LinearLayoutManager.HORIZONTAL, false)
+
+        //notePrevViewBinding.tagsHolderRV.setHasFixedSize(true) // optional but avoids measurement issues
+        notePrevViewBinding.tagsHolderRV.adapter = tagDisplayAdapter
+    }
 
     private fun observeViewModels() {
+
         // Observe changes
         notePreviewViewModel.notes.observe(viewLifecycleOwner) { notes ->
             notePreviewAdapter.refreshData(notes)
@@ -135,16 +186,5 @@ class NotePreviewViewFragment : Fragment() {
         }
     }
 
-    private fun setupAdapterDisplay() {
-        // Define layout and adapter to use for notes display
-        notePrevViewBinding.notesPreviewRV.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        notePrevViewBinding.notesPreviewRV.adapter = notePreviewAdapter
-
-        // Define layout and adapter to use for tag display
-        notePrevViewBinding.tagsHolderRV.layoutManager = LinearLayoutManager(requireContext(),
-            LinearLayoutManager.HORIZONTAL, false)
-        //notePrevViewBinding.tagsHolderRV.setHasFixedSize(true) // optional but avoids measurement issues
-        notePrevViewBinding.tagsHolderRV.adapter = tagDisplayAdapter
-    }
 
 }

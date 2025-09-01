@@ -37,6 +37,7 @@ class HomeViewActivity : AppCompatActivity() {
 
 
         supportFragmentManager.beginTransaction().apply {
+
             add(homeViewBinding.currentHomeFragmentFL.id, notePreviewViewFragment)
             add(homeViewBinding.currentHomeFragmentFL.id, calendarViewFragment)
             add(homeViewBinding.currentHomeFragmentFL.id, settingsViewFragment)
@@ -52,34 +53,42 @@ class HomeViewActivity : AppCompatActivity() {
 
 
         homeViewBinding.notesViewIV.setOnClickListener {
+
             switchToFragment(notePreviewViewFragment)
         }
 
         homeViewBinding.calendarViewIV.setOnClickListener {
+
             switchToFragment(calendarViewFragment)
         }
 
         homeViewBinding.settingsViewIV.setOnClickListener {
+
             switchToFragment(settingsViewFragment)
         }
 
 
         homeViewModel.notePreviewActive.observe(this) { active ->
+
             updateIVButtonHighlight(homeViewBinding.notesViewIV, active)
         }
 
         homeViewModel.calendarActive.observe(this) { active ->
+
             updateIVButtonHighlight(homeViewBinding.calendarViewIV, active)
         }
 
         homeViewModel.settingsActive.observe(this) { active ->
+
             updateIVButtonHighlight(homeViewBinding.settingsViewIV, active)
         }
     }
 
 
     private fun updateFragmentActiveStatus(fragment: Fragment, status: Boolean)  {
+
         when (fragment) {
+
             notePreviewViewFragment -> homeViewModel.setNotePreviewActive(status)
             calendarViewFragment -> homeViewModel.setCalendarActive(status)
             settingsViewFragment -> homeViewModel.setSettingsActive(status)
@@ -89,6 +98,7 @@ class HomeViewActivity : AppCompatActivity() {
     private fun switchToFragment(targetFragment: Fragment) {
 
         supportFragmentManager.beginTransaction().apply {
+
             for (fragment in navigationFragments) {
 
                 if (fragment == targetFragment) {

@@ -15,14 +15,17 @@ class HomeViewModel : ViewModel() {
 
 
     fun setNotePreviewActive(isActive: Boolean) {
+
         _notePreviewActive.value = isActive
     }
 
     fun setCalendarActive(isActive: Boolean) {
+
         _calendarActive.value = isActive
     }
 
     fun setSettingsActive(isActive: Boolean) {
+
         _settingsActive.value = isActive
     }
 

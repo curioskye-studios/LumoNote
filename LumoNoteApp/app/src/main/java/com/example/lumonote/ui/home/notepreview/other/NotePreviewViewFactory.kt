@@ -14,6 +14,7 @@ class NotePreviewViewFactory(
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
+
         // First we check if the caller is asking for a TagViewModel specifically.
         // "isAssignableFrom" means: is modelClass the same type as, or a superclass of, TagViewModel?
         // If true, then we know it's safe to construct and return a TagViewModel.
