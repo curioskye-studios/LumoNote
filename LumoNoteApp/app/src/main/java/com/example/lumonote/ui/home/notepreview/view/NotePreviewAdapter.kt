@@ -16,7 +16,8 @@ import com.example.lumonote.utils.general.GeneralUIHelper
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
 class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
-                         private val shouldHighlightNotePin: (Boolean) -> Unit)
+                         private val shouldHighlightNotePin: (Boolean) -> Unit,
+                         private val whenCurrentNotePinClicked: (Boolean) -> Unit)
     : RecyclerView.Adapter<NotePreviewAdapter.NotePreviewViewHolder>() {
 
     private val notesList = mutableListOf<Note>()
@@ -70,7 +71,10 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
         holder.pinPreview.setOnClickListener {
             //TODO("Pull pin status from note and use it to update highlight display")
             //TODO("Move Taasts to fragment instead based on chnage of pin status")
-            updatePinHightlight(holder)
+
+            //whenCurrentNotePinClicked(true or false)
+
+            updatePinHighlight(holder)
         }
     }
 
@@ -87,7 +91,7 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
 
     }
 
-    private fun updatePinHightlight(holder: NotePreviewViewHolder){
+    private fun updatePinHighlight(holder: NotePreviewViewHolder){
 
         val tintColor = holder.pinPreview.imageTintList
             ?.getColorForState(holder.pinPreview.drawableState, 0)

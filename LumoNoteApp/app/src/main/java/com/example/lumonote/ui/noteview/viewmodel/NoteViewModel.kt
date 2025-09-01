@@ -1,4 +1,4 @@
-package com.example.lumonote.ui.home.notepreview.viewmodel
+package com.example.lumonote.ui.noteview.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,13 +8,10 @@ import com.example.lumonote.data.database.DatabaseHelper
 import com.example.lumonote.data.models.Note
 import kotlinx.coroutines.launch
 
-class NotePreviewViewModel(private val dbConnection: DatabaseHelper) : ViewModel() {
+class NoteViewModel(private val dbConnection: DatabaseHelper) : ViewModel() {
 
     private val _notes = MutableLiveData<List<Note>>()
     val notes: LiveData<List<Note>> = _notes
-
-    private val _isCurrentNotePinned = MutableLiveData<Boolean>()
-    val isCurrentNotePinned: LiveData<Boolean> = _isCurrentNotePinned
 
     init {
 
@@ -26,9 +23,5 @@ class NotePreviewViewModel(private val dbConnection: DatabaseHelper) : ViewModel
         viewModelScope.launch {
             _notes.value = dbConnection.getAllNotes()
         }
-    }
-
-    fun updateIsCurrentNotePinned(isPinned: Boolean) {
-        _isCurrentNotePinned.value = isPinned
     }
 }

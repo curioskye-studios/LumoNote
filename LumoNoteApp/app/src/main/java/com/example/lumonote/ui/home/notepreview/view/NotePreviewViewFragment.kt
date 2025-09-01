@@ -119,16 +119,20 @@ class NotePreviewViewFragment : Fragment() {
 
         notePreviewAdapter = NotePreviewAdapter (
             setNoteIDToOpen =
-            { noteID ->
-                // notePreviewAdapter takes in a function as a parameter
-                // this is the functionality assigned whenever this runs in the adapter
+                { noteID ->
+                    // notePreviewAdapter takes in a function as a parameter
+                    // this is the functionality assigned whenever this runs in the adapter
 
-                openNoteViewActivity(noteID)
-            },
+                    openNoteViewActivity(noteID)
+                },
             shouldHighlightNotePin =
-            {
+                {
 
-            }
+                },
+            whenCurrentNotePinClicked =
+                { isPinned ->
+                    //notePreviewViewModel.updateIsCurrentNotePinned(isPinned)
+                }
         )
 
         tagDisplayAdapter = TagDisplayAdapter (
