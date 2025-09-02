@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.lumonote"
+    namespace = "com.curioskyestudios.lumonote"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.lumonote"
+        applicationId = "com.curioskyestudios.lumonote"
         minSdk = 26
         targetSdk = 33
         versionCode = 1
