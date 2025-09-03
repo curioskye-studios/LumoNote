@@ -20,14 +20,17 @@ class TextHelperViewModel : ViewModel() {
 
 
     fun setTextStyleHelper(textStyleHelper: TextStyleHelper) {
+
         _textStyleHelper.value = textStyleHelper
     }
 
     fun setTextSizeHelper(textSizeHelper: TextSizeHelper) {
+
         _textSizeHelper.value = textSizeHelper
     }
 
     fun setTextBulletHelper(textBulletHelper: TextBulletHelper) {
+
         _textBulletHelper.value = textBulletHelper
     }
 

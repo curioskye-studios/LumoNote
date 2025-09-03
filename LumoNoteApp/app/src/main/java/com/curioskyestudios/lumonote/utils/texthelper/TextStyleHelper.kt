@@ -39,12 +39,15 @@ class TextStyleHelper (private val editTextView: EditText) {
                 val spans = selectedText.getSpans(i, i + 1, CharacterStyle::class.java)
 
                 for (span in spans) {
+
                     Log.d("Spans", "Span class: ${span::class.java.name}")
                 }
 
 
                 for (span in spans) {
+
                     if (span is StyleSpan) {
+
                         val styleName = when (span.style) {
                             Typeface.NORMAL -> "NORMAL"
                             Typeface.BOLD -> TextStyle.BOLD.styleName
@@ -52,44 +55,52 @@ class TextStyleHelper (private val editTextView: EditText) {
                             Typeface.BOLD_ITALIC -> "BOLD_ITALIC"
                             else -> "UNKNOWN"
                         }
+
                         Log.d("CharStyle StyleSpan", styleName)
                     }
                     else {
+
                         Log.d("CharStyle Span", "${span.javaClass.simpleName}")
                     }
                 }
 
                 when (spanType) {
+
                     TextStyle.BOLD, TextStyle.ITALICS -> {
+
                         var checkType  = if (spanType == TextStyle.BOLD) {
+
                             Typeface.BOLD
                         } else {
+
                             Typeface.ITALIC
                         }
 
                         if (spans.isNotEmpty() && spans.any { it is StyleSpan && it.style == checkType }) {
+
                             spanCheck.add(true)
                             Log.d("CharStyle", "Char '${selectedText[i]}' at $i has styles: ${spans.joinToString()}")
                         } else {
+
                             spanCheck.add(false)
                             Log.d("CharStyle","Char '${selectedText[i]}' at $i has no $spanType style")
                         }
                     }
 
                     TextStyle.UNDERLINE -> {
+
                         if (spans.isNotEmpty() && spans.any { it is CustomUnderlineSpan } ) {
+
                             spanCheck.add(true)
                             Log.d("CharStyle","Char '${selectedText[i]}' at $i has underline")
                         } else {
+
                             spanCheck.add(false)
                             Log.d("CharStyle","Char '${selectedText[i]}' at $i has no underline")
                         }
 
                     }
 
-                    else -> {
-                        Log.e("ViewNoteActivity", "Type: $spanType does not exist.")
-                    }
                 }
 
             }
@@ -115,8 +126,11 @@ class TextStyleHelper (private val editTextView: EditText) {
         Log.d("Relevant Spans", relevantSpans.contentToString())
 
         if (relevantSpans != null) {
+
             for (span in relevantSpans) {
+
                 if (span !is RelativeSizeSpan){
+
                     stringBuilder?.removeSpan(span)
                 }
             }
@@ -136,21 +150,27 @@ class TextStyleHelper (private val editTextView: EditText) {
         var setSpan: CharacterStyle? = null
 
         when (type) {
+
             TextStyle.BOLD -> setSpan = toggleBasicFormatting(type, Typeface.BOLD)
             TextStyle.ITALICS -> setSpan = toggleBasicFormatting(type, Typeface.ITALIC)
 
             TextStyle.UNDERLINE -> {
+
                 val underlineSpans =
                     stringBuilder?.getSpans<CustomUnderlineSpan>(selectionStart, selectionEnd)
 
                 // If selected text already has underline, remove it
                 if (isAllSpanned(type)) {
+
                     if (underlineSpans != null) {
+
                         for (span in underlineSpans) {
+
                             stringBuilder?.removeSpan(span)
                         }
                     }
                 } else {
+
                     // Otherwise add underline
                     setSpan = CustomUnderlineSpan()
                 }
@@ -163,9 +183,11 @@ class TextStyleHelper (private val editTextView: EditText) {
         spanCounter++
 
         if (setSpan == null) {
+
             editTextView.setSelection(selectionStart)
         }
         if (selectionStart != selectionEnd) {
+
             // User selected a range of text
             stringBuilder?.setSpan(
                 setSpan,
@@ -207,8 +229,11 @@ class TextStyleHelper (private val editTextView: EditText) {
 
             // if there are pre-existing words set to that style span, remove it (bold or italics)
             if (styleSpans != null) {
+
                 for (span in styleSpans) {
+
                     if (span.style == typeface) {
+
                         stringBuilder?.removeSpan(span)
                     }
                 }
@@ -217,6 +242,7 @@ class TextStyleHelper (private val editTextView: EditText) {
             return null
         }
         else {
+
             // if not, add the text style to everything
             return StyleSpan(typeface)
         }
@@ -228,17 +254,20 @@ class TextStyleHelper (private val editTextView: EditText) {
     fun removeUnintendedUnderlines(editableText: Editable?) {
 
         if (editableText != null) {
+
             val allUnderlines = editableText.getSpans(0, editableText.length, UnderlineSpan::class.java)
+
             for (span in allUnderlines) {
+
                 if (span !is CustomUnderlineSpan) {
+
                     editableText.removeSpan(span)
                 }
             }
+
         }
 
     }
-
-
 
 
 }

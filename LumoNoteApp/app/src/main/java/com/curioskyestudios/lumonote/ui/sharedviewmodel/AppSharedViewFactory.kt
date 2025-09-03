@@ -1,15 +1,15 @@
-package com.curioskyestudios.lumonote.ui.home.notepreview.other
+package com.curioskyestudios.lumonote.ui.sharedviewmodel
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.curioskyestudios.lumonote.data.database.DatabaseHelper
-import com.curioskyestudios.lumonote.ui.home.notepreview.viewmodel.NotePreviewViewModel
 
 
 // A custom ViewModelFactory is needed because our ViewModel has a constructor parameter
 // (a Repository), and ViewModelProvider by default only knows how to create ViewModels
 // with empty constructors.
-class NotePreviewViewFactory(
+class AppSharedViewFactory(
     private val dbConnection: DatabaseHelper   // Factory holds onto the dependency
 ) : ViewModelProvider.Factory {
 
@@ -18,7 +18,7 @@ class NotePreviewViewFactory(
         // First we check if the caller is asking for a TagViewModel specifically.
         // "isAssignableFrom" means: is modelClass the same type as, or a superclass of, TagViewModel?
         // If true, then we know it's safe to construct and return a TagViewModel.
-        if (modelClass.isAssignableFrom(NotePreviewViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(NoteAppSharedViewModel::class.java)) {
 
             // The compiler warning:
             // Because of type erasure, Kotlin/Java generics lose type info at runtime.
@@ -30,7 +30,13 @@ class NotePreviewViewFactory(
             // We already checked isAssignableFrom, so at runtime this cast cannot fail.
             // This is the standard pattern recommended in Android's docs.
             @Suppress("UNCHECKED_CAST")
-            return NotePreviewViewModel(dbConnection) as T
+            return NoteAppSharedViewModel(Application(), dbConnection) as T
+        }
+
+        if (modelClass.isAssignableFrom(TagAppSharedViewModel::class.java)) {
+
+            @Suppress("UNCHECKED_CAST")
+            return TagAppSharedViewModel(Application(), dbConnection) as T
         }
 
         // If some other ViewModel type is requested, we throw an error.

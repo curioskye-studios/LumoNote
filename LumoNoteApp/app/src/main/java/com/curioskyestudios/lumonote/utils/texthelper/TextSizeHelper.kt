@@ -43,11 +43,15 @@ class TextSizeHelper(private val editTextView: EditText) {
         Log.d("Header", "Point 1")
 
         when (type) {
+
             TextSize.NORMAL -> {
+
                 // check if heading size has already been applied
                 if (!relativeSizeSpans.isNullOrEmpty()) {
+
                     // if so, remove it
                     for (span in relativeSizeSpans) {
+
                         stringBuilder?.removeSpan(span)
                     }
                 }
@@ -84,10 +88,13 @@ class TextSizeHelper(private val editTextView: EditText) {
         Log.d("relativeSizeSpan", spanList.contentToString())
 
         if (!spanList.isNullOrEmpty()) {
+
             for (span in spanList) {
+
                 Log.d("Relative Spans", "Span class: ${span::class.java.name}")
             }
         } else {
+
             Log.d("Relative Spans", "None")
         }
 
@@ -95,21 +102,28 @@ class TextSizeHelper(private val editTextView: EditText) {
 
         // check if heading size has already been applied
         if (spanList.isNullOrEmpty()) {
+
             // If not, add it
             return RelativeSizeSpan(scaleFactor)
         }
         else if (spanList.isNotEmpty()) {
+
             // If different header was applied, replace it
             for (span in spanList) {
+
                 stringBuilder?.removeSpan(span)
             }
+
             return RelativeSizeSpan(scaleFactor)
         }
         else {
+
             // if so, remove it (toggle)
             for (span in spanList) {
+
                 stringBuilder?.removeSpan(span)
             }
+
             return null
         }
 

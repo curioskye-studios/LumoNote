@@ -45,43 +45,49 @@ class InputViewModel : ViewModel() {
 
 
     fun setTextStyleHelper(textStyleHelper: TextStyleHelper) {
+
         _textStyleHelper.value = textStyleHelper
     }
 
     fun setTextSizeHelper(textSizeHelper: TextSizeHelper) {
+
         _textSizeHelper.value = textSizeHelper
     }
 
     fun setTextBulletHelper(textBulletHelper: TextBulletHelper) {
+
         _textBulletHelper.value = textBulletHelper
     }
 
     // Call this when EditText gains/loses focus
     fun setEditing(focused: Boolean) {
+
         _isEditing.value = focused
     }
     fun setOpenFormatter(open: Boolean) {
+
         _openFormatter.value = open
     }
 
     fun setStyleSpans(styleSpans: Array<out StyleSpan>?) {
+
         _styleSpans.value = styleSpans
     }
     fun setUnderlineSpans(underlineSpans: Array<out TextStyleHelper.CustomUnderlineSpan>?) {
+
         _underlineSpans.value = underlineSpans
     }
     fun setRelativeSizeSpans(relativeSizeSpans: Array<out RelativeSizeSpan>?) {
+
         _relativeSizeSpans.value = relativeSizeSpans
     }
 
     fun setSelectionStart(selectionStart: Int) {
+
         _selectionStart.value = selectionStart
     }
     fun setSelectionEnd(selectionEnd: Int) {
+
         _selectionEnd.value = selectionEnd
     }
-
-
-
-
 }

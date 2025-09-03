@@ -1,13 +1,12 @@
 package com.curioskyestudios.lumonote.ui.home.notepreview.view
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.curioskyestudios.lumonote.R
 import com.curioskyestudios.lumonote.data.models.Note
@@ -16,8 +15,7 @@ import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
 class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
-                         private val shouldHighlightNotePin: (Boolean) -> Unit,
-                         private val whenCurrentNotePinClicked: (Boolean) -> Unit)
+                         private val whenCurrentNotePinClicked: (Boolean, Int) -> Unit)
     : RecyclerView.Adapter<NotePreviewAdapter.NotePreviewViewHolder>() {
 
     private val notesList = mutableListOf<Note>()
@@ -60,6 +58,10 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
         // index in the list
         holder.titlePreview.text = note.noteTitle
         holder.contentPreview.text = note.noteContent
+        holder.pinPreview.tag = note.notePinned
+        updatePinHighlight(holder)
+
+        //Log.d("NoteFrag", "pinnedPreview: ${holder.pinPreview.tag}")
 
 
         holder.noteCardPreview.setOnClickListener {
@@ -69,10 +71,16 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
 
         // Pin preview of note (toggle gold)
         holder.pinPreview.setOnClickListener {
-            //TODO("Pull pin status from note and use it to update highlight display")
-            //TODO("Move Taasts to fragment instead based on chnage of pin status")
 
-            //whenCurrentNotePinClicked(true or false)
+            val pinnedFlag = holder.pinPreview.tag as Boolean
+
+            Log.d("NoteFrag", "pinnedFlag: $pinnedFlag")
+
+            holder.pinPreview.tag = !pinnedFlag
+
+            val currentNoteID = note.noteID
+
+            whenCurrentNotePinClicked(!pinnedFlag, currentNoteID)
 
             updatePinHighlight(holder)
         }
@@ -93,24 +101,14 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
 
     private fun updatePinHighlight(holder: NotePreviewViewHolder){
 
-        val tintColor = holder.pinPreview.imageTintList
-            ?.getColorForState(holder.pinPreview.drawableState, 0)
+        if (holder.pinPreview.tag == true) {
 
-        val lightGrey3Tint = ContextCompat.getColor(holder.itemView.context, R.color.light_grey_3)
-
-        if (tintColor == lightGrey3Tint) {
             generalUIHelper.changeButtonIVColor(holder.itemView.context, holder.pinPreview,
                 R.color.gold)
-
-            // Put small notification popup at bottom of screen
-            Toast.makeText(holder.itemView.context, "Note Pinned", Toast.LENGTH_SHORT).show()
         } else {
+
             generalUIHelper.changeButtonIVColor(holder.itemView.context, holder.pinPreview,
                 R.color.light_grey_3)
-
-            // Put small notification popup at bottom of screen
-            Toast.makeText(holder.itemView.context, "Note Unpinned", Toast.LENGTH_SHORT).show()
         }
     }
-
 }

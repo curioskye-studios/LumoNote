@@ -39,6 +39,7 @@ class EditInputFragment : Fragment() {
 
     // Called when the Fragment is created (before the UI exists)
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
         inputViewModel = ViewModelProvider(requireActivity()).get(InputViewModel::class.java)
@@ -50,6 +51,7 @@ class EditInputFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         // Inflate the layout for requireContext() fragment
         _editInputViewBinding = FragmentEditInputBinding.inflate(inflater, container, false)
         return editInputViewBinding.root // return the root view for the fragment
@@ -57,13 +59,16 @@ class EditInputFragment : Fragment() {
 
     // Called when the view is created (safe place to interact with UI)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
 
         inputViewModel.isEditing.observe(viewLifecycleOwner){
 
             if (inputViewModel.isEditing.value == true) {
+
                 isActive(editInputViewBinding.textFormatButtonIV)
             } else {
+
                 isNotActive(editInputViewBinding.textFormatButtonIV)
             }
 
@@ -72,18 +77,25 @@ class EditInputFragment : Fragment() {
             //Log.d("EditInput", "Point 1")
         }
 
+
         editInputViewBinding.apply {
 
             colorButtonIV.setOnClickListener {
+
                 activeColorBtn = toggleActiveButton(colorButtonIV, activeColorBtn)
             }
 
+
             checkListButtonIV.setOnClickListener {
+
                 activeChecklistBtn = toggleActiveButton(checkListButtonIV, activeChecklistBtn)
             }
 
+
             imageButtonIV.setOnClickListener {
+
                 isActive(imageButtonIV)
+
                 Handler(Looper.getMainLooper()).postDelayed({
                     // Action here
                     isNotActive(imageButtonIV)
@@ -91,29 +103,30 @@ class EditInputFragment : Fragment() {
             }
 
             textFormatButtonIV.setOnClickListener {
+
                 activeTextFormatBtn = toggleActiveButton(textFormatButtonIV, activeTextFormatBtn)
             }
-
-
         }
-
 
     }
 
 
     // Called when the view is destroyed (e.g. when navigating away)
     override fun onDestroyView() {
+
         super.onDestroyView()
         _editInputViewBinding = null // prevent memory leaks by clearing reference
     }
 
 
     private fun isActive(buttonIV: ImageView) {
+
         // highlight button
         generalUIHelper.changeButtonIVColor(requireContext(), buttonIV, R.color.gold)
     }
 
     private fun isNotActive(buttonIV: ImageView) {
+
         // unhighlight button
         generalUIHelper.changeButtonIVColor(requireContext(), buttonIV, R.color.light_grey_1)
 
@@ -122,14 +135,17 @@ class EditInputFragment : Fragment() {
     private fun toggleActiveButton(buttonIV: ImageView, activeFlag: Boolean) : Boolean {
 
         if (buttonIV == editInputViewBinding.textFormatButtonIV) {
+
             inputViewModel.setOpenFormatter(!activeFlag)
         }
 
         return if (!activeFlag) {
+
             isActive(buttonIV)
             true
 
         } else {
+
             isNotActive(buttonIV)
             false
         }

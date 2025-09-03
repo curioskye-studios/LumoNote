@@ -2,9 +2,11 @@ package com.curioskyestudios.lumonote.ui.home.notepreview.view
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,11 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.curioskyestudios.lumonote.data.database.DatabaseHelper
 import com.curioskyestudios.lumonote.databinding.FragmentNotePreviewViewBinding
-import com.curioskyestudios.lumonote.ui.home.notepreview.other.NotePreviewViewFactory
-import com.curioskyestudios.lumonote.ui.home.notepreview.other.TagViewModelFactory
-import com.curioskyestudios.lumonote.ui.home.notepreview.viewmodel.NotePreviewViewModel
-import com.curioskyestudios.lumonote.ui.home.notepreview.viewmodel.TagViewModel
 import com.curioskyestudios.lumonote.ui.noteview.view.NoteViewActivity
+import com.curioskyestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
+import com.curioskyestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
+import com.curioskyestudios.lumonote.ui.sharedviewmodel.TagAppSharedViewModel
 
 class NotePreviewViewFragment : Fragment() {
 
@@ -33,8 +34,8 @@ class NotePreviewViewFragment : Fragment() {
     private lateinit var notePreviewAdapter: NotePreviewAdapter
     private lateinit var tagDisplayAdapter: TagDisplayAdapter
 
-    private lateinit var notePreviewViewModel: NotePreviewViewModel
-    private lateinit var tagViewModel: TagViewModel
+    private lateinit var tagAppSharedViewModel: TagAppSharedViewModel
+    private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
 
 
     // Called when the Fragment creates its view
@@ -54,14 +55,14 @@ class NotePreviewViewFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         val dbConnection = DatabaseHelper(requireContext()) // DB
-        val tagViewModelConstructor = TagViewModelFactory(dbConnection)  // Factory
-        val notePreviewViewModelConstructor = NotePreviewViewFactory(dbConnection)  // Factory
+        val appSharedVMConstructor = AppSharedViewFactory(dbConnection) // Factory
 
         // Custom ViewModelProviders know how to build viewmodels w/ dbconnection dependency
-        tagViewModel = ViewModelProvider(this, tagViewModelConstructor).get(TagViewModel::class.java)
+        noteAppSharedViewModel = ViewModelProvider(this, appSharedVMConstructor)
+            .get(NoteAppSharedViewModel::class.java)
 
-        notePreviewViewModel = ViewModelProvider(this,
-            notePreviewViewModelConstructor).get(NotePreviewViewModel::class.java)
+        tagAppSharedViewModel = ViewModelProvider(this, appSharedVMConstructor)
+            .get(TagAppSharedViewModel::class.java)
     }
 
 
@@ -84,33 +85,17 @@ class NotePreviewViewFragment : Fragment() {
 
         setupAdapterDisplays()
 
-        observeViewModels()
+        observeNoteViewModelValues()
 
-        // Calls reference to the create note floating button
-        notePrevViewBinding.createButtonIV.setOnClickListener {
+        observeTagViewModelValues()
 
-            var intent = Intent(requireContext(), NoteViewActivity::class.java)
-            startActivity(intent)
-        }
-
-        // Add scroll listener to ensure add tag button scrolls with the tags
-        notePrevViewBinding.tagsHolderRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-                // Move the Add button by same scroll distance
-                notePrevViewBinding.tagAddButtonIV.translationX =
-                    -recyclerView.computeHorizontalScrollOffset().toFloat()
-            }
-        })
-
+        setupListeners()
     }
 
     override fun onResume() {
         super.onResume()
 
-        notePreviewViewModel.loadAllNotes()
+        noteAppSharedViewModel.loadAllNotes()
     }
 
 
@@ -121,33 +106,38 @@ class NotePreviewViewFragment : Fragment() {
         _notePrevViewBinding = null // prevent memory leaks by clearing reference
     }
 
+
     private fun initializeAdapters() {
 
         notePreviewAdapter = NotePreviewAdapter (
             setNoteIDToOpen =
                 { noteID ->
+
                     // notePreviewAdapter takes in a function as a parameter
                     // this is the functionality assigned whenever this runs in the adapter
-
                     openNoteViewActivity(noteID)
                 },
-            shouldHighlightNotePin =
-                {
-
-                },
             whenCurrentNotePinClicked =
-                { isPinned ->
-                    //notePreviewViewModel.updateIsCurrentNotePinned(isPinned)
+                { isPinned, currentNoteID ->
+
+                    Log.d("NoteFrag", isPinned.toString())
+                    Log.d("NoteFrag", currentNoteID.toString())
+
+                    noteAppSharedViewModel.setCurrentPreviewNoteID(currentNoteID)
+                    noteAppSharedViewModel.updatePreviewPinStatus(isPinned)
                 }
         )
 
         tagDisplayAdapter = TagDisplayAdapter (
+
             onTagClickedFunction =
             { position ->
-                tagViewModel.setCurrentTagPosition(position)
+
+                tagAppSharedViewModel.setCurrentTagPosition(position)
             }
         )
     }
+
 
     private fun openNoteViewActivity(noteID: Int) {
 
@@ -160,6 +150,7 @@ class NotePreviewViewFragment : Fragment() {
         // Starts the update note activity
         requireContext().startActivity(intent)
     }
+
 
     private fun setupAdapterDisplays() {
 
@@ -178,21 +169,98 @@ class NotePreviewViewFragment : Fragment() {
         notePrevViewBinding.tagsHolderRV.adapter = tagDisplayAdapter
     }
 
-    private fun observeViewModels() {
+
+    private fun observeNoteViewModelValues() {
 
         // Observe changes
-        notePreviewViewModel.notes.observe(viewLifecycleOwner) { notes ->
+        noteAppSharedViewModel.notes.observe(viewLifecycleOwner) { notes ->
             notePreviewAdapter.refreshData(notes)
         }
 
         // Observe changes
-        tagViewModel.tags.observe(viewLifecycleOwner) { tags ->
+        noteAppSharedViewModel.notifyRefresh.observe(viewLifecycleOwner) { shouldRefresh ->
+
+            if (shouldRefresh == true) {
+                noteAppSharedViewModel.loadAllNotes()
+            }
+        }
+
+        // Observe changes
+        noteAppSharedViewModel.previewNotePinned.observe(viewLifecycleOwner) { isPinned ->
+
+            //update note in database with new pinned status
+            if (noteAppSharedViewModel.currentPreviewNoteID.value != -1) {
+
+                var noteData = noteAppSharedViewModel.getNote(
+                    noteAppSharedViewModel.currentPreviewNoteID.value!!
+                )
+
+                noteData.notePinned = isPinned
+
+                Log.d("NoteFrag", "$noteData")
+
+                noteAppSharedViewModel.setIsNewNote(false)
+                noteAppSharedViewModel.saveNote(noteData)
+
+                noteAppSharedViewModel.setCurrentPreviewNoteID(-1)
+            }
+
+            givePinnedStatusToast(isPinned)
+
+            noteAppSharedViewModel.setNotifyRefresh(true)
+            noteAppSharedViewModel.setNotifyRefresh(false)
+        }
+    }
+
+
+    private fun observeTagViewModelValues() {
+
+        // Observe changes
+        tagAppSharedViewModel.tags.observe(viewLifecycleOwner) { tags ->
             tagDisplayAdapter.refreshData(tags)
         }
 
         // Observe selection
-        tagViewModel.selectedTagPosition.observe(viewLifecycleOwner) { position ->
+        tagAppSharedViewModel.selectedTagPosition.observe(viewLifecycleOwner) { position ->
             tagDisplayAdapter.setSelectedPosition(position)
+        }
+    }
+
+
+    private fun setupListeners() {
+
+        // Calls reference to the create note floating button
+        notePrevViewBinding.createButtonIV.setOnClickListener {
+
+            var intent = Intent(requireContext(), NoteViewActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Add scroll listener to ensure add tag button scrolls with the tags
+        notePrevViewBinding.tagsHolderRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+
+                super.onScrolled(recyclerView, dx, dy)
+
+                // Move the Add button by same scroll distance
+                notePrevViewBinding.tagAddButtonIV.translationX =
+                    -recyclerView.computeHorizontalScrollOffset().toFloat()
+            }
+        })
+    }
+
+
+    private fun givePinnedStatusToast(isPinned: Boolean) {
+
+        if (isPinned) {
+
+            // Put small notification popup at bottom of screen
+            Toast.makeText(requireContext(), "Note Pinned", Toast.LENGTH_SHORT).show()
+        } else {
+
+            // Put small notification popup at bottom of screen
+            Toast.makeText(requireContext(), "Note Unpinned", Toast.LENGTH_SHORT).show()
         }
     }
 

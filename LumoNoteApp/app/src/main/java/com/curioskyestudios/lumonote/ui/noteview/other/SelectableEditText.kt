@@ -11,11 +11,13 @@ class SelectableEditText(context: Context, attrs: AttributeSet?) : AppCompatEdit
     var onSelectionChange: ((Int, Int) -> Unit)? = null
 
     override fun onSelectionChanged(selStart: Int, selEnd: Int) {
+
         super.onSelectionChanged(selStart, selEnd)
         onSelectionChange?.invoke(selStart, selEnd)
     }
 
     fun clearFocusOnKeyboardHide(rootView: View) {
+
         // Variable to track the previous state of the keyboard
         var wasKeyboardVisible = false
 
@@ -53,6 +55,6 @@ class SelectableEditText(context: Context, attrs: AttributeSet?) : AppCompatEdit
             // Update the previous keyboard state for the next layout change
             wasKeyboardVisible = isKeyboardVisible
         }
-
     }
+
 }

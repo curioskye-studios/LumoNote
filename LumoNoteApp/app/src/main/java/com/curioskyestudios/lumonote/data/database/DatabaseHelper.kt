@@ -35,6 +35,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
+
         // Initializes table in database as well as each column (id, title, content)
         val createNoteTableQuery = "CREATE TABLE $NOTE_TABLE_NAME " +
                 "($NOTE_ID_COLUMN INTEGER PRIMARY KEY, $NOTE_TITLE_COLUMN TEXT, $NOTE_CONTENT_COLUMN TEXT," +
@@ -49,6 +50,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+
         // Prevents duplicate tables of the same name being created
         val dropNoteTableQuery = "DROP TABLE IF EXISTS $NOTE_TABLE_NAME"
         db?.execSQL(dropNoteTableQuery)
@@ -83,6 +85,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
     // Retrieve all notes in the database
     fun getAllNotes(): List<Note> {
+
         val notesList = mutableListOf<Note>() // Store note objects, similar to java arraylist
         val db = writableDatabase // Database manipulator object
 
@@ -94,6 +97,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
             cursor is already past the last entry in the result set.
          */
         while (cursor.moveToNext()) {
+
             // Collect each note record from the database, store data as a note object
             val id = cursor.getInt(cursor.getColumnIndexOrThrow(NOTE_ID_COLUMN))
             val title = cursor.getString(cursor.getColumnIndexOrThrow(NOTE_TITLE_COLUMN))
@@ -116,6 +120,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
     // Update a note in the database w/ the edited version
     fun updateNote(note: Note){
+
         val db = writableDatabase // Database manipulator object
 
         val values = ContentValues().apply {
@@ -134,6 +139,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
     // Get a specific note from the database using its id
     fun getNoteByID(noteID: Int): Note {
+
         val db = readableDatabase // Database accessor object
 
         val query = "SELECT * FROM $NOTE_TABLE_NAME WHERE $NOTE_ID_COLUMN = $noteID"
@@ -165,6 +171,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
     // Remove a specific note from the database using its id
     fun deleteNote(noteID: Int) {
+
         val db = writableDatabase // Database manipulator object
 
         val whereClause = "$NOTE_ID_COLUMN = ?"
@@ -186,6 +193,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
         // ContentValues class stores values associated with column names
         val values = ContentValues().apply {
+
             // ID not needed since sqlite provides unique ids
             put(TAG_NAME_COLUMN, tag.tagName)
         }
@@ -196,6 +204,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
     // Retrieve all tags in the database
     fun getAllTags(): List<Tag> {
+
         val tagsList = mutableListOf<Tag>() // Store tag objects, similar to java arraylist
         val db = writableDatabase // Database manipulator object
 
@@ -207,6 +216,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
             cursor is already past the last entry in the result set.
          */
         while (cursor.moveToNext()) {
+
             // Collect each note record from the database, store data as a note object
             val id = cursor.getInt(cursor.getColumnIndexOrThrow(TAG_ID_COLUMN))
             val name = cursor.getString(cursor.getColumnIndexOrThrow(TAG_NAME_COLUMN))
@@ -225,9 +235,11 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
     // Update a tag in the database w/ the edited version
     fun updateTag(tag: Tag){
+
         val db = writableDatabase // Database manipulator object
 
         val values = ContentValues().apply {
+
             put(TAG_NAME_COLUMN, tag.tagName)
         }
 
@@ -240,6 +252,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
     // Get a specific tag from the database using its id
     fun getTagByID(tagID: Int): Tag {
+
         val db = readableDatabase // Database accessor object
 
         val query = "SELECT * FROM $TAG_TABLE_NAME WHERE $TAG_ID_COLUMN = $tagID"
@@ -263,6 +276,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
     // Remove a specific tag from the database using its id
     fun deleteTag(tagID: Int) {
+
         val db = writableDatabase // Database manipulator object
 
         val whereClause = "$TAG_ID_COLUMN = ?"

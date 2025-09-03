@@ -59,6 +59,7 @@ class TagDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
 
         // Handle click to change selection
         holder.tagCardView.setOnClickListener {
+
             onTagClickedFunction(position)
         }
     }
@@ -75,9 +76,12 @@ class TagDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
 
         val previousPosition = selectedPosition
         selectedPosition = position
+
         if (previousPosition != null) {
+
             notifyItemChanged(previousPosition)
         }
+
         notifyItemChanged(position)
     }
 
@@ -91,7 +95,8 @@ class TagDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
             holder.tagLayoutView.setBackgroundColor(ContextCompat.getColor(context, R.color.gold))
             holder.tagName.setTextColor(ContextCompat.getColor(context, R.color.dark_grey))
             holder.tagName.setTypeface(null, Typeface.BOLD);
-        } else {
+        }
+        else {
 
             // Reset other items to default
             holder.tagLayoutView.setBackgroundColor(
@@ -100,9 +105,10 @@ class TagDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
                     R.color.dark_grey
                 )
             )
+
             holder.tagName.setTextColor(ContextCompat.getColor(context, R.color.light_grey_2))
             holder.tagName.setTypeface(null, Typeface.NORMAL);
         }
-
     }
+
 }

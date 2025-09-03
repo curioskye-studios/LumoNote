@@ -41,6 +41,7 @@ class TextFormatFragment: Fragment() {
 
     // Called when the Fragment is created (before the UI exists)
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
         inputViewModel = ViewModelProvider(requireActivity()).get(InputViewModel::class.java)
@@ -52,6 +53,7 @@ class TextFormatFragment: Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         // Inflate the layout for requireContext() fragment
         _textFormatViewBinding = FragmentTextFormatBinding.inflate(inflater, container, false)
         return textFormatViewBinding.root // return the root view for the fragment
@@ -59,6 +61,7 @@ class TextFormatFragment: Fragment() {
 
     // Called when the Fragment creates its view
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
 
         textStyleHelper = inputViewModel.textStyleHelper.value
@@ -66,6 +69,7 @@ class TextFormatFragment: Fragment() {
         textBulletHelper = inputViewModel.textBulletHelper.value
 
         inputViewModel.isEditing.observe(viewLifecycleOwner){
+
             if (inputViewModel.isEditing.value == true) {
                 textFormatterOn()
             } else {
@@ -74,6 +78,7 @@ class TextFormatFragment: Fragment() {
             //Log.d("EditInput", "Point 1")
         }
         inputViewModel.openFormatter.observe(viewLifecycleOwner){
+
             if (inputViewModel.openFormatter.value == true) {
                 textFormatterOn()
             } else {
@@ -86,10 +91,14 @@ class TextFormatFragment: Fragment() {
             val relativeSizeSpans = inputViewModel.relativeSizeSpans.value
 
             if (!relativeSizeSpans.isNullOrEmpty()) {
+
                 for (span in relativeSizeSpans) {
+
                     Log.d("Relative Spans", "Span class: ${span::class.java.name}")
                 }
+
             } else {
+
                 Log.d("Relative Spans", "None")
             }
 
@@ -97,12 +106,14 @@ class TextFormatFragment: Fragment() {
             if (!relativeSizeSpans.isNullOrEmpty()) {
 
                 if (relativeSizeSpans[0].sizeChange == TextSize.H1.scaleFactor){
+
                     generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.h1ButtonIV,
                         R.color.gold)
                     generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.h2ButtonIV,
                         R.color.light_grey_1)
                 }
                 else if (relativeSizeSpans[0].sizeChange == TextSize.H2.scaleFactor){
+
                     generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.h2ButtonIV,
                         R.color.gold)
                     generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.h1ButtonIV,
@@ -113,10 +124,13 @@ class TextFormatFragment: Fragment() {
                     R.color.light_grey_1)
             }
             else {
+
                 generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.normalTextButtonIV,
                     R.color.gold)
+
                 generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.h1ButtonIV,
                     R.color.light_grey_1)
+
                 generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.h2ButtonIV,
                     R.color.light_grey_1)
             }
@@ -138,6 +152,7 @@ class TextFormatFragment: Fragment() {
                 generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.boldButtonIV,
                     R.color.gold)
             } else {
+
                 generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.boldButtonIV,
                     R.color.light_grey_1)
             }
@@ -149,6 +164,7 @@ class TextFormatFragment: Fragment() {
                 generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.italicsButtonIV,
                     R.color.gold)
             } else {
+
                 generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.italicsButtonIV,
                     R.color.light_grey_1)
             }
@@ -167,6 +183,7 @@ class TextFormatFragment: Fragment() {
                 generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.underlineButtonIV,
                     R.color.gold)
             } else {
+
                 generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.underlineButtonIV,
                     R.color.light_grey_1)
             }
@@ -220,24 +237,30 @@ class TextFormatFragment: Fragment() {
 
     // Called when the view is destroyed (e.g. when navigating away)
     override fun onDestroyView() {
+
         super.onDestroyView()
         _textFormatViewBinding = null // prevent memory leaks by clearing reference
     }
 
     private fun textFormatterOn() {
+
         // Show the view
         textFormatViewBinding.formatTextSectionRL.visibility = View.VISIBLE
     }
 
     private fun textFormatterOff() {
+
         // Hide the view
         textFormatViewBinding.formatTextSectionRL.visibility = View.GONE
     }
 
     private fun toggleTextFormatter() {
+
         if (textFormatViewBinding.formatTextSectionRL.visibility == View.VISIBLE) {
+
             textFormatterOff()
         } else {
+
             textFormatterOn()
         }
     }

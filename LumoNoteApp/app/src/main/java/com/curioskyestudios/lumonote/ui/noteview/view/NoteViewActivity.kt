@@ -13,9 +13,9 @@ import com.curioskyestudios.lumonote.R
 import com.curioskyestudios.lumonote.data.database.DatabaseHelper
 import com.curioskyestudios.lumonote.data.models.Note
 import com.curioskyestudios.lumonote.databinding.ActivityNoteViewBinding
-import com.curioskyestudios.lumonote.ui.noteview.other.NoteViewFactory
 import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputViewModel
-import com.curioskyestudios.lumonote.ui.noteview.viewmodel.NoteViewModel
+import com.curioskyestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
+import com.curioskyestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.curioskyestudios.lumonote.utils.general.GeneralTextHelper
 import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
 import com.curioskyestudios.lumonote.utils.texthelper.TextBulletHelper
@@ -39,7 +39,7 @@ class NoteViewActivity : AppCompatActivity() {
     private lateinit var retrievedNote: Note
 
     private lateinit var inputViewModel: InputViewModel
-    private lateinit var noteViewModel: NoteViewModel
+    private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
     private var editInputFragment: EditInputFragment = EditInputFragment()
 
 
@@ -50,6 +50,7 @@ class NoteViewActivity : AppCompatActivity() {
         noteViewBinding = ActivityNoteViewBinding.inflate(layoutInflater)
         setContentView(noteViewBinding.root)
 
+
         clearETViewFocusOnHideKeyboard()
 
         notifyIfEditingNoteContent()
@@ -58,11 +59,11 @@ class NoteViewActivity : AppCompatActivity() {
 
         setupTextHelpers()
 
+        insertEditInputFragment()
 
-        supportFragmentManager.beginTransaction().apply {
+        setOnClickListeners()
 
-            replace(noteViewBinding.editSectionFC.id, editInputFragment)
-        }
+        observeNoteViewModelValues()
 
 
         existingNoteClicked = intent.hasExtra("note_id")
@@ -70,7 +71,7 @@ class NoteViewActivity : AppCompatActivity() {
         // If an existing note was clicked on rather than the create button
         if (existingNoteClicked) {
 
-            // Retrieve the data passed in from NotesAdapter.kt
+            // Retrieve the data passed in from NotePreviewAdapter.kt
             noteID = intent.getIntExtra("note_id", -1)
 
             // If no note found, exit activity
@@ -80,7 +81,7 @@ class NoteViewActivity : AppCompatActivity() {
             }
 
             // Get existing note
-            retrievedNote = noteViewModel.getNote(noteID)
+            retrievedNote = noteAppSharedViewModel.getNote(noteID)
 
             populateUIWithNoteData()
 
@@ -94,33 +95,43 @@ class NoteViewActivity : AppCompatActivity() {
         }
 
 
-        setOnClickListeners()
-
-        observeViewModels()
-
         noteViewBinding.noteContentET.onSelectionChange = { start, end ->
+
             updateSelectionAndSpans(start, end)
         }
     }
 
 
     private fun clearETViewFocusOnHideKeyboard(){
+
         noteViewBinding.noteContentET.clearFocusOnKeyboardHide(noteViewBinding.root)
         noteViewBinding.noteTitleET.clearFocusOnKeyboardHide(noteViewBinding.root)
     }
 
     private fun notifyIfEditingNoteContent() {
+
         // For removing text formatter when text content not being edited
         noteViewBinding.noteContentET.setOnFocusChangeListener {_, hasFocus ->
             inputViewModel.setEditing(hasFocus)
         }
     }
 
+    private fun insertEditInputFragment() {
+
+        supportFragmentManager.beginTransaction().apply {
+
+            replace(noteViewBinding.editSectionFC.id, editInputFragment)
+        }
+    }
+
     private fun setupViewModels() {
 
         var dbConnection = DatabaseHelper(this)
-        var noteViewFactory = NoteViewFactory(dbConnection)
-        noteViewModel = ViewModelProvider(this, noteViewFactory).get(NoteViewModel::class.java)
+        var appSharedViewFactory = AppSharedViewFactory(dbConnection)
+
+        noteAppSharedViewModel = ViewModelProvider(this, appSharedViewFactory)
+            .get(NoteAppSharedViewModel::class.java)
+
 
         inputViewModel = ViewModelProvider(this).get(InputViewModel::class.java)
     }
@@ -157,11 +168,11 @@ class NoteViewActivity : AppCompatActivity() {
     }
 
 
-    private fun observeViewModels() {
+    private fun observeNoteViewModelValues() {
 
-        noteViewModel.noteWasCreated.observe(this){
+        noteAppSharedViewModel.noteWasCreated.observe(this){
 
-            if (noteViewModel.noteWasCreated.value == true) {
+            if (noteAppSharedViewModel.noteWasCreated.value == true) {
 
                 // Closes view note activity, pops from activity stack, returns to main below it
                 finish()
@@ -172,9 +183,9 @@ class NoteViewActivity : AppCompatActivity() {
         }
 
 
-        noteViewModel.noteWasUpdated.observe(this){
+        noteAppSharedViewModel.noteWasUpdated.observe(this){
 
-            if (noteViewModel.noteWasUpdated.value == true) {
+            if (noteAppSharedViewModel.noteWasUpdated.value == true) {
 
                 /// Closes view note activity, pops from activity stack, returns to main below it
                 finish()
@@ -184,9 +195,9 @@ class NoteViewActivity : AppCompatActivity() {
             }
         }
 
-        noteViewModel.noteWasDeleted.observe(this){
+        noteAppSharedViewModel.noteWasDeleted.observe(this){
 
-            if (noteViewModel.noteWasDeleted.value == true) {
+            if (noteAppSharedViewModel.noteWasDeleted.value == true) {
 
                 finish()
 
@@ -195,11 +206,11 @@ class NoteViewActivity : AppCompatActivity() {
             }
         }
 
-        noteViewModel.currentNotePinned.observe(this){
+        noteAppSharedViewModel.currentNotePinned.observe(this){
 
             updatePinHighlight()
 
-            if (noteViewModel.currentNotePinned.value == true) {
+            if (noteAppSharedViewModel.currentNotePinned.value == true) {
 
                 // Put small notification popup at bottom of screen
                 Toast.makeText(this, "Note Pinned", Toast.LENGTH_SHORT).show()
@@ -225,7 +236,7 @@ class NoteViewActivity : AppCompatActivity() {
         // Calls reference to the button of id deleteButton in note_item.xml
         noteViewBinding.deleteButtonIV.setOnClickListener {
 
-            noteViewModel.deleteNote(noteID)
+            noteAppSharedViewModel.deleteNote(noteID)
         }
 
 
@@ -236,7 +247,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             noteViewBinding.pinButtonIV.tag = !pinnedFlag
 
-            noteViewModel.updateCurrentPinStatus(!pinnedFlag)
+            noteAppSharedViewModel.updateCurrentPinStatus(!pinnedFlag)
         }
 
 
@@ -279,21 +290,21 @@ class NoteViewActivity : AppCompatActivity() {
         // If an existing note was clicked on rather than the create button
         if (existingNoteClicked) {
 
-            noteViewModel.setIsNewNote(false)
+            noteAppSharedViewModel.setIsNewNote(false)
 
             var updatedNote = Note(retrievedNote.noteID, title, content, retrievedNote.noteCreatedDate,
                 modified, pinned
             )
 
-            noteViewModel.saveNote(updatedNote)
+            noteAppSharedViewModel.saveNote(updatedNote)
 
         } else {
 
-            noteViewModel.setIsNewNote(true)
+            noteAppSharedViewModel.setIsNewNote(true)
 
             var newNote = Note(0, title, content, created, modified, pinned)
 
-            noteViewModel.saveNote(newNote)
+            noteAppSharedViewModel.saveNote(newNote)
         }
     }
 

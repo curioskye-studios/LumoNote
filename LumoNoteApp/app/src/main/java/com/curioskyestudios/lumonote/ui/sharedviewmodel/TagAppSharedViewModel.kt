@@ -1,14 +1,16 @@
-package com.curioskyestudios.lumonote.ui.home.notepreview.viewmodel
+package com.curioskyestudios.lumonote.ui.sharedviewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.curioskyestudios.lumonote.data.database.DatabaseHelper
 import com.curioskyestudios.lumonote.data.models.Tag
 import kotlinx.coroutines.launch
 
-class TagViewModel(private val dbConnection: DatabaseHelper) : ViewModel() {
+class TagAppSharedViewModel(application: Application, private val dbConnection: DatabaseHelper)
+    : AndroidViewModel(application) {
 
     private val _tags = MutableLiveData<List<Tag>>()
     val tags: LiveData<List<Tag>> = _tags

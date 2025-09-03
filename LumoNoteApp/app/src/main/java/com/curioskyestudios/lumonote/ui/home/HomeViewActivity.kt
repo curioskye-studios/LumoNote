@@ -24,6 +24,7 @@ class HomeViewActivity : AppCompatActivity() {
     private lateinit var navigationFragments: MutableList<Fragment>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_view)
 
@@ -85,6 +86,34 @@ class HomeViewActivity : AppCompatActivity() {
     }
 
 
+    private fun switchToFragment(targetFragment: Fragment) {
+
+        supportFragmentManager.beginTransaction().apply {
+
+            for (fragment in navigationFragments) {
+
+                if (fragment == targetFragment) {
+
+                    //show it
+                    show(fragment)
+
+                    //depending on the fragment, update its view model counterpart to active
+                    updateFragmentActiveStatus(fragment, true)
+                } else {
+
+                    // hide the rest
+                    hide(fragment)
+
+                    //make as inactive all the rest in their view model counterpart
+                    updateFragmentActiveStatus(fragment, false)
+                }
+            }
+
+            commit()
+        }
+    }
+
+
     private fun updateFragmentActiveStatus(fragment: Fragment, status: Boolean)  {
 
         when (fragment) {
@@ -95,34 +124,13 @@ class HomeViewActivity : AppCompatActivity() {
         }
     }
 
-    private fun switchToFragment(targetFragment: Fragment) {
-
-        supportFragmentManager.beginTransaction().apply {
-
-            for (fragment in navigationFragments) {
-
-                if (fragment == targetFragment) {
-                    //show it
-                    show(fragment)
-                    //depending on the fragment, update its view model counterpart to active
-                    updateFragmentActiveStatus(fragment, true)
-                } else {
-                    // hide the rest
-                    hide(fragment)
-                    //make as inactive all the rest in their view model counterpart
-                    updateFragmentActiveStatus(fragment, false)
-                }
-            }
-
-            commit()
-        }
-
-    }
-
     private fun updateIVButtonHighlight(buttonImageView: ImageView, isActive: Boolean) {
+
         if (isActive) {
+
             generalUIHelper.changeButtonIVColor(this, buttonImageView, R.color.gold)
         } else {
+
             generalUIHelper.changeButtonIVColor(this, buttonImageView, R.color.light_grey_2)
         }
     }

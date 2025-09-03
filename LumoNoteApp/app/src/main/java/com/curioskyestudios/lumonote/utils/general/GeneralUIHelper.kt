@@ -5,7 +5,9 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 
 class GeneralUIHelper {
+
     fun changeButtonIVColor(context: Context, buttonIV: ImageView, color: Int) {
+
         buttonIV.imageTintList = ContextCompat.getColorStateList(context, color)
     }
 
