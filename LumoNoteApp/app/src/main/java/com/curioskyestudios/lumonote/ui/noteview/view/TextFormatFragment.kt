@@ -13,10 +13,11 @@ import com.curioskyestudios.lumonote.data.models.TextSize
 import com.curioskyestudios.lumonote.data.models.TextStyle
 import com.curioskyestudios.lumonote.databinding.FragmentTextFormatBinding
 import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputViewModel
+import com.curioskyestudios.lumonote.ui.noteview.viewmodel.TextHelperViewModel
 import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
-import com.curioskyestudios.lumonote.utils.texthelper.TextBulletHelper
-import com.curioskyestudios.lumonote.utils.texthelper.TextSizeHelper
-import com.curioskyestudios.lumonote.utils.texthelper.TextStyleHelper
+import com.curioskyestudios.lumonote.utils.textformathelper.TextBulletHelper
+import com.curioskyestudios.lumonote.utils.textformathelper.TextSizeHelper
+import com.curioskyestudios.lumonote.utils.textformathelper.TextStyleHelper
 
 
 class TextFormatFragment: Fragment() {
@@ -34,6 +35,7 @@ class TextFormatFragment: Fragment() {
     private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
 
     private lateinit var inputViewModel: InputViewModel
+    private lateinit var textHelperViewModel: TextHelperViewModel
     private var textStyleHelper: TextStyleHelper? = null
     private var textSizeHelper: TextSizeHelper? = null
     private var textBulletHelper: TextBulletHelper? = null
@@ -45,6 +47,8 @@ class TextFormatFragment: Fragment() {
         super.onCreate(savedInstanceState)
 
         inputViewModel = ViewModelProvider(requireActivity()).get(InputViewModel::class.java)
+
+        textHelperViewModel = ViewModelProvider(requireActivity()).get(TextHelperViewModel::class.java)
 
     }
 
@@ -64,27 +68,29 @@ class TextFormatFragment: Fragment() {
 
         super.onViewCreated(view, savedInstanceState)
 
-        textStyleHelper = inputViewModel.textStyleHelper.value
-        textSizeHelper = inputViewModel.textSizeHelper.value
-        textBulletHelper = inputViewModel.textBulletHelper.value
+        textStyleHelper = textHelperViewModel.textStyleHelper.value
+        textSizeHelper = textHelperViewModel.textSizeHelper.value
+        textBulletHelper = textHelperViewModel.textBulletHelper.value
 
-        inputViewModel.isEditing.observe(viewLifecycleOwner){
+        observeUIInputVMValues()
 
-            if (inputViewModel.isEditing.value == true) {
-                textFormatterOn()
-            } else {
-                textFormatterOff()
-            }
-            //Log.d("EditInput", "Point 1")
-        }
-        inputViewModel.openFormatter.observe(viewLifecycleOwner){
+        observeSpanInputVMValues()
 
-            if (inputViewModel.openFormatter.value == true) {
-                textFormatterOn()
-            } else {
-                textFormatterOff()
-            }
-        }
+        setOnClickListeners()
+
+    }
+
+
+    // Called when the view is destroyed (e.g. when navigating away)
+    override fun onDestroyView() {
+
+        super.onDestroyView()
+        _textFormatViewBinding = null // prevent memory leaks by clearing reference
+    }
+
+
+
+    private fun observeSpanInputVMValues() {
 
         inputViewModel.relativeSizeSpans.observe(viewLifecycleOwner) {
 
@@ -187,10 +193,39 @@ class TextFormatFragment: Fragment() {
                 generalUIHelper.changeButtonIVColor(requireContext(), textFormatViewBinding.underlineButtonIV,
                     R.color.light_grey_1)
             }
+        }
+    }
 
+
+    private fun observeUIInputVMValues() {
+
+        inputViewModel.isEditing.observe(viewLifecycleOwner){
+
+            if (inputViewModel.isEditing.value == true) {
+
+                textFormatterOn()
+            } else {
+
+                textFormatterOff()
+            }
+            //Log.d("EditInput", "Point 1")
         }
 
+        inputViewModel.openFormatter.observe(viewLifecycleOwner){
 
+            if (inputViewModel.openFormatter.value == true) {
+
+                textFormatterOn()
+            } else {
+
+                textFormatterOff()
+            }
+        }
+
+    }
+
+
+    private fun setOnClickListeners() {
 
         textFormatViewBinding.apply {
 
@@ -234,13 +269,6 @@ class TextFormatFragment: Fragment() {
         }
     }
 
-
-    // Called when the view is destroyed (e.g. when navigating away)
-    override fun onDestroyView() {
-
-        super.onDestroyView()
-        _textFormatViewBinding = null // prevent memory leaks by clearing reference
-    }
 
     private fun textFormatterOn() {
 

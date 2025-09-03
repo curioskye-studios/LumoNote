@@ -1,4 +1,4 @@
-package com.curioskyestudios.lumonote.utils.texthelper
+package com.curioskyestudios.lumonote.utils.textformathelper
 
 import android.graphics.Typeface
 import android.text.Editable
@@ -215,6 +215,7 @@ class TextStyleHelper (private val editTextView: EditText) {
 
     private fun toggleBasicFormatting(type: TextStyle, typeface: Int)
         : CharacterStyle? {
+
         val stringBuilder: Editable? = editTextView.text
         val selectionStart: Int = editTextView.selectionStart
         val selectionEnd: Int = editTextView.selectionEnd

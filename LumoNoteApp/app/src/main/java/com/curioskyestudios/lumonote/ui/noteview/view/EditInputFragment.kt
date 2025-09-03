@@ -31,9 +31,9 @@ class EditInputFragment : Fragment() {
 
     private lateinit var inputViewModel: InputViewModel
 
-    private var activeTextFormatBtn = false
-    private var activeColorBtn = false
-    private var activeChecklistBtn = false
+    private var textFormatBtnActive = false
+    private var colorBtnActive = false
+    private var checklistBtnActive = false
 
 
 
@@ -54,6 +54,7 @@ class EditInputFragment : Fragment() {
 
         // Inflate the layout for requireContext() fragment
         _editInputViewBinding = FragmentEditInputBinding.inflate(inflater, container, false)
+
         return editInputViewBinding.root // return the root view for the fragment
     }
 
@@ -64,50 +65,15 @@ class EditInputFragment : Fragment() {
 
         inputViewModel.isEditing.observe(viewLifecycleOwner){
 
-            if (inputViewModel.isEditing.value == true) {
+            textFormatBtnActive = inputViewModel.isEditing.value!!
 
-                isActive(editInputViewBinding.textFormatButtonIV)
-            } else {
-
-                isNotActive(editInputViewBinding.textFormatButtonIV)
-            }
-
-            activeTextFormatBtn = inputViewModel.isEditing.value!!
+            updateButtonIVHighlight(editInputViewBinding.textFormatButtonIV, textFormatBtnActive)
 
             //Log.d("EditInput", "Point 1")
         }
 
 
-        editInputViewBinding.apply {
-
-            colorButtonIV.setOnClickListener {
-
-                activeColorBtn = toggleActiveButton(colorButtonIV, activeColorBtn)
-            }
-
-
-            checkListButtonIV.setOnClickListener {
-
-                activeChecklistBtn = toggleActiveButton(checkListButtonIV, activeChecklistBtn)
-            }
-
-
-            imageButtonIV.setOnClickListener {
-
-                isActive(imageButtonIV)
-
-                Handler(Looper.getMainLooper()).postDelayed({
-                    // Action here
-                    isNotActive(imageButtonIV)
-                }, 1000) // 1000 ms = 1 seconds
-            }
-
-            textFormatButtonIV.setOnClickListener {
-
-                activeTextFormatBtn = toggleActiveButton(textFormatButtonIV, activeTextFormatBtn)
-            }
-        }
-
+        setOnClickListeners()
     }
 
 
@@ -119,35 +85,69 @@ class EditInputFragment : Fragment() {
     }
 
 
-    private fun isActive(buttonIV: ImageView) {
+    private fun setOnClickListeners() {
+
+        editInputViewBinding.apply {
+
+            colorButtonIV.setOnClickListener {
+
+                colorBtnActive = !colorBtnActive
+                updateButtonIVHighlight(colorButtonIV, colorBtnActive)
+            }
+
+
+            checkListButtonIV.setOnClickListener {
+
+                checklistBtnActive = !checklistBtnActive
+                updateButtonIVHighlight(checkListButtonIV, checklistBtnActive)
+            }
+
+
+            imageButtonIV.setOnClickListener {
+
+                highlightButtonIV(imageButtonIV)
+
+                Handler(Looper.getMainLooper()).postDelayed({
+                    // Action here
+                    unhighlightButtonIV(imageButtonIV)
+                }, 1000) // 1000 ms = 1 seconds
+            }
+
+            textFormatButtonIV.setOnClickListener {
+
+                textFormatBtnActive = !textFormatBtnActive
+                updateButtonIVHighlight(textFormatButtonIV, textFormatBtnActive)
+            }
+        }
+    }
+
+
+    private fun highlightButtonIV(buttonIV: ImageView) {
 
         // highlight button
         generalUIHelper.changeButtonIVColor(requireContext(), buttonIV, R.color.gold)
     }
 
-    private fun isNotActive(buttonIV: ImageView) {
+    private fun unhighlightButtonIV(buttonIV: ImageView) {
 
         // unhighlight button
         generalUIHelper.changeButtonIVColor(requireContext(), buttonIV, R.color.light_grey_1)
 
     }
 
-    private fun toggleActiveButton(buttonIV: ImageView, activeFlag: Boolean) : Boolean {
+    private fun updateButtonIVHighlight(buttonIV: ImageView, isActive: Boolean) {
 
         if (buttonIV == editInputViewBinding.textFormatButtonIV) {
 
-            inputViewModel.setOpenFormatter(!activeFlag)
+            inputViewModel.setOpenFormatter(isActive)
         }
 
-        return if (!activeFlag) {
+        if (isActive) {
 
-            isActive(buttonIV)
-            true
-
+            highlightButtonIV(buttonIV)
         } else {
 
-            isNotActive(buttonIV)
-            false
+            unhighlightButtonIV(buttonIV)
         }
     }
 

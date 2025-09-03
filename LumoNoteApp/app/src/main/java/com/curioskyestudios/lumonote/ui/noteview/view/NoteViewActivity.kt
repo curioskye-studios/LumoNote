@@ -14,22 +14,20 @@ import com.curioskyestudios.lumonote.data.database.DatabaseHelper
 import com.curioskyestudios.lumonote.data.models.Note
 import com.curioskyestudios.lumonote.databinding.ActivityNoteViewBinding
 import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputViewModel
+import com.curioskyestudios.lumonote.ui.noteview.viewmodel.TextHelperViewModel
 import com.curioskyestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.curioskyestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.curioskyestudios.lumonote.utils.general.GeneralTextHelper
 import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
-import com.curioskyestudios.lumonote.utils.texthelper.TextBulletHelper
-import com.curioskyestudios.lumonote.utils.texthelper.TextSizeHelper
-import com.curioskyestudios.lumonote.utils.texthelper.TextStyleHelper
+import com.curioskyestudios.lumonote.utils.textformathelper.TextBulletHelper
+import com.curioskyestudios.lumonote.utils.textformathelper.TextSizeHelper
+import com.curioskyestudios.lumonote.utils.textformathelper.TextStyleHelper
 import java.time.LocalDate
 
 
 class NoteViewActivity : AppCompatActivity() {
 
     private lateinit var noteViewBinding: ActivityNoteViewBinding
-    private lateinit var textStyleHelper: TextStyleHelper
-    private lateinit var textSizeHelper: TextSizeHelper
-    private lateinit var textBulletHelper: TextBulletHelper
     private val generalTextHelper: GeneralTextHelper = GeneralTextHelper()
     private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
 
@@ -39,6 +37,7 @@ class NoteViewActivity : AppCompatActivity() {
     private lateinit var retrievedNote: Note
 
     private lateinit var inputViewModel: InputViewModel
+    private lateinit var textHelperViewModel: TextHelperViewModel
     private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
     private var editInputFragment: EditInputFragment = EditInputFragment()
 
@@ -132,19 +131,20 @@ class NoteViewActivity : AppCompatActivity() {
         noteAppSharedViewModel = ViewModelProvider(this, appSharedViewFactory)
             .get(NoteAppSharedViewModel::class.java)
 
-
         inputViewModel = ViewModelProvider(this).get(InputViewModel::class.java)
+
+        textHelperViewModel = ViewModelProvider(this).get(TextHelperViewModel::class.java)
     }
 
     private fun setupTextHelpers() {
 
-        textStyleHelper = TextStyleHelper(noteViewBinding.noteContentET)
-        textSizeHelper = TextSizeHelper(noteViewBinding.noteContentET)
-        textBulletHelper = TextBulletHelper(noteViewBinding.noteContentET)
+        val textStyleHelper = TextStyleHelper(noteViewBinding.noteContentET)
+        val textSizeHelper = TextSizeHelper(noteViewBinding.noteContentET)
+        val textBulletHelper = TextBulletHelper(noteViewBinding.noteContentET)
 
-        inputViewModel.setTextStyleHelper(textStyleHelper)
-        inputViewModel.setTextSizeHelper(textSizeHelper)
-        inputViewModel.setTextBulletHelper(textBulletHelper)
+        textHelperViewModel.setTextStyleHelper(textStyleHelper)
+        textHelperViewModel.setTextSizeHelper(textSizeHelper)
+        textHelperViewModel.setTextBulletHelper(textBulletHelper)
     }
 
 
@@ -326,8 +326,13 @@ class NoteViewActivity : AppCompatActivity() {
         inputViewModel.setSelectionStart(selectStart)
         inputViewModel.setSelectionEnd(selectEnd)
 
+        Log.d("styleSpans", styleSpans?.contentToString() ?: "null")
+        Log.d("underlineSpans", underlineSpans?.contentToString() ?: "null")
+
         inputViewModel.setStyleSpans(styleSpans)
+
         inputViewModel.setUnderlineSpans(underlineSpans)
+
         inputViewModel.setRelativeSizeSpans(relativeSizeSpans)
 
     }

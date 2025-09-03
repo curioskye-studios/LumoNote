@@ -3,9 +3,9 @@ package com.curioskyestudios.lumonote.ui.noteview.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.curioskyestudios.lumonote.utils.texthelper.TextBulletHelper
-import com.curioskyestudios.lumonote.utils.texthelper.TextSizeHelper
-import com.curioskyestudios.lumonote.utils.texthelper.TextStyleHelper
+import com.curioskyestudios.lumonote.utils.textformathelper.TextBulletHelper
+import com.curioskyestudios.lumonote.utils.textformathelper.TextSizeHelper
+import com.curioskyestudios.lumonote.utils.textformathelper.TextStyleHelper
 
 class TextHelperViewModel : ViewModel() {
 
