@@ -336,18 +336,7 @@ class NoteViewActivity : AppCompatActivity() {
                 selectEnd, RelativeSizeSpan::class.java)
 
         Log.d("relativeSizeSpan", relativeSizeSpans?.contentToString() ?: "null")
-
-//        if (!relativeSizeSpans.isNullOrEmpty()) {
-//
-//            for (span in relativeSizeSpans) {
-//
-//                Log.d("Relative Spans", "Span class: ${span::class.java.name}")
-//            }
-//
-//        } else {
-//
-//            Log.d("Relative Spans", "None")
-//        }
+        
 
         if (relativeSizeSpans?.isNotEmpty() == true) {
 
