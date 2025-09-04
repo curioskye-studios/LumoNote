@@ -6,12 +6,12 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.curioskyestudios.lumonote.R
 import com.curioskyestudios.lumonote.databinding.FragmentEditInputBinding
-import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputViewModel
+import com.curioskyestudios.lumonote.ui.noteview.viewmodel.EditInputViewModel
+import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
+import com.curioskyestudios.lumonote.ui.noteview.viewmodel.TextHelperSharedViewModel
 import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
 
 
@@ -29,12 +29,9 @@ class EditInputFragment : Fragment() {
 
     private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
 
-    private lateinit var inputViewModel: InputViewModel
-
-    private var textFormatBtnActive = false
-    private var colorBtnActive = false
-    private var checklistBtnActive = false
-
+    private lateinit var editInputViewModel: EditInputViewModel
+    private lateinit var inputSharedViewModel: InputSharedViewModel
+    private lateinit var textHelperSharedViewModel: TextHelperSharedViewModel
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -42,7 +39,12 @@ class EditInputFragment : Fragment() {
 
         super.onCreate(savedInstanceState)
 
-        inputViewModel = ViewModelProvider(requireActivity()).get(InputViewModel::class.java)
+        editInputViewModel = ViewModelProvider(this).get(EditInputViewModel::class.java)
+
+        inputSharedViewModel = ViewModelProvider(requireActivity()).get(InputSharedViewModel::class.java)
+
+        textHelperSharedViewModel =
+            ViewModelProvider(requireActivity()).get(TextHelperSharedViewModel::class.java)
 
     }
 
@@ -63,18 +65,13 @@ class EditInputFragment : Fragment() {
 
         super.onViewCreated(view, savedInstanceState)
 
-        inputViewModel.isEditing.observe(viewLifecycleOwner){
+        observeEditInputVMValues()
 
-            textFormatBtnActive = inputViewModel.isEditing.value!!
-
-            updateButtonIVHighlight(editInputViewBinding.textFormatButtonIV, textFormatBtnActive)
-
-            //Log.d("EditInput", "Point 1")
-        }
-
+        observeInputVMValues()
 
         setOnClickListeners()
     }
+
 
 
     // Called when the view is destroyed (e.g. when navigating away)
@@ -85,71 +82,112 @@ class EditInputFragment : Fragment() {
     }
 
 
+
+    private fun observeEditInputVMValues() {
+
+        editInputViewModel.apply {
+
+            textFormatBtnActive.observe(viewLifecycleOwner) {
+
+                val isActive = it
+                generalUIHelper.updateButtonIVHighlight(editInputViewBinding.textFormatButtonIV,
+                    isActive, requireContext())
+            }
+
+            colorBtnActive.observe(viewLifecycleOwner) {
+
+                val isActive = it
+                generalUIHelper.updateButtonIVHighlight(editInputViewBinding.colorButtonIV,
+                    isActive, requireContext())
+            }
+
+            checklistBtnActive.observe(viewLifecycleOwner) {
+
+                val isActive = it
+                generalUIHelper.updateButtonIVHighlight(editInputViewBinding.checkListButtonIV,
+                    isActive, requireContext())
+            }
+        }
+    }
+
+
+    private fun observeInputVMValues() {
+
+        inputSharedViewModel.apply {
+
+            // watch to know when editing note content
+            isEditing.observe(viewLifecycleOwner){
+
+                val isEditingStatus = it
+                val textFormatIsActive =
+                    editInputViewModel.textFormatBtnActive.value as Boolean
+
+                // ensure status is consistent
+                if (isEditingStatus != textFormatIsActive) {
+
+                    editInputViewModel.setTextFormatBtnActive(!textFormatIsActive)
+                }
+
+                generalUIHelper.updateButtonIVHighlight(editInputViewBinding.textFormatButtonIV,
+                    isEditingStatus, requireContext())
+            }
+
+        }
+
+    }
+
+
     private fun setOnClickListeners() {
 
         editInputViewBinding.apply {
 
             colorButtonIV.setOnClickListener {
 
-                colorBtnActive = !colorBtnActive
-                updateButtonIVHighlight(colorButtonIV, colorBtnActive)
+                val colorActiveStatus =
+                    editInputViewModel.colorBtnActive.value as Boolean
+
+                editInputViewModel.setColorBtnActive(!colorActiveStatus)
+
+                generalUIHelper.updateButtonIVHighlight(colorButtonIV, !colorActiveStatus,
+                    requireContext())
             }
 
 
             checkListButtonIV.setOnClickListener {
 
-                checklistBtnActive = !checklistBtnActive
-                updateButtonIVHighlight(checkListButtonIV, checklistBtnActive)
+                val checklistActiveStatus =
+                    editInputViewModel.checklistBtnActive.value as Boolean
+
+                editInputViewModel.setChecklistBtnActive(!checklistActiveStatus)
+
+                generalUIHelper.updateButtonIVHighlight(checkListButtonIV, !checklistActiveStatus,
+                    requireContext())
             }
 
 
             imageButtonIV.setOnClickListener {
 
-                highlightButtonIV(imageButtonIV)
+                generalUIHelper.highlightButtonIV(imageButtonIV, requireContext())
 
                 Handler(Looper.getMainLooper()).postDelayed({
                     // Action here
-                    unhighlightButtonIV(imageButtonIV)
+                    generalUIHelper.unhighlightButtonIV(imageButtonIV, requireContext())
                 }, 1000) // 1000 ms = 1 seconds
             }
 
             textFormatButtonIV.setOnClickListener {
 
-                textFormatBtnActive = !textFormatBtnActive
-                updateButtonIVHighlight(textFormatButtonIV, textFormatBtnActive)
+                val textFormatActiveStatus =
+                    editInputViewModel.textFormatBtnActive.value as Boolean
+
+                editInputViewModel.setTextFormatBtnActive(!textFormatActiveStatus)
+
+                textHelperSharedViewModel.setOpenFormatter(!textFormatActiveStatus)
+
+                generalUIHelper.updateButtonIVHighlight(textFormatButtonIV,
+                    !textFormatActiveStatus, requireContext())
             }
         }
     }
-
-
-    private fun highlightButtonIV(buttonIV: ImageView) {
-
-        // highlight button
-        generalUIHelper.changeButtonIVColor(requireContext(), buttonIV, R.color.gold)
-    }
-
-    private fun unhighlightButtonIV(buttonIV: ImageView) {
-
-        // unhighlight button
-        generalUIHelper.changeButtonIVColor(requireContext(), buttonIV, R.color.light_grey_1)
-
-    }
-
-    private fun updateButtonIVHighlight(buttonIV: ImageView, isActive: Boolean) {
-
-        if (buttonIV == editInputViewBinding.textFormatButtonIV) {
-
-            inputViewModel.setOpenFormatter(isActive)
-        }
-
-        if (isActive) {
-
-            highlightButtonIV(buttonIV)
-        } else {
-
-            unhighlightButtonIV(buttonIV)
-        }
-    }
-
 
 }

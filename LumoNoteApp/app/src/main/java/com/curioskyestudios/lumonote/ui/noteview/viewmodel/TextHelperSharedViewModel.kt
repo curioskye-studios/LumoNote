@@ -7,7 +7,12 @@ import com.curioskyestudios.lumonote.utils.textformathelper.TextBulletHelper
 import com.curioskyestudios.lumonote.utils.textformathelper.TextSizeHelper
 import com.curioskyestudios.lumonote.utils.textformathelper.TextStyleHelper
 
-class TextHelperViewModel : ViewModel() {
+class TextHelperSharedViewModel : ViewModel() {
+
+    // LiveData to track if TextFormatter should be visible
+    private val _openFormatter = MutableLiveData(false)
+    val openFormatter: LiveData<Boolean> get() = _openFormatter
+
 
     private val _textStyleHelper = MutableLiveData<TextStyleHelper>()
     val textStyleHelper: LiveData<TextStyleHelper> get() = _textStyleHelper
@@ -17,6 +22,12 @@ class TextHelperViewModel : ViewModel() {
 
     private val _textBulletHelper = MutableLiveData<TextBulletHelper>()
     val textBulletHelper: LiveData<TextBulletHelper> get() = _textBulletHelper
+
+
+    fun setOpenFormatter(open: Boolean) {
+
+        _openFormatter.value = open
+    }
 
 
     fun setTextStyleHelper(textStyleHelper: TextStyleHelper) {

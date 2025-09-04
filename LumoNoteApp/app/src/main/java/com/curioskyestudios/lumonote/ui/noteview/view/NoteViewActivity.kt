@@ -1,5 +1,6 @@
 package com.curioskyestudios.lumonote.ui.noteview.view
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
@@ -12,9 +13,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.curioskyestudios.lumonote.R
 import com.curioskyestudios.lumonote.data.database.DatabaseHelper
 import com.curioskyestudios.lumonote.data.models.Note
+import com.curioskyestudios.lumonote.data.models.TextSize
+import com.curioskyestudios.lumonote.data.models.TextStyle
 import com.curioskyestudios.lumonote.databinding.ActivityNoteViewBinding
-import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputViewModel
-import com.curioskyestudios.lumonote.ui.noteview.viewmodel.TextHelperViewModel
+import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
+import com.curioskyestudios.lumonote.ui.noteview.viewmodel.TextHelperSharedViewModel
 import com.curioskyestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.curioskyestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.curioskyestudios.lumonote.utils.general.GeneralTextHelper
@@ -36,8 +39,12 @@ class NoteViewActivity : AppCompatActivity() {
     private var existingNoteClicked: Boolean = false
     private lateinit var retrievedNote: Note
 
-    private lateinit var inputViewModel: InputViewModel
-    private lateinit var textHelperViewModel: TextHelperViewModel
+    private lateinit var textStyleHelper: TextStyleHelper
+    private lateinit var textSizeHelper: TextSizeHelper
+    private lateinit var textBulletHelper: TextBulletHelper
+
+    private lateinit var inputSharedViewModel: InputSharedViewModel
+    private lateinit var textHelperSharedViewModel: TextHelperSharedViewModel
     private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
     private var editInputFragment: EditInputFragment = EditInputFragment()
 
@@ -62,7 +69,7 @@ class NoteViewActivity : AppCompatActivity() {
 
         setOnClickListeners()
 
-        observeNoteViewModelValues()
+        observeNoteVMValues()
 
 
         existingNoteClicked = intent.hasExtra("note_id")
@@ -94,10 +101,7 @@ class NoteViewActivity : AppCompatActivity() {
         }
 
 
-        noteViewBinding.noteContentET.onSelectionChange = { start, end ->
-
-            updateSelectionAndSpans(start, end)
-        }
+        updateSelectionAndSpans()
     }
 
 
@@ -111,7 +115,7 @@ class NoteViewActivity : AppCompatActivity() {
 
         // For removing text formatter when text content not being edited
         noteViewBinding.noteContentET.setOnFocusChangeListener {_, hasFocus ->
-            inputViewModel.setEditing(hasFocus)
+            inputSharedViewModel.setEditing(hasFocus)
         }
     }
 
@@ -131,20 +135,20 @@ class NoteViewActivity : AppCompatActivity() {
         noteAppSharedViewModel = ViewModelProvider(this, appSharedViewFactory)
             .get(NoteAppSharedViewModel::class.java)
 
-        inputViewModel = ViewModelProvider(this).get(InputViewModel::class.java)
+        inputSharedViewModel = ViewModelProvider(this).get(InputSharedViewModel::class.java)
 
-        textHelperViewModel = ViewModelProvider(this).get(TextHelperViewModel::class.java)
+        textHelperSharedViewModel = ViewModelProvider(this).get(TextHelperSharedViewModel::class.java)
     }
 
     private fun setupTextHelpers() {
 
-        val textStyleHelper = TextStyleHelper(noteViewBinding.noteContentET)
-        val textSizeHelper = TextSizeHelper(noteViewBinding.noteContentET)
-        val textBulletHelper = TextBulletHelper(noteViewBinding.noteContentET)
+        textStyleHelper = TextStyleHelper(noteViewBinding.noteContentET)
+        textSizeHelper = TextSizeHelper(noteViewBinding.noteContentET)
+        textBulletHelper = TextBulletHelper(noteViewBinding.noteContentET)
 
-        textHelperViewModel.setTextStyleHelper(textStyleHelper)
-        textHelperViewModel.setTextSizeHelper(textSizeHelper)
-        textHelperViewModel.setTextBulletHelper(textBulletHelper)
+        textHelperSharedViewModel.setTextStyleHelper(textStyleHelper)
+        textHelperSharedViewModel.setTextSizeHelper(textSizeHelper)
+        textHelperSharedViewModel.setTextBulletHelper(textBulletHelper)
     }
 
 
@@ -168,7 +172,7 @@ class NoteViewActivity : AppCompatActivity() {
     }
 
 
-    private fun observeNoteViewModelValues() {
+    private fun observeNoteVMValues() {
 
         noteAppSharedViewModel.noteWasCreated.observe(this){
 
@@ -309,31 +313,110 @@ class NoteViewActivity : AppCompatActivity() {
     }
 
 
-    private fun updateSelectionAndSpans(selectStart: Int, selectEnd: Int) {
+    private fun updateSelectionAndSpans() {
 
-        val noteContent = noteViewBinding.noteContentET
-        val selected = noteContent.text?.substring(selectStart, selectEnd)
-        Log.d("Selection", "Selected: $selected")
+        noteViewBinding.noteContentET.onSelectionChange = { selectStart, selectEnd ->
 
-        val styleSpans = noteContent.text?.getSpans<StyleSpan>(selectStart, selectEnd)
-        val underlineSpans =
-            noteContent.text?.getSpans<TextStyleHelper.CustomUnderlineSpan>(selectStart, selectEnd)
+            val noteContent = noteViewBinding.noteContentET
+            val selected = noteContent.text?.substring(selectStart, selectEnd)
 
-        val relativeSizeSpans = noteContent.text?.getSpans(selectStart,
-            selectEnd, RelativeSizeSpan::class.java)
+            Log.d("Selection", "Selected: $selected")
+
+            checkForHeaderSizing(selectStart, selectEnd)
+
+            checkForStyleFormatting(selectStart, selectEnd)
+        }
+    }
+
+
+    private fun checkForHeaderSizing(selectStart: Int, selectEnd: Int) {
+
+        val relativeSizeSpans =
+            noteViewBinding.noteContentET.text?.getSpans(selectStart,
+                selectEnd, RelativeSizeSpan::class.java)
+
         Log.d("relativeSizeSpan", relativeSizeSpans?.contentToString() ?: "null")
 
-        inputViewModel.setSelectionStart(selectStart)
-        inputViewModel.setSelectionEnd(selectEnd)
+//        if (!relativeSizeSpans.isNullOrEmpty()) {
+//
+//            for (span in relativeSizeSpans) {
+//
+//                Log.d("Relative Spans", "Span class: ${span::class.java.name}")
+//            }
+//
+//        } else {
+//
+//            Log.d("Relative Spans", "None")
+//        }
+
+        if (relativeSizeSpans?.isNotEmpty() == true) {
+
+            if (relativeSizeSpans[0].sizeChange == TextSize.H1.scaleFactor){
+
+                inputSharedViewModel.setIsHeader1Sized(true)
+            }
+            else if (relativeSizeSpans[0].sizeChange == TextSize.H2.scaleFactor){
+
+                inputSharedViewModel.setIsHeader2Sized(true)
+            }
+        } else {
+
+            inputSharedViewModel.setIsNormalSized(true)
+        }
+    }
+
+
+    private fun checkForStyleFormatting(selectStart: Int, selectEnd: Int){
+
+        val styleSpans =
+            noteViewBinding.noteContentET.text?.getSpans<StyleSpan>(selectStart, selectEnd)
+
+        val underlineSpans = noteViewBinding.noteContentET.text?.
+            getSpans<TextStyleHelper.CustomUnderlineSpan>(selectStart, selectEnd)
 
         Log.d("styleSpans", styleSpans?.contentToString() ?: "null")
         Log.d("underlineSpans", underlineSpans?.contentToString() ?: "null")
 
-        inputViewModel.setStyleSpans(styleSpans)
+        if (styleSpans?.isNotEmpty() == true) {
 
-        inputViewModel.setUnderlineSpans(underlineSpans)
+            if (textStyleHelper.isAllSpanned(TextStyle.BOLD) ||
+                (styleSpans.any { it.style == Typeface.BOLD } && selectStart == selectEnd)) {
 
-        inputViewModel.setRelativeSizeSpans(relativeSizeSpans)
+                inputSharedViewModel.setIsBold(true)
+            } else {
+
+                inputSharedViewModel.setIsBold(false)
+            }
+
+
+            if (textStyleHelper.isAllSpanned(TextStyle.ITALICS) ||
+                (styleSpans.any { it.style == Typeface.ITALIC } && selectStart == selectEnd)) {
+
+                inputSharedViewModel.setIsItalics(true)
+            } else {
+
+                inputSharedViewModel.setIsItalics(false)
+            }
+        } else {
+
+            inputSharedViewModel.setIsBold(false)
+            inputSharedViewModel.setIsItalics(false)
+        }
+
+        if (underlineSpans?.isNotEmpty() == true) {
+
+            if (textStyleHelper.isAllSpanned(TextStyle.UNDERLINE) ||
+                (underlineSpans.isNotEmpty() && selectStart == selectEnd)) {
+
+                inputSharedViewModel.setIsUnderlined(true)
+            } else {
+
+                inputSharedViewModel.setIsUnderlined(false)
+            }
+        } else {
+
+            inputSharedViewModel.setIsUnderlined(false)
+        }
 
     }
 
