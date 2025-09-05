@@ -20,6 +20,11 @@ class SpanningSelectableEditText(context: Context, attrs: AttributeSet?)
 
     var onSelectionChange: ((Int, Int) -> Unit)? = null
 
+    override fun onSelectionChanged(selStart: Int, selEnd: Int) {
+
+        super.onSelectionChanged(selStart, selEnd)
+        onSelectionChange?.invoke(selStart, selEnd)
+    }
 
     fun getStyleHelper() : TextStyleHelper {
 
@@ -39,12 +44,6 @@ class SpanningSelectableEditText(context: Context, attrs: AttributeSet?)
     fun getSpanChecker() : TextSpanChecker {
 
         return textSpanChecker
-    }
-
-    override fun onSelectionChanged(selStart: Int, selEnd: Int) {
-
-        super.onSelectionChanged(selStart, selEnd)
-        onSelectionChange?.invoke(selStart, selEnd)
     }
 
     fun clearFocusOnKeyboardHide(rootView: View) {
