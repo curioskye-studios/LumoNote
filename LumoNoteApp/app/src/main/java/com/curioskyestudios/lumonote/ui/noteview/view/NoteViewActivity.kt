@@ -1,16 +1,10 @@
 package com.curioskyestudios.lumonote.ui.noteview.view
 
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.style.RelativeSizeSpan
-import android.text.style.StyleSpan
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.getSpans
 import androidx.lifecycle.ViewModelProvider
-import com.curioskyestudios.lumonote.R
 import com.curioskyestudios.lumonote.data.database.DatabaseHelper
 import com.curioskyestudios.lumonote.data.models.Note
 import com.curioskyestudios.lumonote.data.models.TextSize
@@ -20,11 +14,13 @@ import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.curioskyestudios.lumonote.ui.noteview.viewmodel.TextHelperSharedViewModel
 import com.curioskyestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.curioskyestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
+import com.curioskyestudios.lumonote.utils.edittexthelper.TextBulletHelper
+import com.curioskyestudios.lumonote.utils.edittexthelper.TextSizeHelper
+import com.curioskyestudios.lumonote.utils.edittexthelper.TextSpanChecker
+import com.curioskyestudios.lumonote.utils.edittexthelper.TextStyleHelper
+import com.curioskyestudios.lumonote.utils.general.BasicUtilityHelper
 import com.curioskyestudios.lumonote.utils.general.GeneralTextHelper
 import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
-import com.curioskyestudios.lumonote.utils.textformathelper.TextBulletHelper
-import com.curioskyestudios.lumonote.utils.textformathelper.TextSizeHelper
-import com.curioskyestudios.lumonote.utils.textformathelper.TextStyleHelper
 import java.time.LocalDate
 
 
@@ -42,6 +38,8 @@ class NoteViewActivity : AppCompatActivity() {
     private lateinit var textStyleHelper: TextStyleHelper
     private lateinit var textSizeHelper: TextSizeHelper
     private lateinit var textBulletHelper: TextBulletHelper
+    private lateinit var textSpanChecker: TextSpanChecker
+    private val basicUtilityHelper = BasicUtilityHelper()
 
     private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var textHelperSharedViewModel: TextHelperSharedViewModel
@@ -56,21 +54,101 @@ class NoteViewActivity : AppCompatActivity() {
         noteViewBinding = ActivityNoteViewBinding.inflate(layoutInflater)
         setContentView(noteViewBinding.root)
 
+        // Set up view models
+        var dbConnection = DatabaseHelper(this)
+        var appSharedViewFactory = AppSharedViewFactory(dbConnection)
 
-        clearETViewFocusOnHideKeyboard()
+        noteAppSharedViewModel = ViewModelProvider(this, appSharedViewFactory)
+            .get(NoteAppSharedViewModel::class.java)
+
+        inputSharedViewModel = ViewModelProvider(this).get(InputSharedViewModel::class.java)
+
+        textHelperSharedViewModel = ViewModelProvider(this).get(TextHelperSharedViewModel::class.java)
+
+
+        val isExistingNote = checkIfIsExistingNote()
+        if (isExistingNote == null) {
+
+            finish()
+            return
+        } else {
+
+            populateUIWithNoteData(isExistingNote)
+        }
+
+        //insert EditInputFragment
+        supportFragmentManager.beginTransaction().apply {
+
+            replace(noteViewBinding.editSectionFC.id, editInputFragment)
+        }
+
+        // Set up text helpers
+        textSpanChecker = TextSpanChecker(noteViewBinding.noteContentET)
+        textStyleHelper = TextStyleHelper(noteViewBinding.noteContentET)
+        textSizeHelper = TextSizeHelper(noteViewBinding.noteContentET)
+        textBulletHelper = TextBulletHelper(noteViewBinding.noteContentET)
+
+        textHelperSharedViewModel.setTextStyleHelper(textStyleHelper)
+        textHelperSharedViewModel.setTextSizeHelper(textSizeHelper)
+        textHelperSharedViewModel.setTextBulletHelper(textBulletHelper)
+
+
+        // Setup Functionality
+        noteViewBinding.apply {
+            basicUtilityHelper.clearETViewFocusOnHideKeyboard(arrayOf(noteTitleET, noteContentET), root)
+        }
 
         notifyIfEditingNoteContent()
 
-        setupViewModels()
-
-        setupTextHelpers()
-
-        insertEditInputFragment()
+        updateSelectionOnChange()
 
         setOnClickListeners()
 
         observeNoteVMValues()
 
+        finalNoteFeedback()
+    }
+
+
+    private fun notifyIfEditingNoteContent() {
+
+        // For removing text formatter when text content not being edited
+        noteViewBinding.noteContentET.setOnFocusChangeListener {_, hasFocus ->
+
+            inputSharedViewModel.setEditing(hasFocus)
+        }
+    }
+
+    private fun updateSelectionOnChange() {
+
+        noteViewBinding.noteContentET.onSelectionChange = { selectStart, selectEnd ->
+
+            textSpanChecker.apply {
+
+                setSelection(selectStart, selectEnd)
+
+                when (getTextSizingType()) {
+
+                    TextSize.H1 -> inputSharedViewModel.setIsHeader1Sized(true)
+                    TextSize.H2 -> inputSharedViewModel.setIsHeader2Sized(true)
+                    TextSize.NORMAL -> inputSharedViewModel.setIsNormalSized(true)
+                }
+
+                val styleIsPresentValues = getTextStylePresentValues(textStyleHelper)
+
+                val isBold = styleIsPresentValues[TextStyle.BOLD] as Boolean
+                val isItalics = styleIsPresentValues[TextStyle.ITALICS] as Boolean
+                val isUnderlined = styleIsPresentValues[TextStyle.UNDERLINE] as Boolean
+
+                inputSharedViewModel.setIsBold(isBold)
+                inputSharedViewModel.setIsItalics(isItalics)
+                inputSharedViewModel.setIsUnderlined(isUnderlined)
+            }
+
+        }
+    }
+
+    private fun checkIfIsExistingNote() : Boolean? {
 
         existingNoteClicked = intent.hasExtra("note_id")
 
@@ -82,16 +160,40 @@ class NoteViewActivity : AppCompatActivity() {
 
             // If no note found, exit activity
             if (noteID == -1) {
-                finish()
-                return
+                return null
             }
 
             // Get existing note
             retrievedNote = noteAppSharedViewModel.getNote(noteID)
+        }
 
-            populateUIWithNoteData()
+        return existingNoteClicked
+    }
 
-        } else {
+
+    private fun populateUIWithNoteData(usingExistingNote: Boolean) {
+
+        if (usingExistingNote) {
+
+            Log.d("populateUIWithNoteData", retrievedNote.noteModifiedDate)
+
+            // Parse the modified date as a date object
+            val convertedDate = LocalDate.parse(retrievedNote.noteModifiedDate);
+            val retrievedNoteDate = generalTextHelper.formatDate(convertedDate)
+
+            Log.d("noteData", retrievedNote.notePinned.toString())
+
+            // Populate the view note activity UI w/ the pre-existing note data
+            noteViewBinding.modifiedDateTV.text = retrievedNoteDate
+            noteViewBinding.noteTitleET.setText(retrievedNote.noteTitle)
+            noteViewBinding.noteContentET.setText(retrievedNote.noteContent)
+
+            noteViewBinding.pinButtonIV.tag = retrievedNote.notePinned
+
+            generalUIHelper.updatePinHighlight(noteViewBinding.pinButtonIV, this)
+        }
+
+        else {
 
             // Display the modified date as current date
             noteViewBinding.modifiedDateTV.text = generalTextHelper.formatDate(LocalDate.now())
@@ -99,130 +201,21 @@ class NoteViewActivity : AppCompatActivity() {
             // set isPinned to false
             noteViewBinding.pinButtonIV.tag = false
         }
-
-
-        updateSelectionAndSpans()
-    }
-
-
-    private fun clearETViewFocusOnHideKeyboard(){
-
-        noteViewBinding.noteContentET.clearFocusOnKeyboardHide(noteViewBinding.root)
-        noteViewBinding.noteTitleET.clearFocusOnKeyboardHide(noteViewBinding.root)
-    }
-
-    private fun notifyIfEditingNoteContent() {
-
-        // For removing text formatter when text content not being edited
-        noteViewBinding.noteContentET.setOnFocusChangeListener {_, hasFocus ->
-            inputSharedViewModel.setEditing(hasFocus)
-        }
-    }
-
-    private fun insertEditInputFragment() {
-
-        supportFragmentManager.beginTransaction().apply {
-
-            replace(noteViewBinding.editSectionFC.id, editInputFragment)
-        }
-    }
-
-    private fun setupViewModels() {
-
-        var dbConnection = DatabaseHelper(this)
-        var appSharedViewFactory = AppSharedViewFactory(dbConnection)
-
-        noteAppSharedViewModel = ViewModelProvider(this, appSharedViewFactory)
-            .get(NoteAppSharedViewModel::class.java)
-
-        inputSharedViewModel = ViewModelProvider(this).get(InputSharedViewModel::class.java)
-
-        textHelperSharedViewModel = ViewModelProvider(this).get(TextHelperSharedViewModel::class.java)
-    }
-
-    private fun setupTextHelpers() {
-
-        textStyleHelper = TextStyleHelper(noteViewBinding.noteContentET)
-        textSizeHelper = TextSizeHelper(noteViewBinding.noteContentET)
-        textBulletHelper = TextBulletHelper(noteViewBinding.noteContentET)
-
-        textHelperSharedViewModel.setTextStyleHelper(textStyleHelper)
-        textHelperSharedViewModel.setTextSizeHelper(textSizeHelper)
-        textHelperSharedViewModel.setTextBulletHelper(textBulletHelper)
-    }
-
-
-    private fun populateUIWithNoteData() {
-
-        Log.d("populateUIWithNoteData", retrievedNote.noteModifiedDate)
-
-        // Parse the modified date as a date object
-        val convertedDate = LocalDate.parse(retrievedNote.noteModifiedDate);
-        val retrievedNoteDate = generalTextHelper.formatDate(convertedDate)
-
-        Log.d("noteData", retrievedNote.notePinned.toString())
-
-        // Populate the view note activity UI w/ the pre-existing note data
-        noteViewBinding.modifiedDateTV.text = retrievedNoteDate
-        noteViewBinding.noteTitleET.setText(retrievedNote.noteTitle)
-        noteViewBinding.noteContentET.setText(retrievedNote.noteContent)
-
-        noteViewBinding.pinButtonIV.tag = retrievedNote.notePinned
-        updatePinHighlight()
     }
 
 
     private fun observeNoteVMValues() {
 
-        noteAppSharedViewModel.noteWasCreated.observe(this){
-
-            if (noteAppSharedViewModel.noteWasCreated.value == true) {
-
-                // Closes view note activity, pops from activity stack, returns to main below it
-                finish()
-
-                // Put small notification popup at bottom of screen
-                Toast.makeText(this, "Note Created", Toast.LENGTH_LONG).show()
-            }
-        }
-
-
-        noteAppSharedViewModel.noteWasUpdated.observe(this){
-
-            if (noteAppSharedViewModel.noteWasUpdated.value == true) {
-
-                /// Closes view note activity, pops from activity stack, returns to main below it
-                finish()
-
-                // Put small notification popup at bottom of screen
-                Toast.makeText(this, "Changes Saved", Toast.LENGTH_LONG).show()
-            }
-        }
-
-        noteAppSharedViewModel.noteWasDeleted.observe(this){
-
-            if (noteAppSharedViewModel.noteWasDeleted.value == true) {
-
-                finish()
-
-                // Put small notification popup at bottom of screen
-                Toast.makeText(this, "Note Deleted", Toast.LENGTH_SHORT).show()
-            }
-        }
-
         noteAppSharedViewModel.currentNotePinned.observe(this){
 
-            updatePinHighlight()
+            generalUIHelper.updatePinHighlight(noteViewBinding.pinButtonIV, this)
 
-            if (noteAppSharedViewModel.currentNotePinned.value == true) {
+            val pinStateFeedback =
+                if (noteAppSharedViewModel.currentNotePinned.value == true) { "Note Pinned" }
 
-                // Put small notification popup at bottom of screen
-                Toast.makeText(this, "Note Pinned", Toast.LENGTH_SHORT).show()
-            } else {
+                else { "Note Unpinned" }
 
-                // Put small notification popup at bottom of screen
-                Toast.makeText(this, "Note Unpinned", Toast.LENGTH_SHORT).show()
-            }
+            generalUIHelper.displayFeedbackToast(this, pinStateFeedback, false)
         }
     }
 
@@ -262,7 +255,8 @@ class NoteViewActivity : AppCompatActivity() {
         }
 
 
-        val backButtonPressedCallback = object : OnBackPressedCallback(true) {
+        val backButtonPressedCallback =
+            object : OnBackPressedCallback(true) {
 
             override fun handleOnBackPressed() {
                 // Custom logic for back button press
@@ -313,113 +307,31 @@ class NoteViewActivity : AppCompatActivity() {
     }
 
 
-    private fun updateSelectionAndSpans() {
 
-        noteViewBinding.noteContentET.onSelectionChange = { selectStart, selectEnd ->
+    private fun finalNoteFeedback() {
 
-            val noteContent = noteViewBinding.noteContentET
-            val selected = noteContent.text?.substring(selectStart, selectEnd)
+        noteAppSharedViewModel.noteWasCreated.observe(this){
 
-            Log.d("Selection", "Selected: $selected")
+            if (noteAppSharedViewModel.noteWasCreated.value == true) {
 
-            checkForHeaderSizing(selectStart, selectEnd)
-
-            checkForStyleFormatting(selectStart, selectEnd)
-        }
-    }
-
-
-    private fun checkForHeaderSizing(selectStart: Int, selectEnd: Int) {
-
-        val relativeSizeSpans =
-            noteViewBinding.noteContentET.text?.getSpans(selectStart,
-                selectEnd, RelativeSizeSpan::class.java)
-
-        Log.d("relativeSizeSpan", relativeSizeSpans?.contentToString() ?: "null")
-        
-
-        if (relativeSizeSpans?.isNotEmpty() == true) {
-
-            if (relativeSizeSpans[0].sizeChange == TextSize.H1.scaleFactor){
-
-                inputSharedViewModel.setIsHeader1Sized(true)
+                generalUIHelper.closeActivityWithFeedback("Note Created", this, this)
             }
-            else if (relativeSizeSpans[0].sizeChange == TextSize.H2.scaleFactor){
-
-                inputSharedViewModel.setIsHeader2Sized(true)
-            }
-        } else {
-
-            inputSharedViewModel.setIsNormalSized(true)
-        }
-    }
-
-
-    private fun checkForStyleFormatting(selectStart: Int, selectEnd: Int){
-
-        val styleSpans =
-            noteViewBinding.noteContentET.text?.getSpans<StyleSpan>(selectStart, selectEnd)
-
-        val underlineSpans = noteViewBinding.noteContentET.text?.
-            getSpans<TextStyleHelper.CustomUnderlineSpan>(selectStart, selectEnd)
-
-        Log.d("styleSpans", styleSpans?.contentToString() ?: "null")
-        Log.d("underlineSpans", underlineSpans?.contentToString() ?: "null")
-
-        if (styleSpans?.isNotEmpty() == true) {
-
-            if (textStyleHelper.isAllSpanned(TextStyle.BOLD) ||
-                (styleSpans.any { it.style == Typeface.BOLD } && selectStart == selectEnd)) {
-
-                inputSharedViewModel.setIsBold(true)
-            } else {
-
-                inputSharedViewModel.setIsBold(false)
-            }
-
-
-            if (textStyleHelper.isAllSpanned(TextStyle.ITALICS) ||
-                (styleSpans.any { it.style == Typeface.ITALIC } && selectStart == selectEnd)) {
-
-                inputSharedViewModel.setIsItalics(true)
-            } else {
-
-                inputSharedViewModel.setIsItalics(false)
-            }
-        } else {
-
-            inputSharedViewModel.setIsBold(false)
-            inputSharedViewModel.setIsItalics(false)
         }
 
-        if (underlineSpans?.isNotEmpty() == true) {
+        noteAppSharedViewModel.noteWasUpdated.observe(this){
 
-            if (textStyleHelper.isAllSpanned(TextStyle.UNDERLINE) ||
-                (underlineSpans.isNotEmpty() && selectStart == selectEnd)) {
+            if (noteAppSharedViewModel.noteWasUpdated.value == true) {
 
-                inputSharedViewModel.setIsUnderlined(true)
-            } else {
-
-                inputSharedViewModel.setIsUnderlined(false)
+                generalUIHelper.closeActivityWithFeedback("Note Updated", this, this)
             }
-        } else {
-
-            inputSharedViewModel.setIsUnderlined(false)
         }
 
-    }
+        noteAppSharedViewModel.noteWasDeleted.observe(this){
 
+            if (noteAppSharedViewModel.noteWasDeleted.value == true) {
 
-    private fun updatePinHighlight(){
-
-        if (noteViewBinding.pinButtonIV.tag == true) {
-
-            generalUIHelper.changeButtonIVColor(this, noteViewBinding.pinButtonIV,
-                R.color.gold)
-        } else {
-
-            generalUIHelper.changeButtonIVColor(this, noteViewBinding.pinButtonIV,
-                R.color.light_grey_3)
+                generalUIHelper.closeActivityWithFeedback("Note Deleted", this, this)
+            }
         }
     }
 

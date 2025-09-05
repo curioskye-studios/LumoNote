@@ -11,10 +11,10 @@ import com.curioskyestudios.lumonote.data.models.TextStyle
 import com.curioskyestudios.lumonote.databinding.FragmentTextFormatBinding
 import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.curioskyestudios.lumonote.ui.noteview.viewmodel.TextHelperSharedViewModel
+import com.curioskyestudios.lumonote.utils.edittexthelper.TextBulletHelper
+import com.curioskyestudios.lumonote.utils.edittexthelper.TextSizeHelper
+import com.curioskyestudios.lumonote.utils.edittexthelper.TextStyleHelper
 import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
-import com.curioskyestudios.lumonote.utils.textformathelper.TextBulletHelper
-import com.curioskyestudios.lumonote.utils.textformathelper.TextSizeHelper
-import com.curioskyestudios.lumonote.utils.textformathelper.TextStyleHelper
 
 
 class TextFormatFragment: Fragment() {

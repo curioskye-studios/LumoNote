@@ -1,4 +1,4 @@
-package com.curioskyestudios.lumonote.utils.textformathelper
+package com.curioskyestudios.lumonote.utils.edittexthelper
 
 import android.text.Editable
 import android.text.Spanned

@@ -1,4 +1,4 @@
-package com.curioskyestudios.lumonote.utils.textformathelper
+package com.curioskyestudios.lumonote.utils.edittexthelper
 
 import android.graphics.Typeface
 import android.text.Editable
