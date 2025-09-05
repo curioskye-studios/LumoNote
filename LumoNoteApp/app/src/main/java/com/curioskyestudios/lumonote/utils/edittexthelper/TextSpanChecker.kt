@@ -14,7 +14,6 @@ class TextSpanChecker (private val editTextView: EditText) {
     private var selectionStart: Int = 0
     private var selectionEnd: Int = 0
 
-    private val noteContent = editTextView
     private lateinit var selected: String
 
 
@@ -35,7 +34,7 @@ class TextSpanChecker (private val editTextView: EditText) {
 
     private fun updateSelectedText() {
 
-        selected = noteContent.text?.substring(selectionStart, selectionEnd).toString()
+        selected = editTextView.text?.substring(selectionStart, selectionEnd).toString()
     }
 
 

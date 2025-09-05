@@ -11,9 +11,7 @@ import android.widget.EditText
 
 class TextBulletHelper(private val editTextView: EditText) {
 
-    private val textStyleHelper: TextStyleHelper = TextStyleHelper(editTextView)
-
-    fun formatBullet() {
+    fun formatBullet(textStyleHelper: TextStyleHelper) {
 
         val stringBuilder: Editable? = editTextView.text
         var setSpan: CharacterStyle? = null

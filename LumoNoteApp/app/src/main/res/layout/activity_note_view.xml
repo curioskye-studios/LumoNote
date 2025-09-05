@@ -161,7 +161,7 @@
             </TextView>
 
 
-            <com.curioskyestudios.lumonote.ui.noteview.other.SelectableEditText
+            <EditText
                 android:id="@+id/noteTitleET"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -181,7 +181,7 @@
 
                 app:layout_constraintTop_toBottomOf="@+id/modifiedDateTV" />
 
-            <com.curioskyestudios.lumonote.ui.noteview.other.SelectableEditText
+            <com.curioskyestudios.lumonote.ui.noteview.other.SpanningSelectableEditText
                 android:id="@+id/noteContentET"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

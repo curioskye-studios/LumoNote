@@ -9,11 +9,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.curioskyestudios.lumonote.data.models.TextSize
 import com.curioskyestudios.lumonote.data.models.TextStyle
 import com.curioskyestudios.lumonote.databinding.FragmentTextFormatBinding
+import com.curioskyestudios.lumonote.ui.noteview.other.SpanningSelectableEditText
+import com.curioskyestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
-import com.curioskyestudios.lumonote.ui.noteview.viewmodel.TextHelperSharedViewModel
-import com.curioskyestudios.lumonote.utils.edittexthelper.TextBulletHelper
-import com.curioskyestudios.lumonote.utils.edittexthelper.TextSizeHelper
-import com.curioskyestudios.lumonote.utils.edittexthelper.TextStyleHelper
 import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
 
 
@@ -32,10 +30,9 @@ class TextFormatFragment: Fragment() {
     private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
 
     private lateinit var inputSharedViewModel: InputSharedViewModel
-    private lateinit var textHelperSharedViewModel: TextHelperSharedViewModel
-    private var textStyleHelper: TextStyleHelper? = null
-    private var textSizeHelper: TextSizeHelper? = null
-    private var textBulletHelper: TextBulletHelper? = null
+    private lateinit var editContentSharedViewModel: EditContentSharedViewModel
+
+    private lateinit var noteContentET: SpanningSelectableEditText
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -45,7 +42,8 @@ class TextFormatFragment: Fragment() {
 
         inputSharedViewModel = ViewModelProvider(requireActivity()).get(InputSharedViewModel::class.java)
 
-        textHelperSharedViewModel = ViewModelProvider(requireActivity()).get(TextHelperSharedViewModel::class.java)
+        editContentSharedViewModel =
+            ViewModelProvider(requireActivity()).get(EditContentSharedViewModel::class.java)
 
     }
 
@@ -65,11 +63,9 @@ class TextFormatFragment: Fragment() {
 
         super.onViewCreated(view, savedInstanceState)
 
-        textStyleHelper = textHelperSharedViewModel.textStyleHelper.value
-        textSizeHelper = textHelperSharedViewModel.textSizeHelper.value
-        textBulletHelper = textHelperSharedViewModel.textBulletHelper.value
+        noteContentET = editContentSharedViewModel.noteContentEditTextView.value as SpanningSelectableEditText
 
-        observeTextHelperVMValues()
+        observeEditContentVMValues()
 
         observeUIInputVMValues()
 
@@ -84,30 +80,11 @@ class TextFormatFragment: Fragment() {
         _textFormatViewBinding = null // prevent memory leaks by clearing reference
     }
 
-    private fun observeTextHelperVMValues() {
+    private fun observeEditContentVMValues() {
 
-        textHelperSharedViewModel.apply {
+        editContentSharedViewModel.apply {
 
-            openFormatter.observe(viewLifecycleOwner){
-
-                if (openFormatter.value == true) {
-
-                    textFormatterOn()
-                } else {
-
-                    textFormatterOff()
-                }
-            }
-        }
-
-    }
-
-
-    private fun observeUIInputVMValues() {
-
-        inputSharedViewModel.apply {
-
-            isEditing.observe(viewLifecycleOwner){
+            isEditing.observe(viewLifecycleOwner) {
 
                 if (isEditing.value == true) {
 
@@ -116,9 +93,7 @@ class TextFormatFragment: Fragment() {
 
                     textFormatterOff()
                 }
-                //Log.d("EditInput", "Point 1")
             }
-
 
             isNormalSized.observe(viewLifecycleOwner) {
 
@@ -147,26 +122,46 @@ class TextFormatFragment: Fragment() {
 
             isBold.observe(viewLifecycleOwner) {
 
-                val isFullyBold = it
+                val isBold = it
 
                 generalUIHelper.updateButtonIVHighlight(textFormatViewBinding.boldButtonIV,
-                    isFullyBold, requireContext())
+                    isBold, requireContext())
             }
 
             isItalics.observe(viewLifecycleOwner) {
 
-                val isFullyItalics = it
+                val isItalics = it
 
                 generalUIHelper.updateButtonIVHighlight(textFormatViewBinding.italicsButtonIV,
-                    isFullyItalics, requireContext())
+                    isItalics, requireContext())
             }
 
             isUnderlined.observe(viewLifecycleOwner) {
 
-                val isFullyUnderlined = it
+                val isUnderlined = it
 
                 generalUIHelper.updateButtonIVHighlight(textFormatViewBinding.underlineButtonIV,
-                    isFullyUnderlined, requireContext())
+                    isUnderlined, requireContext())
+            }
+
+        }
+
+    }
+
+
+    private fun observeUIInputVMValues() {
+
+        inputSharedViewModel.apply {
+
+            openFormatter.observe(viewLifecycleOwner){
+
+                if (openFormatter.value == true) {
+
+                    textFormatterOn()
+                } else {
+
+                    textFormatterOff()
+                }
             }
         }
 
@@ -179,44 +174,46 @@ class TextFormatFragment: Fragment() {
 
             normalTextButtonIV.setOnClickListener {
 
-                textSizeHelper!!.formatAsHeader(TextSize.NORMAL)
+                noteContentET.getSizeHelper().formatAsHeader(TextSize.NORMAL)
             }
             h1ButtonIV.setOnClickListener {
 
-                textSizeHelper!!.formatAsHeader(TextSize.H1)
+                noteContentET.getSizeHelper().formatAsHeader(TextSize.H1)
             }
             h2ButtonIV.setOnClickListener {
 
-                textSizeHelper!!.formatAsHeader(TextSize.H2)
+                noteContentET.getSizeHelper().formatAsHeader(TextSize.H2)
             }
 
 
             boldButtonIV.setOnClickListener {
 
-                textStyleHelper!!.formatText(TextStyle.BOLD)
+                noteContentET.getStyleHelper().formatText(TextStyle.BOLD)
             }
             italicsButtonIV.setOnClickListener {
 
-                textStyleHelper!!.formatText(TextStyle.ITALICS)
+                noteContentET.getStyleHelper().formatText(TextStyle.ITALICS)
             }
             underlineButtonIV.setOnClickListener {
 
-                textStyleHelper!!.formatText(TextStyle.UNDERLINE)
+                noteContentET.getStyleHelper().formatText(TextStyle.UNDERLINE)
             }
+
+
             bulletButtonIV.setOnClickListener {
 
-                textBulletHelper!!.formatBullet()
+                noteContentET.getBulletHelper().formatBullet(noteContentET.getStyleHelper())
             }
         }
 
 
         textFormatViewBinding.clearFormatsButtonIV.setOnClickListener {
 
-            textStyleHelper!!.clearTextStyles()
+            noteContentET.getStyleHelper().clearTextStyles()
 
-            inputSharedViewModel.setIsBold(false)
-            inputSharedViewModel.setIsItalics(false)
-            inputSharedViewModel.setIsUnderlined(false)
+            editContentSharedViewModel.setIsBold(false)
+            editContentSharedViewModel.setIsItalics(false)
+            editContentSharedViewModel.setIsUnderlined(false)
         }
     }
 

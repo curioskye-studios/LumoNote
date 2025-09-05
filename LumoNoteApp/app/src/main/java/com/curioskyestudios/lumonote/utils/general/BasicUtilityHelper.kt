@@ -1,16 +1,12 @@
 package com.curioskyestudios.lumonote.utils.general
 
 import android.view.View
-import com.curioskyestudios.lumonote.ui.noteview.other.SelectableEditText
+import com.curioskyestudios.lumonote.ui.noteview.other.SpanningSelectableEditText
 
 class BasicUtilityHelper {
 
-    fun clearETViewFocusOnHideKeyboard(editTextViews: Array<SelectableEditText>, rootView: View){
+    fun clearETViewFocusOnHideKeyboard(editTextView: SpanningSelectableEditText, rootView: View){
 
-        for (editTextView in editTextViews) {
-
-            editTextView.clearFocusOnKeyboardHide(rootView)
-            editTextView.clearFocusOnKeyboardHide(rootView)
-        }
+        editTextView.clearFocusOnKeyboardHide(rootView)
     }
 }

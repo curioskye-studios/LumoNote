@@ -10,14 +10,10 @@ import com.curioskyestudios.lumonote.data.models.Note
 import com.curioskyestudios.lumonote.data.models.TextSize
 import com.curioskyestudios.lumonote.data.models.TextStyle
 import com.curioskyestudios.lumonote.databinding.ActivityNoteViewBinding
+import com.curioskyestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
-import com.curioskyestudios.lumonote.ui.noteview.viewmodel.TextHelperSharedViewModel
 import com.curioskyestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.curioskyestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
-import com.curioskyestudios.lumonote.utils.edittexthelper.TextBulletHelper
-import com.curioskyestudios.lumonote.utils.edittexthelper.TextSizeHelper
-import com.curioskyestudios.lumonote.utils.edittexthelper.TextSpanChecker
-import com.curioskyestudios.lumonote.utils.edittexthelper.TextStyleHelper
 import com.curioskyestudios.lumonote.utils.general.BasicUtilityHelper
 import com.curioskyestudios.lumonote.utils.general.GeneralTextHelper
 import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
@@ -35,14 +31,10 @@ class NoteViewActivity : AppCompatActivity() {
     private var existingNoteClicked: Boolean = false
     private lateinit var retrievedNote: Note
 
-    private lateinit var textStyleHelper: TextStyleHelper
-    private lateinit var textSizeHelper: TextSizeHelper
-    private lateinit var textBulletHelper: TextBulletHelper
-    private lateinit var textSpanChecker: TextSpanChecker
     private val basicUtilityHelper = BasicUtilityHelper()
 
     private lateinit var inputSharedViewModel: InputSharedViewModel
-    private lateinit var textHelperSharedViewModel: TextHelperSharedViewModel
+    private lateinit var editContentSharedViewModel: EditContentSharedViewModel
     private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
     private var editInputFragment: EditInputFragment = EditInputFragment()
 
@@ -54,6 +46,7 @@ class NoteViewActivity : AppCompatActivity() {
         noteViewBinding = ActivityNoteViewBinding.inflate(layoutInflater)
         setContentView(noteViewBinding.root)
 
+
         // Set up view models
         var dbConnection = DatabaseHelper(this)
         var appSharedViewFactory = AppSharedViewFactory(dbConnection)
@@ -63,9 +56,10 @@ class NoteViewActivity : AppCompatActivity() {
 
         inputSharedViewModel = ViewModelProvider(this).get(InputSharedViewModel::class.java)
 
-        textHelperSharedViewModel = ViewModelProvider(this).get(TextHelperSharedViewModel::class.java)
+        editContentSharedViewModel = ViewModelProvider(this).get(EditContentSharedViewModel::class.java)
+        editContentSharedViewModel.setNoteContentEditTextView(noteViewBinding.noteContentET)
 
-
+        // Check if working with existing note
         val isExistingNote = checkIfIsExistingNote()
         if (isExistingNote == null) {
 
@@ -82,21 +76,11 @@ class NoteViewActivity : AppCompatActivity() {
             replace(noteViewBinding.editSectionFC.id, editInputFragment)
         }
 
-        // Set up text helpers
-        textSpanChecker = TextSpanChecker(noteViewBinding.noteContentET)
-        textStyleHelper = TextStyleHelper(noteViewBinding.noteContentET)
-        textSizeHelper = TextSizeHelper(noteViewBinding.noteContentET)
-        textBulletHelper = TextBulletHelper(noteViewBinding.noteContentET)
-
-        textHelperSharedViewModel.setTextStyleHelper(textStyleHelper)
-        textHelperSharedViewModel.setTextSizeHelper(textSizeHelper)
-        textHelperSharedViewModel.setTextBulletHelper(textBulletHelper)
-
 
         // Setup Functionality
-        noteViewBinding.apply {
-            basicUtilityHelper.clearETViewFocusOnHideKeyboard(arrayOf(noteTitleET, noteContentET), root)
-        }
+
+        basicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteContentET,
+            noteViewBinding.root)
 
         notifyIfEditingNoteContent()
 
@@ -115,7 +99,7 @@ class NoteViewActivity : AppCompatActivity() {
         // For removing text formatter when text content not being edited
         noteViewBinding.noteContentET.setOnFocusChangeListener {_, hasFocus ->
 
-            inputSharedViewModel.setEditing(hasFocus)
+            editContentSharedViewModel.setEditing(hasFocus)
         }
     }
 
@@ -123,26 +107,27 @@ class NoteViewActivity : AppCompatActivity() {
 
         noteViewBinding.noteContentET.onSelectionChange = { selectStart, selectEnd ->
 
-            textSpanChecker.apply {
+            noteViewBinding.noteContentET.getSpanChecker().apply {
 
                 setSelection(selectStart, selectEnd)
 
                 when (getTextSizingType()) {
 
-                    TextSize.H1 -> inputSharedViewModel.setIsHeader1Sized(true)
-                    TextSize.H2 -> inputSharedViewModel.setIsHeader2Sized(true)
-                    TextSize.NORMAL -> inputSharedViewModel.setIsNormalSized(true)
+                    TextSize.H1 -> editContentSharedViewModel.setIsHeader1Sized(true)
+                    TextSize.H2 ->  editContentSharedViewModel.setIsHeader2Sized(true)
+                    TextSize.NORMAL ->  editContentSharedViewModel.setIsNormalSized(true)
                 }
 
-                val styleIsPresentValues = getTextStylePresentValues(textStyleHelper)
+                val styleIsPresentValues =
+                    getTextStylePresentValues(noteViewBinding.noteContentET.getStyleHelper())
 
                 val isBold = styleIsPresentValues[TextStyle.BOLD] as Boolean
                 val isItalics = styleIsPresentValues[TextStyle.ITALICS] as Boolean
                 val isUnderlined = styleIsPresentValues[TextStyle.UNDERLINE] as Boolean
 
-                inputSharedViewModel.setIsBold(isBold)
-                inputSharedViewModel.setIsItalics(isItalics)
-                inputSharedViewModel.setIsUnderlined(isUnderlined)
+                editContentSharedViewModel.setIsBold(isBold)
+                editContentSharedViewModel.setIsItalics(isItalics)
+                editContentSharedViewModel.setIsUnderlined(isUnderlined)
             }
 
         }

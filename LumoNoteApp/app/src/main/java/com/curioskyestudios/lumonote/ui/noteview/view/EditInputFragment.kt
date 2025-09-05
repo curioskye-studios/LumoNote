@@ -9,9 +9,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.curioskyestudios.lumonote.databinding.FragmentEditInputBinding
+import com.curioskyestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.curioskyestudios.lumonote.ui.noteview.viewmodel.EditInputViewModel
 import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
-import com.curioskyestudios.lumonote.ui.noteview.viewmodel.TextHelperSharedViewModel
 import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
 
 
@@ -31,7 +31,7 @@ class EditInputFragment : Fragment() {
 
     private lateinit var editInputViewModel: EditInputViewModel
     private lateinit var inputSharedViewModel: InputSharedViewModel
-    private lateinit var textHelperSharedViewModel: TextHelperSharedViewModel
+    private lateinit var editContentSharedViewModel: EditContentSharedViewModel
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -41,11 +41,10 @@ class EditInputFragment : Fragment() {
 
         editInputViewModel = ViewModelProvider(this).get(EditInputViewModel::class.java)
 
-        inputSharedViewModel = ViewModelProvider(requireActivity()).get(InputSharedViewModel::class.java)
+        inputSharedViewModel = ViewModelProvider(this).get(InputSharedViewModel::class.java)
 
-        textHelperSharedViewModel =
-            ViewModelProvider(requireActivity()).get(TextHelperSharedViewModel::class.java)
-
+        editContentSharedViewModel =
+            ViewModelProvider(requireActivity()).get(EditContentSharedViewModel::class.java)
     }
 
     // Called when the Fragment creates its view
@@ -67,7 +66,7 @@ class EditInputFragment : Fragment() {
 
         observeEditInputVMValues()
 
-        observeInputVMValues()
+        observeEditContentVMValues()
 
         setOnClickListeners()
     }
@@ -86,6 +85,7 @@ class EditInputFragment : Fragment() {
     private fun observeEditInputVMValues() {
 
         editInputViewModel.apply {
+
 
             textFormatBtnActive.observe(viewLifecycleOwner) {
 
@@ -111,9 +111,9 @@ class EditInputFragment : Fragment() {
     }
 
 
-    private fun observeInputVMValues() {
+    private fun observeEditContentVMValues() {
 
-        inputSharedViewModel.apply {
+        editContentSharedViewModel.apply {
 
             // watch to know when editing note content
             isEditing.observe(viewLifecycleOwner){
@@ -182,7 +182,7 @@ class EditInputFragment : Fragment() {
 
                 editInputViewModel.setTextFormatBtnActive(!textFormatActiveStatus)
 
-                textHelperSharedViewModel.setOpenFormatter(!textFormatActiveStatus)
+                inputSharedViewModel.setOpenFormatter(!textFormatActiveStatus)
 
                 generalUIHelper.updateButtonIVHighlight(textFormatButtonIV,
                     !textFormatActiveStatus, requireContext())
