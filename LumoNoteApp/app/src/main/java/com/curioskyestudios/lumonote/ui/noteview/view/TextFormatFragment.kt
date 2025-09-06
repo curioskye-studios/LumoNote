@@ -1,7 +1,6 @@
 package com.curioskyestudios.lumonote.ui.noteview.view
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -144,8 +143,6 @@ class TextFormatFragment: Fragment() {
             }
 
             shouldOpenFormatter.observe(viewLifecycleOwner){
-
-                Log.d("textformatbutton", "open: $it")
 
                 generalUIHelper.changeViewVisibility(textFormatViewBinding.formatTextSectionRL, it)
             }

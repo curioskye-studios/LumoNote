@@ -133,16 +133,30 @@ class EditInputFragment : Fragment() {
 
             noteContentIsEditing.observe(viewLifecycleOwner){
 
-                // disable textformatbutton when not editing note content
+                // disable buttons when not editing note content
 
                 if (it == true) {
 
+                    generalButtonIVHelper.enableButtonIV(editInputViewBinding.colorButtonIV,
+                        requireContext())
+                    generalButtonIVHelper.enableButtonIV(editInputViewBinding.checkListButtonIV,
+                        requireContext())
+                    generalButtonIVHelper.enableButtonIV(editInputViewBinding.imageButtonIV,
+                        requireContext())
                     generalButtonIVHelper.enableButtonIV(editInputViewBinding.textFormatButtonIV,
                         requireContext())
+
+                    // since automatically opens textformatter when editing
                     editInputViewModel.setTextFormatBtnActive(true)
                 }
                 else {
 
+                    generalButtonIVHelper.disableButtonIV(editInputViewBinding.colorButtonIV,
+                        requireContext())
+                    generalButtonIVHelper.disableButtonIV(editInputViewBinding.checkListButtonIV,
+                        requireContext())
+                    generalButtonIVHelper.disableButtonIV(editInputViewBinding.imageButtonIV,
+                        requireContext())
                     generalButtonIVHelper.disableButtonIV(editInputViewBinding.textFormatButtonIV,
                         requireContext())
                 }
@@ -157,6 +171,24 @@ class EditInputFragment : Fragment() {
 
         editInputViewModel.apply {
 
+            colorBtnIsActive.observe(viewLifecycleOwner) {
+
+                if (editInputViewBinding.colorButtonIV.isEnabled) {
+
+                    generalButtonIVHelper.updateButtonIVHighlight(editInputViewBinding.colorButtonIV,
+                        it, requireContext())
+                }
+            }
+
+            checklistBtnIsActive.observe(viewLifecycleOwner) {
+
+                if (editInputViewBinding.checkListButtonIV.isEnabled) {
+
+                    generalButtonIVHelper.updateButtonIVHighlight(editInputViewBinding.checkListButtonIV,
+                        it, requireContext())
+                }
+            }
+
             textFormatBtnIsActive.observe(viewLifecycleOwner) {
 
                 if (editInputViewBinding.textFormatButtonIV.isEnabled) {
@@ -166,17 +198,6 @@ class EditInputFragment : Fragment() {
                 }
             }
 
-            colorBtnIsActive.observe(viewLifecycleOwner) {
-
-                generalButtonIVHelper.updateButtonIVHighlight(editInputViewBinding.colorButtonIV,
-                    it, requireContext())
-            }
-
-            checklistBtnIsActive.observe(viewLifecycleOwner) {
-
-                generalButtonIVHelper.updateButtonIVHighlight(editInputViewBinding.checkListButtonIV,
-                    it, requireContext())
-            }
         }
     }
 
