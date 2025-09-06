@@ -8,12 +8,8 @@ import com.curioskyestudios.lumonote.ui.noteview.other.SpanningSelectableEditTex
 class EditContentSharedViewModel : ViewModel() {
 
     private val _noteContentEditTextView = MutableLiveData<SpanningSelectableEditText>()
-    val noteContentEditTextView : LiveData<SpanningSelectableEditText> get() = _noteContentEditTextView
-
-
-    // LiveData to track if EditText is focused
-    private val _isEditing = MutableLiveData(false)
-    val isEditing: LiveData<Boolean> get() = _isEditing
+    val noteContentEditTextView : LiveData<SpanningSelectableEditText>
+        get() = _noteContentEditTextView
 
 
     private val _isNormalSized = MutableLiveData(true)
@@ -38,12 +34,6 @@ class EditContentSharedViewModel : ViewModel() {
         _noteContentEditTextView.value = noteContentET
     }
 
-    // Call this when EditText gains/loses focus
-    fun setEditing(focused: Boolean) {
-
-        _isEditing.value = focused
-    }
-
 
     fun setIsNormalSized(isNormal: Boolean) {
 
@@ -65,6 +55,7 @@ class EditContentSharedViewModel : ViewModel() {
         _isHeader1Sized.value = !isHeader2
         _isNormalSized.value = !isHeader2
     }
+
 
     fun setIsBold(isFullyBold: Boolean) {
 

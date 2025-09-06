@@ -1,73 +1,17 @@
 package com.curioskyestudios.lumonote.utils.general
 
-import android.app.Activity
-import android.content.Context
-import android.widget.ImageView
-import android.widget.Toast
-import androidx.core.content.ContextCompat
-import com.curioskyestudios.lumonote.R
+import android.view.View
 
 class GeneralUIHelper {
 
-    fun changeButtonIVColor(context: Context, buttonIV: ImageView, color: Int) {
+    fun changeViewVisibility(view: View, showView: Boolean) {
 
-        buttonIV.imageTintList = ContextCompat.getColorStateList(context, color)
-    }
+        if (showView) {
 
-
-    fun highlightButtonIV(buttonIV: ImageView, context: Context) {
-
-        // highlight button
-        changeButtonIVColor(context, buttonIV, R.color.gold)
-    }
-
-    fun unhighlightButtonIV(buttonIV: ImageView, context: Context) {
-
-        // unhighlight button
-        changeButtonIVColor(context, buttonIV, R.color.light_grey_1)
-    }
-
-    fun updateButtonIVHighlight(buttonIV: ImageView, isActive: Boolean, context: Context) {
-
-        if (isActive) {
-
-            highlightButtonIV(buttonIV, context)
+            view.visibility = View.VISIBLE
         } else {
 
-            unhighlightButtonIV(buttonIV, context)
+            view.visibility = View.GONE
         }
     }
-
-    fun updatePinHighlight(pinButtonIV: ImageView, context: Context){
-
-        if (pinButtonIV.tag == true) {
-
-            changeButtonIVColor(context, pinButtonIV, R.color.gold)
-        } else {
-
-            changeButtonIVColor(context, pinButtonIV, R.color.light_grey_3)
-        }
-    }
-
-
-    fun displayFeedbackToast(context: Context, message: String, longDisplayPeriod: Boolean) {
-
-        if (longDisplayPeriod) {
-
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-        } else {
-
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-        }
-
-    }
-
-    fun closeActivityWithFeedback(feedback: String, context: Context, activity: Activity) {
-
-        // Closes view note activity, pops from activity stack, returns to main below it
-        activity.finish()
-
-        displayFeedbackToast(context, feedback, true)
-    }
-
 }

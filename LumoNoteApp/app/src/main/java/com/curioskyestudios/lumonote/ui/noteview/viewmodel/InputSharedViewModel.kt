@@ -7,12 +7,20 @@ import androidx.lifecycle.ViewModel
 class InputSharedViewModel : ViewModel() {
 
     // LiveData to track if TextFormatter should be visible
-    private val _openFormatter = MutableLiveData(false)
-    val openFormatter: LiveData<Boolean> get() = _openFormatter
+    private val _shouldOpenFormatter = MutableLiveData(false)
+    val shouldOpenFormatter: LiveData<Boolean> get() = _shouldOpenFormatter
+
+    private val _noteContentIsEditing = MutableLiveData(false)
+    val noteContentIsEditing: LiveData<Boolean> get() = _noteContentIsEditing
 
 
-    fun setOpenFormatter(open: Boolean) {
+    fun setShouldOpenFormatter(open: Boolean) {
 
-        _openFormatter.value = open
+        _shouldOpenFormatter.value = open
+    }
+
+    fun setNoteContentIsEditing(focused: Boolean) {
+
+        _noteContentIsEditing.value = focused
     }
 }

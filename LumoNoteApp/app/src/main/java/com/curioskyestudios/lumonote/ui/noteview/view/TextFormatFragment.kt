@@ -1,6 +1,7 @@
 package com.curioskyestudios.lumonote.ui.noteview.view
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import com.curioskyestudios.lumonote.databinding.FragmentTextFormatBinding
 import com.curioskyestudios.lumonote.ui.noteview.other.SpanningSelectableEditText
 import com.curioskyestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
+import com.curioskyestudios.lumonote.utils.general.GeneralButtonIVHelper
 import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
 
 
@@ -27,6 +29,7 @@ class TextFormatFragment: Fragment() {
     // The "!!" means it assumes _textFormatViewBinding is not null between onCreateView & onDestroyView
     private val textFormatViewBinding get() = _textFormatViewBinding!!
 
+    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
     private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
 
     private lateinit var inputSharedViewModel: InputSharedViewModel
@@ -65,11 +68,11 @@ class TextFormatFragment: Fragment() {
 
         noteContentET = editContentSharedViewModel.noteContentEditTextView.value as SpanningSelectableEditText
 
-        observeEditContentVMValues()
-
-        observeUIInputVMValues()
-
         setOnClickListeners()
+
+        observeInputSharedVMValues()
+
+        observeEditContentVMValues()
     }
 
 
@@ -78,93 +81,6 @@ class TextFormatFragment: Fragment() {
 
         super.onDestroyView()
         _textFormatViewBinding = null // prevent memory leaks by clearing reference
-    }
-
-    private fun observeEditContentVMValues() {
-
-        editContentSharedViewModel.apply {
-
-            isEditing.observe(viewLifecycleOwner) {
-
-                if (isEditing.value == true) {
-
-                    textFormatterOn()
-                } else {
-
-                    textFormatterOff()
-                }
-            }
-
-            isNormalSized.observe(viewLifecycleOwner) {
-
-                val isNormal = it
-
-                generalUIHelper.updateButtonIVHighlight(textFormatViewBinding.normalTextButtonIV,
-                    isNormal, requireContext())
-            }
-
-            isHeader1Sized.observe(viewLifecycleOwner) {
-
-                val isHeader1 = it
-
-                generalUIHelper.updateButtonIVHighlight(textFormatViewBinding.h1ButtonIV,
-                    isHeader1, requireContext())
-            }
-
-            isHeader2Sized.observe(viewLifecycleOwner) {
-
-                val isHeader2 = it
-
-                generalUIHelper.updateButtonIVHighlight(textFormatViewBinding.h2ButtonIV,
-                    isHeader2, requireContext())
-            }
-
-
-            isBold.observe(viewLifecycleOwner) {
-
-                val isBold = it
-
-                generalUIHelper.updateButtonIVHighlight(textFormatViewBinding.boldButtonIV,
-                    isBold, requireContext())
-            }
-
-            isItalics.observe(viewLifecycleOwner) {
-
-                val isItalics = it
-
-                generalUIHelper.updateButtonIVHighlight(textFormatViewBinding.italicsButtonIV,
-                    isItalics, requireContext())
-            }
-
-            isUnderlined.observe(viewLifecycleOwner) {
-
-                val isUnderlined = it
-
-                generalUIHelper.updateButtonIVHighlight(textFormatViewBinding.underlineButtonIV,
-                    isUnderlined, requireContext())
-            }
-
-        }
-
-    }
-
-
-    private fun observeUIInputVMValues() {
-
-        inputSharedViewModel.apply {
-
-            openFormatter.observe(viewLifecycleOwner){
-
-                if (openFormatter.value == true) {
-
-                    textFormatterOn()
-                } else {
-
-                    textFormatterOff()
-                }
-            }
-        }
-
     }
 
 
@@ -218,15 +134,68 @@ class TextFormatFragment: Fragment() {
     }
 
 
-    private fun textFormatterOn() {
+    private fun observeInputSharedVMValues() {
 
-        // Show the view
-        textFormatViewBinding.formatTextSectionRL.visibility = View.VISIBLE
+        inputSharedViewModel.apply {
+
+            noteContentIsEditing.observe(viewLifecycleOwner){
+
+                setShouldOpenFormatter(it)
+            }
+
+            shouldOpenFormatter.observe(viewLifecycleOwner){
+
+                Log.d("textformatbutton", "open: $it")
+
+                generalUIHelper.changeViewVisibility(textFormatViewBinding.formatTextSectionRL, it)
+            }
+
+        }
+
     }
 
-    private fun textFormatterOff() {
+    private fun observeEditContentVMValues() {
 
-        // Hide the view
-        textFormatViewBinding.formatTextSectionRL.visibility = View.GONE
+        editContentSharedViewModel.apply {
+
+            isNormalSized.observe(viewLifecycleOwner) {
+
+                generalButtonIVHelper.updateButtonIVHighlight(textFormatViewBinding.normalTextButtonIV,
+                    it, requireContext())
+            }
+
+            isHeader1Sized.observe(viewLifecycleOwner) {
+
+                generalButtonIVHelper.updateButtonIVHighlight(textFormatViewBinding.h1ButtonIV,
+                    it, requireContext())
+            }
+
+            isHeader2Sized.observe(viewLifecycleOwner) {
+
+                generalButtonIVHelper.updateButtonIVHighlight(textFormatViewBinding.h2ButtonIV,
+                    it, requireContext())
+            }
+
+
+            isBold.observe(viewLifecycleOwner) {
+
+                generalButtonIVHelper.updateButtonIVHighlight(textFormatViewBinding.boldButtonIV,
+                    it, requireContext())
+            }
+
+            isItalics.observe(viewLifecycleOwner) {
+
+                generalButtonIVHelper.updateButtonIVHighlight(textFormatViewBinding.italicsButtonIV,
+                    it, requireContext())
+            }
+
+            isUnderlined.observe(viewLifecycleOwner) {
+
+                generalButtonIVHelper.updateButtonIVHighlight(textFormatViewBinding.underlineButtonIV,
+                   it, requireContext())
+            }
+        }
+
     }
+
 }

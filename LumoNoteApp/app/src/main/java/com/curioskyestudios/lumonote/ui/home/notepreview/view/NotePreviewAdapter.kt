@@ -10,7 +10,7 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.curioskyestudios.lumonote.R
 import com.curioskyestudios.lumonote.data.models.Note
-import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
+import com.curioskyestudios.lumonote.utils.general.GeneralButtonIVHelper
 
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
@@ -19,7 +19,7 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
     : RecyclerView.Adapter<NotePreviewAdapter.NotePreviewViewHolder>() {
 
     private val notesList = mutableListOf<Note>()
-    private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
+    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
 
     // cache of highlighted/selected item, updated by notepreviewfragment
     private val areNotesPinned = mutableListOf<Boolean>()
@@ -103,11 +103,11 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
 
         if (holder.pinPreview.tag == true) {
 
-            generalUIHelper.changeButtonIVColor(holder.itemView.context, holder.pinPreview,
+            generalButtonIVHelper.changeButtonIVCustomColor(holder.itemView.context, holder.pinPreview,
                 R.color.gold)
         } else {
 
-            generalUIHelper.changeButtonIVColor(holder.itemView.context, holder.pinPreview,
+            generalButtonIVHelper.changeButtonIVCustomColor(holder.itemView.context, holder.pinPreview,
                 R.color.light_grey_3)
         }
     }

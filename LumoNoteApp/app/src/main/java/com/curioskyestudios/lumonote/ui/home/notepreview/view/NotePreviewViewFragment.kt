@@ -85,11 +85,11 @@ class NotePreviewViewFragment : Fragment() {
 
         setupAdapterDisplays()
 
-        observeNoteViewModelValues()
-
-        observeTagViewModelValues()
-
         setupListeners()
+
+        observeNoteAppVMValues()
+
+        observeTagAppVMValues()
     }
 
     override fun onResume() {
@@ -120,8 +120,8 @@ class NotePreviewViewFragment : Fragment() {
             whenCurrentNotePinClicked =
                 { isPinned, currentNoteID ->
 
-                    Log.d("NoteFrag", isPinned.toString())
-                    Log.d("NoteFrag", currentNoteID.toString())
+//                    Log.d("NoteFrag", isPinned.toString())
+//                    Log.d("NoteFrag", currentNoteID.toString())
 
                     noteAppSharedViewModel.setCurrentPreviewNoteID(currentNoteID)
                     noteAppSharedViewModel.updatePreviewPinStatus(isPinned)
@@ -136,19 +136,6 @@ class NotePreviewViewFragment : Fragment() {
                 tagAppSharedViewModel.setCurrentTagPosition(position)
             }
         )
-    }
-
-
-    private fun openNoteViewActivity(noteID: Int) {
-
-        // Open Note View of note by clicking on one
-        val intent = Intent(requireContext(), NoteViewActivity::class.java).apply {
-            // Also pass in the id of the note interacted w/ for later retrieval in update note
-            putExtra("note_id", noteID)
-        }
-
-        // Starts the update note activity
-        requireContext().startActivity(intent)
     }
 
 
@@ -170,7 +157,44 @@ class NotePreviewViewFragment : Fragment() {
     }
 
 
-    private fun observeNoteViewModelValues() {
+
+    private fun setupListeners() {
+
+        // Calls reference to the create note floating button
+        notePrevViewBinding.createButtonIV.setOnClickListener {
+
+            var intent = Intent(requireContext(), NoteViewActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Add scroll listener to ensure add tag button scrolls with the tags
+        notePrevViewBinding.tagsHolderRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+
+                super.onScrolled(recyclerView, dx, dy)
+
+                // Move the Add button by same scroll distance
+                notePrevViewBinding.tagAddButtonIV.translationX =
+                    -recyclerView.computeHorizontalScrollOffset().toFloat()
+            }
+        })
+    }
+
+    private fun openNoteViewActivity(noteID: Int) {
+
+        // Open Note View of note by clicking on one
+        val intent = Intent(requireContext(), NoteViewActivity::class.java).apply {
+            // Also pass in the id of the note interacted w/ for later retrieval in note view
+            putExtra("note_id", noteID)
+        }
+
+        // Starts the update note activity
+        requireContext().startActivity(intent)
+    }
+
+
+    private fun observeNoteAppVMValues() {
 
         // Observe changes
         noteAppSharedViewModel.notes.observe(viewLifecycleOwner) { notes ->
@@ -213,7 +237,7 @@ class NotePreviewViewFragment : Fragment() {
     }
 
 
-    private fun observeTagViewModelValues() {
+    private fun observeTagAppVMValues() {
 
         // Observe changes
         tagAppSharedViewModel.tags.observe(viewLifecycleOwner) { tags ->
@@ -224,30 +248,6 @@ class NotePreviewViewFragment : Fragment() {
         tagAppSharedViewModel.selectedTagPosition.observe(viewLifecycleOwner) { position ->
             tagDisplayAdapter.setSelectedPosition(position)
         }
-    }
-
-
-    private fun setupListeners() {
-
-        // Calls reference to the create note floating button
-        notePrevViewBinding.createButtonIV.setOnClickListener {
-
-            var intent = Intent(requireContext(), NoteViewActivity::class.java)
-            startActivity(intent)
-        }
-
-        // Add scroll listener to ensure add tag button scrolls with the tags
-        notePrevViewBinding.tagsHolderRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-
-                super.onScrolled(recyclerView, dx, dy)
-
-                // Move the Add button by same scroll distance
-                notePrevViewBinding.tagAddButtonIV.translationX =
-                    -recyclerView.computeHorizontalScrollOffset().toFloat()
-            }
-        })
     }
 
 

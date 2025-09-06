@@ -15,8 +15,8 @@ import com.curioskyestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.curioskyestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.curioskyestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.curioskyestudios.lumonote.utils.general.BasicUtilityHelper
+import com.curioskyestudios.lumonote.utils.general.GeneralButtonIVHelper
 import com.curioskyestudios.lumonote.utils.general.GeneralTextHelper
-import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
 import java.time.LocalDate
 
 
@@ -24,7 +24,7 @@ class NoteViewActivity : AppCompatActivity() {
 
     private lateinit var noteViewBinding: ActivityNoteViewBinding
     private val generalTextHelper: GeneralTextHelper = GeneralTextHelper()
-    private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
+    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
 
     // Stores reference to id of current note being updated, stays -1 if not found
     private var noteID: Int = -1
@@ -79,27 +79,33 @@ class NoteViewActivity : AppCompatActivity() {
 
         // Setup Functionality
 
+        basicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteTitleET,
+            noteViewBinding.root)
         basicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteContentET,
             noteViewBinding.root)
 
-        notifyIfEditingNoteContent()
+        notifyIfEditing()
 
         updateSelectionOnChange()
 
         setOnClickListeners()
 
-        observeNoteVMValues()
+        observeNoteAppVMValues()
 
         finalNoteFeedback()
     }
 
 
-    private fun notifyIfEditingNoteContent() {
+    private fun notifyIfEditing() {
 
         // For removing text formatter when text content not being edited
         noteViewBinding.noteContentET.setOnFocusChangeListener {_, hasFocus ->
 
-            editContentSharedViewModel.setEditing(hasFocus)
+            inputSharedViewModel.setNoteContentIsEditing(hasFocus)
+
+//            Log.d("textFormatButtonEditingContent",
+//                "content:" + inputSharedViewModel.noteContentIsEditing.value.toString())
+
         }
     }
 
@@ -175,7 +181,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             noteViewBinding.pinButtonIV.tag = retrievedNote.notePinned
 
-            generalUIHelper.updatePinHighlight(noteViewBinding.pinButtonIV, this)
+            generalButtonIVHelper.updatePinHighlight(noteViewBinding.pinButtonIV, this)
         }
 
         else {
@@ -187,23 +193,6 @@ class NoteViewActivity : AppCompatActivity() {
             noteViewBinding.pinButtonIV.tag = false
         }
     }
-
-
-    private fun observeNoteVMValues() {
-
-        noteAppSharedViewModel.currentNotePinned.observe(this){
-
-            generalUIHelper.updatePinHighlight(noteViewBinding.pinButtonIV, this)
-
-            val pinStateFeedback =
-                if (noteAppSharedViewModel.currentNotePinned.value == true) { "Note Pinned" }
-
-                else { "Note Unpinned" }
-
-            generalUIHelper.displayFeedbackToast(this, pinStateFeedback, false)
-        }
-    }
-
 
     private fun setOnClickListeners(){
 
@@ -243,12 +232,28 @@ class NoteViewActivity : AppCompatActivity() {
         val backButtonPressedCallback =
             object : OnBackPressedCallback(true) {
 
-            override fun handleOnBackPressed() {
-                // Custom logic for back button press
-                collectNoteData()
+                override fun handleOnBackPressed() {
+                    // Custom logic for back button press
+                    collectNoteData()
+                }
             }
-        }
         onBackPressedDispatcher.addCallback(this, backButtonPressedCallback)
+    }
+
+
+    private fun observeNoteAppVMValues() {
+
+        noteAppSharedViewModel.currentNotePinned.observe(this){
+
+            generalButtonIVHelper.updatePinHighlight(noteViewBinding.pinButtonIV, this)
+
+            val pinStateFeedback =
+                if (it == true) { "Note Pinned" }
+
+                else { "Note Unpinned" }
+
+            generalButtonIVHelper.displayFeedbackToast(this, pinStateFeedback, false)
+        }
     }
 
 
@@ -297,25 +302,28 @@ class NoteViewActivity : AppCompatActivity() {
 
         noteAppSharedViewModel.noteWasCreated.observe(this){
 
-            if (noteAppSharedViewModel.noteWasCreated.value == true) {
+            if (it == true) {
 
-                generalUIHelper.closeActivityWithFeedback("Note Created", this, this)
+                generalButtonIVHelper.closeActivityWithFeedback("Note Created",
+                    this, this)
             }
         }
 
         noteAppSharedViewModel.noteWasUpdated.observe(this){
 
-            if (noteAppSharedViewModel.noteWasUpdated.value == true) {
+            if (it == true) {
 
-                generalUIHelper.closeActivityWithFeedback("Note Updated", this, this)
+                generalButtonIVHelper.closeActivityWithFeedback("Note Updated",
+                    this, this)
             }
         }
 
         noteAppSharedViewModel.noteWasDeleted.observe(this){
 
-            if (noteAppSharedViewModel.noteWasDeleted.value == true) {
+            if (it == true) {
 
-                generalUIHelper.closeActivityWithFeedback("Note Deleted", this, this)
+                generalButtonIVHelper.closeActivityWithFeedback("Note Deleted",
+                    this, this)
             }
         }
     }

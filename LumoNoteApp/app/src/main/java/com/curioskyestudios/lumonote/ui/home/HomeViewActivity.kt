@@ -10,13 +10,13 @@ import com.curioskyestudios.lumonote.databinding.ActivityHomeViewBinding
 import com.curioskyestudios.lumonote.ui.home.calendar.CalendarViewFragment
 import com.curioskyestudios.lumonote.ui.home.notepreview.view.NotePreviewViewFragment
 import com.curioskyestudios.lumonote.ui.home.settings.SettingsViewFragment
-import com.curioskyestudios.lumonote.utils.general.GeneralUIHelper
+import com.curioskyestudios.lumonote.utils.general.GeneralButtonIVHelper
 
 class HomeViewActivity : AppCompatActivity() {
 
     private lateinit var homeViewBinding: ActivityHomeViewBinding
     private lateinit var homeViewModel: HomeViewModel
-    private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
+    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
 
     private val notePreviewViewFragment = NotePreviewViewFragment()
     private val calendarViewFragment = CalendarViewFragment()
@@ -128,10 +128,10 @@ class HomeViewActivity : AppCompatActivity() {
 
         if (isActive) {
 
-            generalUIHelper.changeButtonIVColor(this, buttonImageView, R.color.gold)
+            generalButtonIVHelper.changeButtonIVCustomColor(this, buttonImageView, R.color.gold)
         } else {
 
-            generalUIHelper.changeButtonIVColor(this, buttonImageView, R.color.light_grey_2)
+            generalButtonIVHelper.changeButtonIVCustomColor(this, buttonImageView, R.color.light_grey_2)
         }
     }
 

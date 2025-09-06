@@ -6,26 +6,27 @@ import androidx.lifecycle.ViewModel
 
 class EditInputViewModel : ViewModel() {
 
-    private val _textFormatBtnActive = MutableLiveData(false)
-    val textFormatBtnActive: LiveData<Boolean> get() = _textFormatBtnActive
-    private val _colorBtnActive = MutableLiveData(false)
-    val colorBtnActive: LiveData<Boolean> get() = _colorBtnActive
-    private val _checklistBtnActive = MutableLiveData(false)
-    val checklistBtnActive: LiveData<Boolean> get() = _checklistBtnActive
+    private val _textFormatBtnIsActive = MutableLiveData(false)
+    val textFormatBtnIsActive: LiveData<Boolean> get() = _textFormatBtnIsActive
+    private val _colorBtnIsActive = MutableLiveData(false)
+    val colorBtnIsActive: LiveData<Boolean> get() = _colorBtnIsActive
+    private val _checklistBtnIsActive = MutableLiveData(false)
+    val checklistBtnIsActive: LiveData<Boolean> get() = _checklistBtnIsActive
 
 
     fun setTextFormatBtnActive(isActive: Boolean) {
 
-        _textFormatBtnActive.value = isActive
+
+        _textFormatBtnIsActive.value = isActive
     }
 
     fun setColorBtnActive(isActive: Boolean) {
 
-        _colorBtnActive.value = isActive
+        _colorBtnIsActive.value = isActive
     }
 
     fun setChecklistBtnActive(isActive: Boolean) {
 
-        _checklistBtnActive.value = isActive
+        _checklistBtnIsActive.value = isActive
     }
 }
