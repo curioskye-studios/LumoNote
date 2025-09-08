@@ -1,4 +1,4 @@
-package com.curioskyestudios.lumonote.ui.home.notepreview.view
+package com.curioskyestudios.lumonote.ui.home.calendar.view
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,9 +14,9 @@ import com.curioskyestudios.lumonote.utils.general.GeneralButtonIVHelper
 
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
-class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
-                         private val whenCurrentNotePinClicked: (Boolean, Int) -> Unit)
-    : RecyclerView.Adapter<NotePreviewAdapter.NotePreviewViewHolder>() {
+class CalendarNotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
+                                 private val whenCurrentNotePinClicked: (Boolean, Int) -> Unit)
+    : RecyclerView.Adapter<CalendarNotePreviewAdapter.NotePreviewViewHolder>() {
 
     private val notesList = mutableListOf<Note>()
     private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()

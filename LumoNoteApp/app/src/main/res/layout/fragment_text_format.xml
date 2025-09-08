@@ -9,6 +9,8 @@
     android:layout_width="match_parent"
     android:background="@drawable/black_fab"
 
+    android:clickable="true"
+
     tools:context=".ui.noteview.view.TextFormatFragment">
 
 

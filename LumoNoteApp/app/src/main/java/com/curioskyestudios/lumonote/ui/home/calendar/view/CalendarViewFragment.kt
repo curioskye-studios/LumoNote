@@ -1,4 +1,4 @@
-package com.curioskyestudios.lumonote.ui.home.calendar
+package com.curioskyestudios.lumonote.ui.home.calendar.view
 
 import android.os.Bundle
 import android.view.LayoutInflater

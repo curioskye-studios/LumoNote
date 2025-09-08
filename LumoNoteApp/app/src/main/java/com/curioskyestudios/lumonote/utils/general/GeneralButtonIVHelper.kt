@@ -2,30 +2,19 @@ package com.curioskyestudios.lumonote.utils.general
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import com.curioskyestudios.lumonote.R
 
 class GeneralButtonIVHelper {
 
-    fun getResourceDrawable(context: Context, drawable: Int, customColor: Int): Drawable? {
+    fun changeButtonIVResBackground(context: Context, buttonIV: ImageView, color: Int) {
 
-        val retrievedDrawable = ContextCompat.getDrawable(context, drawable)
-
-        // Wrap and mutate so it won't affect other uses of the same drawable
-        val tintedDrawable = retrievedDrawable?.mutate()
-
-        if (tintedDrawable != null) {
-            DrawableCompat.setTint(tintedDrawable, ContextCompat.getColor(context, customColor))
-        }
-
-        return tintedDrawable
+        buttonIV.setBackgroundColor(ContextCompat.getColor(context, color))
     }
 
-    fun changeButtonIVCustomColor(context: Context, buttonIV: ImageView, color: Int) {
+    fun changeButtonIVResTint(context: Context, buttonIV: ImageView, color: Int) {
 
         buttonIV.imageTintList = ContextCompat.getColorStateList(context, color)
     }
@@ -33,14 +22,14 @@ class GeneralButtonIVHelper {
 
     fun disableButtonIV(buttonIV: ImageView, context: Context) {
 
-        changeButtonIVCustomColor(context, buttonIV, R.color.light_grey_3)
+        changeButtonIVResTint(context, buttonIV, R.color.light_grey_3)
 
         buttonIV.isEnabled = false
     }
 
     fun enableButtonIV(buttonIV: ImageView, context: Context) {
 
-        changeButtonIVCustomColor(context, buttonIV, R.color.light_grey_1)
+        changeButtonIVResTint(context, buttonIV, R.color.light_grey_1)
 
         buttonIV.isEnabled = true
     }
@@ -48,12 +37,14 @@ class GeneralButtonIVHelper {
 
     fun highlightButtonIV(buttonIV: ImageView, context: Context) {
 
-        changeButtonIVCustomColor(context, buttonIV, R.color.gold)
+        changeButtonIVResTint(context, buttonIV, R.color.gold)
+        //changeButtonIVResBackground(context, buttonIV, R.color.black)
     }
 
     fun unhighlightButtonIV(buttonIV: ImageView, context: Context) {
 
-        changeButtonIVCustomColor(context, buttonIV, R.color.light_grey_1)
+        changeButtonIVResTint(context, buttonIV, R.color.light_grey_1)
+        //buttonIV.setBackgroundResource(0)
     }
 
     fun updateButtonIVHighlight(buttonIV: ImageView, isActive: Boolean, context: Context) {
@@ -71,10 +62,10 @@ class GeneralButtonIVHelper {
 
         if (pinButtonIV.tag == true) {
 
-            changeButtonIVCustomColor(context, pinButtonIV, R.color.gold)
+            changeButtonIVResTint(context, pinButtonIV, R.color.gold)
         } else {
 
-            changeButtonIVCustomColor(context, pinButtonIV, R.color.light_grey_3)
+            changeButtonIVResTint(context, pinButtonIV, R.color.light_grey_3)
         }
     }
 

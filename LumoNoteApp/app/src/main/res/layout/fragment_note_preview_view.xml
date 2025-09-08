@@ -8,6 +8,7 @@
 
     android:background="@color/black"
     android:orientation="vertical"
+    android:clickable="true"
 
     android:id="@+id/notePreviewViewRL"
 

@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.curioskyestudios.lumonote.R
 import com.curioskyestudios.lumonote.databinding.ActivityHomeViewBinding
-import com.curioskyestudios.lumonote.ui.home.calendar.CalendarViewFragment
+import com.curioskyestudios.lumonote.ui.home.calendar.view.CalendarViewFragment
 import com.curioskyestudios.lumonote.ui.home.notepreview.view.NotePreviewViewFragment
 import com.curioskyestudios.lumonote.ui.home.settings.SettingsViewFragment
 import com.curioskyestudios.lumonote.utils.general.GeneralButtonIVHelper
@@ -128,10 +128,10 @@ class HomeViewActivity : AppCompatActivity() {
 
         if (isActive) {
 
-            generalButtonIVHelper.changeButtonIVCustomColor(this, buttonImageView, R.color.gold)
+            generalButtonIVHelper.changeButtonIVResTint(this, buttonImageView, R.color.gold)
         } else {
 
-            generalButtonIVHelper.changeButtonIVCustomColor(this, buttonImageView, R.color.light_grey_2)
+            generalButtonIVHelper.changeButtonIVResTint(this, buttonImageView, R.color.light_grey_2)
         }
     }
 
