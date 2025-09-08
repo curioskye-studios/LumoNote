@@ -59,6 +59,7 @@ class NoteViewActivity : AppCompatActivity() {
         editContentSharedViewModel = ViewModelProvider(this).get(EditContentSharedViewModel::class.java)
         editContentSharedViewModel.setNoteContentEditTextView(noteViewBinding.noteContentET)
 
+
         // Check if working with existing note
         val isExistingNote = checkIfIsExistingNote()
         if (isExistingNote == null) {
@@ -68,12 +69,6 @@ class NoteViewActivity : AppCompatActivity() {
         } else {
 
             populateUIWithNoteData(isExistingNote)
-        }
-
-        //insert EditInputFragment
-        supportFragmentManager.beginTransaction().apply {
-
-            replace(noteViewBinding.editSectionFC.id, editInputFragment)
         }
 
 
@@ -86,7 +81,7 @@ class NoteViewActivity : AppCompatActivity() {
 
         notifyIfEditing()
 
-        updateSelectionOnChange()
+        detectSelectionFormattingOnChange()
 
         setOnClickListeners()
 
@@ -109,7 +104,7 @@ class NoteViewActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateSelectionOnChange() {
+    private fun detectSelectionFormattingOnChange() {
 
         noteViewBinding.noteContentET.onSelectionChange = { selectStart, selectEnd ->
 

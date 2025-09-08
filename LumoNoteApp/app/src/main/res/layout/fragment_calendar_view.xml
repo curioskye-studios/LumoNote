@@ -44,6 +44,42 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <com.ak.KalendarView
+        android:id="@+id/calendarDateSelectorCV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/calendarTopBarCL"
+
+        app:calendarBackground="@color/black"
+
+        app:monthTextStyle="@style/CalendarMonthTextStyle"
+        app:weekTextStyle="@style/CalendarWeekTextStyle"
+        app:dateTextStyle="@style/CalendarDateTextStyle"
+
+        app:nextIcon="@drawable/baseline_cal_arrow_forward_24"
+        app:prevIcon="@drawable/baseline_cal_arrow_back_24"
+
+        app:todayIndicator="@drawable/gold_circle"
+        app:selectedIndicator="@drawable/gold_fab"
+        app:eventIndicator="@drawable/gold_fab"
+
+        app:dateColor="@color/light_grey_1"
+        app:nonMonthDateColor="@color/light_grey_3"
+        app:todayDateColor="@color/gold"
+        app:selectedDateColor="@color/black"
+
+        app:animatingMonths="false"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/calendarNotesPreviewRV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="12dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:layout_below="@id/calendarDateSelectorCV"/>
 
 
 </RelativeLayout>

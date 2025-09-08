@@ -2,12 +2,28 @@ package com.curioskyestudios.lumonote.utils.general
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import com.curioskyestudios.lumonote.R
 
 class GeneralButtonIVHelper {
+
+    fun getResourceDrawable(context: Context, drawable: Int, customColor: Int): Drawable? {
+
+        val retrievedDrawable = ContextCompat.getDrawable(context, drawable)
+
+        // Wrap and mutate so it won't affect other uses of the same drawable
+        val tintedDrawable = retrievedDrawable?.mutate()
+
+        if (tintedDrawable != null) {
+            DrawableCompat.setTint(tintedDrawable, ContextCompat.getColor(context, customColor))
+        }
+
+        return tintedDrawable
+    }
 
     fun changeButtonIVCustomColor(context: Context, buttonIV: ImageView, color: Int) {
 
