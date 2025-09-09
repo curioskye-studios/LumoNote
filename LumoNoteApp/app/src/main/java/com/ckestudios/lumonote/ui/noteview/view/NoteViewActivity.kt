@@ -17,6 +17,7 @@ import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.ckestudios.lumonote.utils.general.BasicUtilityHelper
 import com.ckestudios.lumonote.utils.general.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.general.GeneralTextHelper
+import com.ckestudios.lumonote.utils.general.GeneralUIHelper
 import java.time.LocalDate
 
 
@@ -32,6 +33,7 @@ class NoteViewActivity : AppCompatActivity() {
     private lateinit var retrievedNote: Note
 
     private val basicUtilityHelper = BasicUtilityHelper()
+    private val generalUIHelper = GeneralUIHelper()
 
     private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
@@ -247,7 +249,7 @@ class NoteViewActivity : AppCompatActivity() {
 
                 else { "Note Unpinned" }
 
-            generalButtonIVHelper.displayFeedbackToast(this, pinStateFeedback, false)
+            generalUIHelper.displayFeedbackToast(this, pinStateFeedback, false)
         }
     }
 
@@ -299,8 +301,8 @@ class NoteViewActivity : AppCompatActivity() {
 
             if (it == true) {
 
-                generalButtonIVHelper.closeActivityWithFeedback("Note Created",
-                    this, this)
+                generalUIHelper.closeActivityWithFeedback("Note Created", this,
+                    this)
             }
         }
 
@@ -308,8 +310,8 @@ class NoteViewActivity : AppCompatActivity() {
 
             if (it == true) {
 
-                generalButtonIVHelper.closeActivityWithFeedback("Note Updated",
-                    this, this)
+                generalUIHelper.closeActivityWithFeedback("Note Updated", this,
+                    this)
             }
         }
 
@@ -317,8 +319,8 @@ class NoteViewActivity : AppCompatActivity() {
 
             if (it == true) {
 
-                generalButtonIVHelper.closeActivityWithFeedback("Note Deleted",
-                    this, this)
+                generalUIHelper.closeActivityWithFeedback("Note Deleted", this,
+                    this)
             }
         }
     }

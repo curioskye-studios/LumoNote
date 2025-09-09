@@ -45,18 +45,15 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-
     <com.ak.KalendarView
-        android:id="@+id/calendarDateSelectorCV"
+        android:id="@+id/calendarDateSelectorKV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:layout_marginTop="3dp"
-        android:paddingTop="8dp"
+        android:paddingTop="10dp"
         android:paddingBottom="24dp"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
+        android:layout_marginTop="3dp"
         android:layout_marginRight="12dp"
         android:layout_marginLeft="12dp"
         android:background="@drawable/calendar_background"
@@ -84,13 +81,14 @@
         app:animatingMonths="false"
         />
 
+
     <TextView
         android:id="@+id/selectedDateTV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
 
-        android:hint="Weekday, Month XX, XXXX"
+        android:hint="Weekday, Mon XX, XXXX"
         android:textColor="@color/light_grey_1"
         android:textColorHint="@color/light_grey_1"
         android:textSize="22dp"
@@ -98,21 +96,17 @@
         android:textStyle="bold"
         android:fontFamily="@font/inter"
 
-        android:layout_below="@id/calendarDateSelectorCV"
+        android:layout_below="@id/calendarDateSelectorKV"
         />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/calendarNotesPreviewRV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        android:layout_marginTop="16dp"
         android:paddingLeft="12dp"
         android:paddingRight="12dp"
-
-
-        android:layout_below="@id/selectedDateTV"
-        />
+        android:layout_marginTop="8dp"
+        android:layout_below="@id/selectedDateTV"/>
 
 
 </RelativeLayout>

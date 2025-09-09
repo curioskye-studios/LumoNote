@@ -1,9 +1,7 @@
 package com.ckestudios.lumonote.utils.general
 
-import android.app.Activity
 import android.content.Context
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.ckestudios.lumonote.R
 
@@ -67,27 +65,6 @@ class GeneralButtonIVHelper {
 
             changeButtonIVResTint(context, pinButtonIV, R.color.light_grey_3)
         }
-    }
-
-
-    fun displayFeedbackToast(context: Context, message: String, longDisplayPeriod: Boolean) {
-
-        if (longDisplayPeriod) {
-
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-        } else {
-
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-        }
-
-    }
-
-    fun closeActivityWithFeedback(feedback: String, context: Context, activity: Activity) {
-
-        // Closes view note activity, pops from activity stack, returns to main below it
-        activity.finish()
-
-        displayFeedbackToast(context, feedback, true)
     }
 
 }

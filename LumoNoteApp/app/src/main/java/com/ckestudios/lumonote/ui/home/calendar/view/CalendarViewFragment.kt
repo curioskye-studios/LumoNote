@@ -5,9 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.ckestudios.lumonote.databinding.FragmentCalendarViewBinding
+import com.ckestudios.lumonote.ui.home.calendar.viewmodel.CalendarViewModel
 import com.ckestudios.lumonote.utils.general.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.general.GeneralTextHelper
 import com.ckestudios.lumonote.utils.general.GeneralUIHelper
+import java.time.ZoneId
 import java.util.Date
 
 
@@ -25,11 +29,16 @@ class CalendarViewFragment : Fragment() {
 
     private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
     private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
+    private val generalTextHelper: GeneralTextHelper = GeneralTextHelper()
+
+    private lateinit var calendarViewModel: CalendarViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
+        calendarViewModel = ViewModelProvider(this).get(CalendarViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -46,7 +55,26 @@ class CalendarViewFragment : Fragment() {
 
         super.onViewCreated(view, savedInstanceState)
 
-        calendarViewBinding.calendarDateSelectorCV.setInitialSelectedDate(Date())
+
+        calendarViewBinding.calendarDateSelectorKV.setInitialSelectedDate(Date())
+
+        calendarViewModel.setSelectedDate(Date())
+
+
+        calendarViewBinding.calendarDateSelectorKV.setDateSelector { selectedDate ->
+
+           calendarViewModel.setSelectedDate(selectedDate)
+        }
+
+        calendarViewModel.selectedDate.observe(viewLifecycleOwner) { date ->
+
+            val localDateConvert= date.toInstant()
+            .atZone(ZoneId.systemDefault()) // or specify a zone
+            .toLocalDate()
+
+            calendarViewBinding.selectedDateTV.text = generalTextHelper.formatDate(localDateConvert)
+        }
+
     }
 
     // Called when the view is destroyed (e.g. when navigating away)

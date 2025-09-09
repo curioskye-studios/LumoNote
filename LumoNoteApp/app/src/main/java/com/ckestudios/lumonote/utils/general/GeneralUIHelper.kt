@@ -1,8 +1,10 @@
 package com.ckestudios.lumonote.utils.general
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 
@@ -31,5 +33,26 @@ class GeneralUIHelper {
 
             view.visibility = View.GONE
         }
+    }
+
+
+    fun displayFeedbackToast(context: Context, message: String, longDisplayPeriod: Boolean) {
+
+        if (longDisplayPeriod) {
+
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        } else {
+
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+    fun closeActivityWithFeedback(feedback: String, context: Context, activity: Activity) {
+
+        // Closes view note activity, pops from activity stack, returns to main below it
+        activity.finish()
+
+        displayFeedbackToast(context, feedback, true)
     }
 }
