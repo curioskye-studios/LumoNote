@@ -45,6 +45,42 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <LinearLayout
+        android:id="@+id/generalLabelTV"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:fontFamily="@font/inter"
+        android:layout_marginBottom="16dp"
+        android:textColor="@color/light_grey_1"
+        android:textSize="20dp"
 
+        android:background="@drawable/calendar_background"
+
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+
+        android:paddingLeft="24dp"
+
+        android:layout_below="@id/settingsTopBarCL"
+        >
+
+        <TextView
+            android:id="@+id/generalLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:fontFamily="@font/inter"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
+            android:text="General"
+            android:textColor="@color/gold"
+            android:textStyle="bold"
+            android:textSize="20sp"
+
+            android:layout_below="@id/settingsTopBarCL"
+            >
+        </TextView>
+
+    </LinearLayout>
 
 </RelativeLayout>

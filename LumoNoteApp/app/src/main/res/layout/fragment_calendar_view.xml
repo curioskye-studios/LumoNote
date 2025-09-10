@@ -45,68 +45,119 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.ak.KalendarView
-        android:id="@+id/calendarDateSelectorKV"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:paddingBottom="24dp"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginRight="12dp"
-        android:layout_marginLeft="12dp"
-        android:background="@drawable/calendar_background"
+        android:layout_height="match_parent"
 
         android:layout_below="@id/calendarTopBarCL"
 
-        app:calendarBackground="@color/dark_grey"
+        android:layout_marginRight="12dp"
+        android:layout_marginLeft="12dp"
+        >
 
-        app:monthTextStyle="@style/CalendarMonthTextStyle"
-        app:weekTextStyle="@style/CalendarWeekTextStyle"
-        app:dateTextStyle="@style/CalendarDateTextStyle"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        app:nextIcon="@drawable/baseline_cal_arrow_forward_24"
-        app:prevIcon="@drawable/baseline_cal_arrow_back_24"
+            <com.ak.KalendarView
+                android:id="@+id/calendarDateSelectorKV"
+                android:layout_width="match_parent"
+                android:layout_height="415dp"
 
-        app:todayIndicator="@drawable/gold_circle"
-        app:selectedIndicator="@drawable/gold_circle_filled"
-        app:eventIndicator="@drawable/gold_circle_filled"
+                android:paddingTop="10dp"
+                android:paddingBottom="24dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:layout_marginTop="6dp"
 
-        app:dateColor="@color/light_grey_1"
-        app:nonMonthDateColor="@color/light_grey_3"
-        app:todayDateColor="@color/gold"
-        app:selectedDateColor="@color/black"
+                android:background="@drawable/calendar_background"
 
-        app:animatingMonths="false"
-        />
+                app:calendarBackground="@color/dark_grey"
+
+                app:monthTextStyle="@style/CalendarMonthTextStyle"
+                app:weekTextStyle="@style/CalendarWeekTextStyle"
+                app:dateTextStyle="@style/CalendarDateTextStyle"
+
+                app:nextIcon="@drawable/baseline_cal_arrow_forward_24"
+                app:prevIcon="@drawable/baseline_cal_arrow_back_24"
+
+                app:todayIndicator="@drawable/gold_circle"
+                app:selectedIndicator="@drawable/gold_circle_filled"
+                app:eventIndicator="@drawable/gold_circle_filled"
+
+                app:dateColor="@color/light_grey_1"
+                app:nonMonthDateColor="@color/light_grey_3"
+                app:todayDateColor="@color/gold"
+                app:selectedDateColor="@color/black"
+
+                app:animatingMonths="false"
+                />
 
 
-    <TextView
-        android:id="@+id/selectedDateTV"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+            <TextView
+                android:id="@+id/selectedDateTV"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="18dp"
 
-        android:hint="Weekday, Mon XX, XXXX"
-        android:textColor="@color/light_grey_1"
-        android:textColorHint="@color/light_grey_1"
-        android:textSize="22dp"
-        android:textAlignment="center"
-        android:textStyle="bold"
-        android:fontFamily="@font/inter"
+                android:hint="Weekday, Mon XX, XXXX"
+                android:textColor="@color/gold"
+                android:textColorHint="@color/gold"
+                android:textSize="23dp"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter"
 
-        android:layout_below="@id/calendarDateSelectorKV"
-        />
+                android:layout_below="@id/calendarDateSelectorKV"
+                />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/calendarNotesPreviewRV"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
-        android:layout_marginTop="8dp"
-        android:layout_below="@id/selectedDateTV"/>
+            <TextView
+                android:id="@+id/notesLabelTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="16dp"
+                android:text="Notes Created"
+                android:textColor="@color/light_grey_3"
+                android:textSize="20dp"
+                android:textAlignment="center"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+            </TextView>
+
+
+            <TextView
+                android:id="@+id/noNotesMessageTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="16dp"
+                android:paddingLeft="16dp"
+                android:text="No notes created on this day yet."
+                android:textColor="@color/light_grey_1"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+            </TextView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/calendarNotesPreviewRV"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/selectedDateTV"/>
+
+
+        </LinearLayout>
+
+
+
+    </androidx.core.widget.NestedScrollView>
+
+
 
 
 </RelativeLayout>

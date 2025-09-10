@@ -95,10 +95,6 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
         notifyDataSetChanged()
     }
 
-    fun updateAreNotesPinned() {
-
-    }
-
     private fun updatePinHighlight(holder: NotePreviewViewHolder){
 
         if (holder.pinPreview.tag == true) {
