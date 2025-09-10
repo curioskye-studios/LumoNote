@@ -8,7 +8,6 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.models.Note
-import com.ckestudios.lumonote.utils.general.GeneralButtonIVHelper
 
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
@@ -16,24 +15,24 @@ class CalendarNotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit)
     : RecyclerView.Adapter<CalendarNotePreviewAdapter.CalendarNotePreviewViewHolder>() {
 
     private val notesList = mutableListOf<Note>()
-    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
 
 
     // The layout from which this view data is accessed is passed into this later
-    class CalendarNotePreviewViewHolder (notePreviewView: View) : RecyclerView.ViewHolder(notePreviewView) {
+    class CalendarNotePreviewViewHolder (calendarNotePreviewView: View) : RecyclerView.ViewHolder(calendarNotePreviewView) {
 
-        val noteCardPreview: CardView = notePreviewView.findViewById(R.id.notePreviewCV)
-        val titlePreview: TextView = notePreviewView.findViewById(R.id.titlePreviewTV)
-        val contentPreview: TextView = notePreviewView.findViewById(R.id.contentPreviewTV)
+        val noteCardPreview: CardView = calendarNotePreviewView.findViewById(R.id.notePreviewCV)
+        val titlePreview: TextView = calendarNotePreviewView.findViewById(R.id.titlePreviewTV)
+        val contentPreview: TextView = calendarNotePreviewView.findViewById(R.id.contentPreviewTV)
     }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalendarNotePreviewViewHolder {
 
-        val notePreviewView = LayoutInflater.from(parent.context).inflate(R.layout.item_calendar_note,
+        val calendarNotePreviewView =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_calendar_note,
             parent, false)
 
-        return CalendarNotePreviewViewHolder(notePreviewView)
+        return CalendarNotePreviewViewHolder(calendarNotePreviewView)
     }
 
     // Returns the total number of items in the data set held by the adapter

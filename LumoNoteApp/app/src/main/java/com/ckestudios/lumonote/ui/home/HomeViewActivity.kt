@@ -42,6 +42,7 @@ class HomeViewActivity : AppCompatActivity() {
             commit()
         }
 
+        homeViewModel.setNotePreviewActive(true)
         switchToFragment(notePreviewViewFragment, calendarViewFragment, settingsViewFragment)
 
         homeViewBinding.notesViewIV.setOnClickListener {

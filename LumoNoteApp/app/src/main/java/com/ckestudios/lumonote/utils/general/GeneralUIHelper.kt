@@ -48,11 +48,12 @@ class GeneralUIHelper {
 
     }
 
-    fun closeActivityWithFeedback(feedback: String, context: Context, activity: Activity) {
+    fun closeActivityWithFeedback(feedback: String, context: Context, activity: Activity,
+                                  longDisplayPeriod: Boolean) {
 
         // Closes view note activity, pops from activity stack, returns to main below it
         activity.finish()
 
-        displayFeedbackToast(context, feedback, true)
+        displayFeedbackToast(context, feedback, longDisplayPeriod)
     }
 }

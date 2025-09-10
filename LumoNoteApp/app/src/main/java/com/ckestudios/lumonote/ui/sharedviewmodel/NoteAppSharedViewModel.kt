@@ -8,7 +8,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.ckestudios.lumonote.data.database.DatabaseHelper
 import com.ckestudios.lumonote.data.models.Note
+import com.ckestudios.lumonote.utils.general.BasicUtilityHelper
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.util.Date
 
 
 // This lives as long as the Application
@@ -17,6 +20,8 @@ class NoteAppSharedViewModel(application: Application, private val dbConnection:
 
     private val _notes = MutableLiveData<List<Note>>()
     val notes: LiveData<List<Note>> = _notes
+    private val _notesOnDate = MutableLiveData<List<Note>>()
+    val notesOnDate: LiveData<List<Note>> = _notesOnDate
     private val _notifyRefresh = MutableLiveData<Boolean>()
     val notifyRefresh: LiveData<Boolean> = _notifyRefresh
 
@@ -38,15 +43,27 @@ class NoteAppSharedViewModel(application: Application, private val dbConnection:
     private val _currentPreviewNoteID = MutableLiveData(-1)
     val currentPreviewNoteID: LiveData<Int> = _currentPreviewNoteID
 
+    val basicUtilityHelper = BasicUtilityHelper()
+
     init {
 
         loadAllNotes()
+
+        val currentDateAsLocalDate = basicUtilityHelper.convertDateToLocalDate(Date())
+        loadAllNotesOnDate(currentDateAsLocalDate)
     }
 
     fun loadAllNotes() {
 
         viewModelScope.launch {
             _notes.value = dbConnection.getAllNotes()
+        }
+    }
+
+    fun loadAllNotesOnDate(date: LocalDate) {
+
+        viewModelScope.launch {
+            _notesOnDate.value = dbConnection.getNotesByDate(date.toString())
         }
     }
 

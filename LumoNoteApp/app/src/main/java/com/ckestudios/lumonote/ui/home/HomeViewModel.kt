@@ -14,6 +14,7 @@ class HomeViewModel : ViewModel() {
     val settingsActive: LiveData<Boolean> get() = _settingsActive
 
 
+
     fun setNotePreviewActive(isActive: Boolean) {
 
         _notePreviewActive.value = isActive

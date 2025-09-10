@@ -14,11 +14,11 @@ import com.ckestudios.lumonote.ui.home.calendar.viewmodel.CalendarViewModel
 import com.ckestudios.lumonote.ui.noteview.view.NoteViewActivity
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
+import com.ckestudios.lumonote.utils.general.BasicUtilityHelper
 import com.ckestudios.lumonote.utils.general.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.general.GeneralTextHelper
 import com.ckestudios.lumonote.utils.general.GeneralUIHelper
 import java.time.LocalDate
-import java.time.ZoneId
 import java.util.Date
 
 
@@ -39,6 +39,7 @@ class CalendarViewFragment : Fragment() {
     private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
     private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
     private val generalTextHelper: GeneralTextHelper = GeneralTextHelper()
+    private val basicUtilityHelper: BasicUtilityHelper = BasicUtilityHelper()
 
     private lateinit var calendarViewModel: CalendarViewModel
     private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
@@ -74,11 +75,13 @@ class CalendarViewFragment : Fragment() {
 
         // Initialize calendar selected date
         val todayCurrentDate = Date()
+        val todayCurrentLocalDate = basicUtilityHelper.convertDateToLocalDate(Date())
 
         calendarViewBinding.calendarDateSelectorKV.setInitialSelectedDate(todayCurrentDate)
-        calendarViewModel.setSelectedDate(todayCurrentDate)
+        calendarViewModel.setSelectedDate(todayCurrentLocalDate)
 
 
+        // Setup Functionalities
         initializeAdapters()
 
         setupAdapterDisplays()
@@ -88,6 +91,12 @@ class CalendarViewFragment : Fragment() {
         observeNoteAppVMValues()
 
         observeCalendarVMValues()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        noteAppSharedViewModel.loadAllNotesOnDate(calendarViewModel.selectedDate.value as LocalDate)
     }
 
     // Called when the view is destroyed (e.g. when navigating away)
@@ -133,43 +142,57 @@ class CalendarViewFragment : Fragment() {
 
     private fun setupListeners() {
 
-        calendarViewModel.selectedDate.observe(viewLifecycleOwner) { date ->
+        calendarViewBinding.calendarDateSelectorKV.setDateSelector { selectedDate ->
 
-            val dateAsLocalDate= date.toInstant()
-                .atZone(ZoneId.systemDefault()) // or specify a zone
-                .toLocalDate()
+            val selectedDateAsLocalDate =
+                basicUtilityHelper.convertDateToLocalDate(selectedDate)
 
-            if (dateAsLocalDate == LocalDate.now()) {
-
-                calendarViewBinding.selectedDateTV.text = "Today"
-            } else {
-
-                val dateWithWeekDay = generalTextHelper.formatDate(dateAsLocalDate)
-
-                val dateNoWeekday =  dateWithWeekDay.substring(5)
-
-                calendarViewBinding.selectedDateTV.text = "$dateNoWeekday"
-            }
-
-
+            calendarViewModel.setSelectedDate(selectedDateAsLocalDate)
         }
+
     }
 
     private fun observeNoteAppVMValues() {
 
         // Observe changes
-        noteAppSharedViewModel.notes.observe(viewLifecycleOwner) { notes ->
+        noteAppSharedViewModel.notesOnDate.observe(viewLifecycleOwner) { notesOnDate ->
 
-            calendarNotePreviewAdapter.refreshData(notes)
+            calendarNotePreviewAdapter.refreshData(notesOnDate)
+
+            calendarViewModel.setDateHasNotes(notesOnDate.isNotEmpty())
+
         }
     }
 
 
     private fun observeCalendarVMValues() {
 
-        calendarViewBinding.calendarDateSelectorKV.setDateSelector { selectedDate ->
+        calendarViewModel.apply {
 
-            calendarViewModel.setSelectedDate(selectedDate)
+            selectedDate.observe(viewLifecycleOwner) { date ->
+
+                if (date == LocalDate.now()) {
+
+                    calendarViewBinding.selectedDateTV.text = "Today"
+                } else {
+
+                    val dateWithWeekDay = generalTextHelper.formatDate(date)
+
+                    val dateNoWeekday =  dateWithWeekDay.substring(5)
+
+                    calendarViewBinding.selectedDateTV.text = "$dateNoWeekday"
+                }
+
+                noteAppSharedViewModel.loadAllNotesOnDate(date)
+            }
+
+            dateHasNotes.observe(viewLifecycleOwner) { hasNotes ->
+
+                generalUIHelper.changeViewVisibility(calendarViewBinding.noNotesMessageTV,
+                        !hasNotes)
+            }
+
+            
         }
     }
 

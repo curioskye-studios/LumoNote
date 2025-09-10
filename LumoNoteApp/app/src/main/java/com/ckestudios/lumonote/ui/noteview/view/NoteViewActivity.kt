@@ -302,7 +302,7 @@ class NoteViewActivity : AppCompatActivity() {
             if (it == true) {
 
                 generalUIHelper.closeActivityWithFeedback("Note Created", this,
-                    this)
+                    this, true)
             }
         }
 
@@ -311,7 +311,7 @@ class NoteViewActivity : AppCompatActivity() {
             if (it == true) {
 
                 generalUIHelper.closeActivityWithFeedback("Note Updated", this,
-                    this)
+                    this, true)
             }
         }
 
@@ -320,7 +320,7 @@ class NoteViewActivity : AppCompatActivity() {
             if (it == true) {
 
                 generalUIHelper.closeActivityWithFeedback("Note Deleted", this,
-                    this)
+                    this, true)
             }
         }
     }

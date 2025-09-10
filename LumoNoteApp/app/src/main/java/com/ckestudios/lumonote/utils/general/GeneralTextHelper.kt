@@ -3,7 +3,9 @@ package com.ckestudios.lumonote.utils.general
 import android.util.Log
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Date
 
 class GeneralTextHelper {
     fun formatDate(date: LocalDate) : String {
@@ -46,7 +48,9 @@ class GeneralTextHelper {
         }
 
         return "${weekDayString.take(3)}, $fixedCurrentDate"
-
     }
+
+
+
 
 }

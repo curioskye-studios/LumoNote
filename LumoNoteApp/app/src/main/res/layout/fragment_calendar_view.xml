@@ -136,7 +136,7 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="16dp"
                 android:paddingLeft="16dp"
-                android:text="No notes created on this day yet."
+                android:text="No notes created on this day."
                 android:textColor="@color/light_grey_1"
                 android:textSize="16sp"
                 android:textStyle="bold"

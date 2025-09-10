@@ -118,6 +118,34 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
         return notesList
     }
 
+    fun getNotesByDate(date: String): List<Note> {
+
+        val notesList = mutableListOf<Note>()
+        val db = readableDatabase
+
+        // Query notes where created date matches the given date
+        val query = "SELECT * FROM $NOTE_TABLE_NAME WHERE $NOTE_CREATED_COLUMN = ?"
+        val cursor = db.rawQuery(query, arrayOf(date))
+
+        while (cursor.moveToNext()) {
+            val id = cursor.getInt(cursor.getColumnIndexOrThrow(NOTE_ID_COLUMN))
+            val title = cursor.getString(cursor.getColumnIndexOrThrow(NOTE_TITLE_COLUMN))
+            val content = cursor.getString(cursor.getColumnIndexOrThrow(NOTE_CONTENT_COLUMN))
+            val createdDate = cursor.getString(cursor.getColumnIndexOrThrow(NOTE_CREATED_COLUMN))
+            val modifiedDate = cursor.getString(cursor.getColumnIndexOrThrow(NOTE_MODIFIED_COLUMN))
+            val isPinned = cursor.getString(cursor.getColumnIndexOrThrow(NOTE_PINNED_COLUMN))
+
+            val note = Note(id, title, content, createdDate, modifiedDate, isPinned.toBoolean())
+            notesList.add(note)
+        }
+
+        cursor.close()
+        db.close()
+
+        return notesList
+    }
+
+
     // Update a note in the database w/ the edited version
     fun updateNote(note: Note){
 
