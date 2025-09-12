@@ -3,14 +3,16 @@ package com.ckestudios.lumonote.ui.sharedviewmodel
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.ckestudios.lumonote.data.database.DatabaseHelper
+import com.ckestudios.lumonote.data.database.NoteRepository
+import com.ckestudios.lumonote.data.database.Repository
+import com.ckestudios.lumonote.data.database.TagRepository
 
 
 // A custom ViewModelFactory is needed because our ViewModel has a constructor parameter
 // (a Repository), and ViewModelProvider by default only knows how to create ViewModels
 // with empty constructors.
 class AppSharedViewFactory(
-    private val dbConnection: DatabaseHelper   // Factory holds onto the dependency
+    private val repository: Repository  // Factory holds onto the dependency
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -30,13 +32,13 @@ class AppSharedViewFactory(
             // We already checked isAssignableFrom, so at runtime this cast cannot fail.
             // This is the standard pattern recommended in Android's docs.
             @Suppress("UNCHECKED_CAST")
-            return NoteAppSharedViewModel(Application(), dbConnection) as T
+            return NoteAppSharedViewModel(Application(), repository as NoteRepository) as T
         }
 
         if (modelClass.isAssignableFrom(TagAppSharedViewModel::class.java)) {
 
             @Suppress("UNCHECKED_CAST")
-            return TagAppSharedViewModel(Application(), dbConnection) as T
+            return TagAppSharedViewModel(Application(), repository as TagRepository) as T
         }
 
         // If some other ViewModel type is requested, we throw an error.

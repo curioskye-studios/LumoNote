@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.ckestudios.lumonote.data.database.DatabaseHelper
+import com.ckestudios.lumonote.data.database.NoteRepository
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.utils.general.BasicUtilityHelper
 import kotlinx.coroutines.launch
@@ -15,7 +15,7 @@ import java.util.Date
 
 
 // This lives as long as the Application
-class NoteAppSharedViewModel(application: Application, private val dbConnection: DatabaseHelper)
+class NoteAppSharedViewModel(application: Application, private val noteRepository: NoteRepository)
     : AndroidViewModel(application) {
 
     private val _notes = MutableLiveData<List<Note>>()
@@ -56,14 +56,14 @@ class NoteAppSharedViewModel(application: Application, private val dbConnection:
     fun loadAllNotes() {
 
         viewModelScope.launch {
-            _notes.value = dbConnection.getAllNotes()
+            _notes.value = noteRepository.getItems()
         }
     }
 
     fun loadAllNotesOnDate(date: LocalDate) {
 
         viewModelScope.launch {
-            _notesOnDate.value = dbConnection.getNotesByDate(date.toString())
+            _notesOnDate.value = noteRepository.getNotesByDate(date.toString())
         }
     }
 
@@ -73,12 +73,12 @@ class NoteAppSharedViewModel(application: Application, private val dbConnection:
 
     fun getNote(noteID: Int) : Note {
         // Call database helper object and invoke get note method to pull note from database
-        return dbConnection.getNoteByID(noteID)
+        return noteRepository.getItemByID(noteID)
     }
 
     fun deleteNote(noteID: Int) {
         // Call database helper object and invoke delete note method w/ note id
-        dbConnection.deleteNote(noteID)
+        noteRepository.deleteItem(noteID)
 
         // notify activity
         setNoteWasDeleted(true)
@@ -93,14 +93,14 @@ class NoteAppSharedViewModel(application: Application, private val dbConnection:
             Log.d("noteDataDate", note.noteModifiedDate)
 
             // Call database helper object and invoke note insertion method w/ new note
-            dbConnection.insertNote(note)
+            noteRepository.insertItem(note)
 
             setNoteWasCreated(true)
         } else {
 
 
             // Call database helper object and invoke note update method w/ updated note
-            dbConnection.updateNote(note)
+            noteRepository.updateItem(note)
 
             setNoteWasUpdated(true)
         }

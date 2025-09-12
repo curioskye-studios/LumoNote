@@ -193,6 +193,7 @@
                 android:hint="Make a note..."
 
                 android:inputType="textMultiLine"
+                android:textColorHighlight="@color/light_grey_3"
                 android:lineSpacingMultiplier="1.2"
                 android:minHeight="48dp"
                 android:paddingRight="10dp"

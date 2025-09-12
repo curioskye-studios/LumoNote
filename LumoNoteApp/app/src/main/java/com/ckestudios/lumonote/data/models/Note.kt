@@ -1,7 +1,7 @@
 package com.ckestudios.lumonote.data.models
 
 // Stores all the data associated with a note element object
-data class Note(
+data class Note (
 
     val noteID: Int,
 
@@ -11,4 +11,7 @@ data class Note(
     val noteCreatedDate: String,
     val noteModifiedDate: String,
     var notePinned: Boolean
-)
+) : Item() {
+    override val ID: Int
+        get() = noteID
+}

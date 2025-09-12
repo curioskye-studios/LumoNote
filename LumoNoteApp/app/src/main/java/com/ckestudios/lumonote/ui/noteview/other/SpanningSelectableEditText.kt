@@ -14,6 +14,7 @@ class SpanningSelectableEditText(context: Context, attrs: AttributeSet?)
     private val textSizeHelper = TextSizeHelper(this)
     private val textBulletHelper = TextBulletHelper(this)
     private val textSpanChecker = TextSpanChecker(this)
+    private lateinit var richTextFormatter: RichTextFormatter
 
     fun getStyleHelper() : TextStyleHelper {
 
@@ -33,6 +34,11 @@ class SpanningSelectableEditText(context: Context, attrs: AttributeSet?)
     fun getSpanChecker() : TextSpanChecker {
 
         return textSpanChecker
+    }
+
+    fun setRichTextFormatter(richTextFormatter: RichTextFormatter) {
+
+        this.richTextFormatter = richTextFormatter
     }
 
 }

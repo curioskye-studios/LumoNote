@@ -12,7 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.ckestudios.lumonote.data.database.DatabaseHelper
+import com.ckestudios.lumonote.data.database.NoteRepository
+import com.ckestudios.lumonote.data.database.TagRepository
 import com.ckestudios.lumonote.databinding.FragmentNotePreviewViewBinding
 import com.ckestudios.lumonote.ui.noteview.view.NoteViewActivity
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
@@ -54,14 +55,14 @@ class NotePreviewViewFragment : Fragment() {
 
         super.onCreate(savedInstanceState)
 
-        val dbConnection = DatabaseHelper(requireContext()) // DB
-        val appSharedVMConstructor = AppSharedViewFactory(dbConnection) // Factory
+        val noteRepository = NoteRepository(requireContext()) // DB
+        val tagRepository = TagRepository(requireContext()) // DB
 
         // Custom ViewModelProviders know how to build viewmodels w/ dbconnection dependency
-        noteAppSharedViewModel = ViewModelProvider(this, appSharedVMConstructor)
+        noteAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(noteRepository))
             .get(NoteAppSharedViewModel::class.java)
 
-        tagAppSharedViewModel = ViewModelProvider(this, appSharedVMConstructor)
+        tagAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(tagRepository))
             .get(TagAppSharedViewModel::class.java)
     }
 

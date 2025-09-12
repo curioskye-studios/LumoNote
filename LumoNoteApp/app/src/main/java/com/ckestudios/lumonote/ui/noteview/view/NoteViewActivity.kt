@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.ckestudios.lumonote.data.database.DatabaseHelper
+import com.ckestudios.lumonote.data.database.NoteRepository
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.data.models.TextSize
 import com.ckestudios.lumonote.data.models.TextStyle
@@ -50,8 +50,8 @@ class NoteViewActivity : AppCompatActivity() {
 
 
         // Set up view models
-        var dbConnection = DatabaseHelper(this)
-        var appSharedViewFactory = AppSharedViewFactory(dbConnection)
+        var noteRepository = NoteRepository(this)
+        var appSharedViewFactory = AppSharedViewFactory(noteRepository)
 
         noteAppSharedViewModel = ViewModelProvider(this, appSharedViewFactory)
             .get(NoteAppSharedViewModel::class.java)

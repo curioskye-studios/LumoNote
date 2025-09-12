@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ckestudios.lumonote.data.database.DatabaseHelper
+import com.ckestudios.lumonote.data.database.NoteRepository
 import com.ckestudios.lumonote.databinding.FragmentCalendarViewBinding
 import com.ckestudios.lumonote.ui.home.calendar.viewmodel.CalendarViewModel
 import com.ckestudios.lumonote.ui.noteview.view.NoteViewActivity
@@ -49,8 +49,8 @@ class CalendarViewFragment : Fragment() {
 
         super.onCreate(savedInstanceState)
 
-        val dbConnection = DatabaseHelper(requireContext()) // DB
-        val appSharedVMConstructor = AppSharedViewFactory(dbConnection) // Factory
+        val noteRepository = NoteRepository(requireContext()) // DB
+        val appSharedVMConstructor = AppSharedViewFactory(noteRepository) // Factory
 
         // Custom ViewModelProviders know how to build viewmodels w/ dbconnection dependency
         noteAppSharedViewModel = ViewModelProvider(this, appSharedVMConstructor)

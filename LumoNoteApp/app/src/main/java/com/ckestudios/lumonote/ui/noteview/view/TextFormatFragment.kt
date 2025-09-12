@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.ckestudios.lumonote.data.models.TextSize
 import com.ckestudios.lumonote.data.models.TextStyle
 import com.ckestudios.lumonote.databinding.FragmentTextFormatBinding
+import com.ckestudios.lumonote.ui.noteview.other.RichTextFormatter
 import com.ckestudios.lumonote.ui.noteview.other.SpanningSelectableEditText
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
@@ -35,6 +36,7 @@ class TextFormatFragment: Fragment() {
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
 
     private lateinit var noteContentET: SpanningSelectableEditText
+    private lateinit var richTextFormatter: RichTextFormatter
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -66,6 +68,7 @@ class TextFormatFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         noteContentET = editContentSharedViewModel.noteContentEditTextView.value as SpanningSelectableEditText
+        richTextFormatter = RichTextFormatter(noteContentET)
 
         setOnClickListeners()
 
@@ -87,6 +90,8 @@ class TextFormatFragment: Fragment() {
 
         textFormatViewBinding.apply {
 
+            noteContentET.setRichTextFormatter(richTextFormatter)
+
             normalTextButtonIV.setOnClickListener {
 
                 noteContentET.getSizeHelper().formatAsHeader(TextSize.NORMAL)
@@ -103,7 +108,10 @@ class TextFormatFragment: Fragment() {
 
             boldButtonIV.setOnClickListener {
 
-                noteContentET.getStyleHelper().formatText(TextStyle.BOLD)
+                //noteContentET.getStyleHelper().formatText(TextStyle.BOLD)
+                richTextFormatter.applyRichText(noteContentET.selectionStart, noteContentET.selectionEnd)
+                richTextFormatter.removeBold(noteContentET.selectionStart, noteContentET.selectionEnd)
+
             }
             italicsButtonIV.setOnClickListener {
 
