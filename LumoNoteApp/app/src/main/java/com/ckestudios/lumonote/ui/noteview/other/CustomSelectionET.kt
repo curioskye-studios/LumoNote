@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.appcompat.widget.AppCompatEditText
 
-open class SelectableEditText(context: Context, attrs: AttributeSet?)
+open class CustomSelectionET(context: Context, attrs: AttributeSet?)
     : AppCompatEditText(context, attrs) {
     var onSelectionChange: ((Int, Int) -> Unit)? = null
 

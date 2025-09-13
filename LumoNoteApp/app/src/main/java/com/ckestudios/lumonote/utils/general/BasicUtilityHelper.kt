@@ -1,14 +1,14 @@
 package com.ckestudios.lumonote.utils.general
 
 import android.view.View
-import com.ckestudios.lumonote.ui.noteview.other.SelectableEditText
+import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 
 class BasicUtilityHelper {
 
-    fun clearETViewFocusOnHideKeyboard(editTextView: SelectableEditText, rootView: View){
+    fun clearETViewFocusOnHideKeyboard(editTextView: CustomSelectionET, rootView: View){
 
         editTextView.clearFocusOnKeyboardHide(rootView)
     }

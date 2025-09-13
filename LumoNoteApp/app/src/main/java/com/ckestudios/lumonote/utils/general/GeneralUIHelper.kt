@@ -4,9 +4,12 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
+import android.view.Window
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 
 class GeneralUIHelper {
 
@@ -35,6 +38,19 @@ class GeneralUIHelper {
         }
     }
 
+    fun openKeyboardForView(window: Window, view: View) {
+
+        // Get a controller that can manage system UI insets (keyboard, status bar, nav bar)
+        // for the current window, using 'editText' as the reference view.
+        val insetsController =
+            WindowCompat.getInsetsController(window, view)
+
+        // If the controller exists, request the system to show the IME (soft keyboard).
+        // 'WindowInsetsCompat.Type.ime()' specifically represents the on-screen keyboard.
+        insetsController?.show(WindowInsetsCompat.Type.ime())
+
+    }
+
 
     fun displayFeedbackToast(context: Context, message: String, longDisplayPeriod: Boolean) {
 
@@ -56,4 +72,5 @@ class GeneralUIHelper {
 
         displayFeedbackToast(context, feedback, longDisplayPeriod)
     }
+
 }

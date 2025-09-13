@@ -6,15 +6,16 @@ import com.ckestudios.lumonote.utils.edittexthelper.TextBulletHelper
 import com.ckestudios.lumonote.utils.edittexthelper.TextSizeHelper
 import com.ckestudios.lumonote.utils.edittexthelper.TextSpanChecker
 import com.ckestudios.lumonote.utils.edittexthelper.TextStyleHelper
+import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
 
-class SpanningSelectableEditText(context: Context, attrs: AttributeSet?)
-    : SelectableEditText(context, attrs) {
+class SpannedCustomSelectionET(context: Context, attrs: AttributeSet?)
+    : CustomSelectionET(context, attrs) {
 
     private val textStyleHelper = TextStyleHelper(this)
     private val textSizeHelper = TextSizeHelper(this)
     private val textBulletHelper = TextBulletHelper(this)
     private val textSpanChecker = TextSpanChecker(this)
-    private lateinit var richTextFormatter: RichTextFormatter
+    private lateinit var basicTextFormatter: BasicTextFormatter
 
     fun getStyleHelper() : TextStyleHelper {
 
@@ -36,9 +37,14 @@ class SpanningSelectableEditText(context: Context, attrs: AttributeSet?)
         return textSpanChecker
     }
 
-    fun setRichTextFormatter(richTextFormatter: RichTextFormatter) {
+    fun setBasicTextFormatter(textFormatter: BasicTextFormatter) {
 
-        this.richTextFormatter = richTextFormatter
+        basicTextFormatter = textFormatter
+    }
+
+    fun getBasicTextFormatter() : BasicTextFormatter {
+
+        return basicTextFormatter
     }
 
 }

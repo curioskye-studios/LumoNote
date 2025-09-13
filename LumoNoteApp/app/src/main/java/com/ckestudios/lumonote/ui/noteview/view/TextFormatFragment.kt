@@ -9,12 +9,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.ckestudios.lumonote.data.models.TextSize
 import com.ckestudios.lumonote.data.models.TextStyle
 import com.ckestudios.lumonote.databinding.FragmentTextFormatBinding
-import com.ckestudios.lumonote.ui.noteview.other.RichTextFormatter
-import com.ckestudios.lumonote.ui.noteview.other.SpanningSelectableEditText
+import com.ckestudios.lumonote.ui.noteview.other.SpannedCustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.general.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.general.GeneralUIHelper
+import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
 
 
 class TextFormatFragment: Fragment() {
@@ -35,8 +35,8 @@ class TextFormatFragment: Fragment() {
     private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
 
-    private lateinit var noteContentET: SpanningSelectableEditText
-    private lateinit var richTextFormatter: RichTextFormatter
+    private lateinit var noteContentET: SpannedCustomSelectionET
+    private lateinit var basicTextFormatter: BasicTextFormatter
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -67,8 +67,8 @@ class TextFormatFragment: Fragment() {
 
         super.onViewCreated(view, savedInstanceState)
 
-        noteContentET = editContentSharedViewModel.noteContentEditTextView.value as SpanningSelectableEditText
-        richTextFormatter = RichTextFormatter(noteContentET)
+        noteContentET = editContentSharedViewModel.noteContentEditTextView.value as SpannedCustomSelectionET
+        basicTextFormatter = BasicTextFormatter(noteContentET)
 
         setOnClickListeners()
 
@@ -90,8 +90,6 @@ class TextFormatFragment: Fragment() {
 
         textFormatViewBinding.apply {
 
-            noteContentET.setRichTextFormatter(richTextFormatter)
-
             normalTextButtonIV.setOnClickListener {
 
                 noteContentET.getSizeHelper().formatAsHeader(TextSize.NORMAL)
@@ -109,13 +107,15 @@ class TextFormatFragment: Fragment() {
             boldButtonIV.setOnClickListener {
 
                 //noteContentET.getStyleHelper().formatText(TextStyle.BOLD)
-                richTextFormatter.applyRichText(noteContentET.selectionStart, noteContentET.selectionEnd)
-                richTextFormatter.removeBold(noteContentET.selectionStart, noteContentET.selectionEnd)
+                basicTextFormatter.applyFormatting(noteContentET.selectionStart,
+                    noteContentET.selectionEnd, TextStyle.BOLD)
 
             }
             italicsButtonIV.setOnClickListener {
 
-                noteContentET.getStyleHelper().formatText(TextStyle.ITALICS)
+                //noteContentET.getStyleHelper().formatText(TextStyle.ITALICS)
+                basicTextFormatter.applyFormatting(noteContentET.selectionStart,
+                    noteContentET.selectionEnd, TextStyle.ITALICS)
             }
             underlineButtonIV.setOnClickListener {
 
@@ -148,6 +148,32 @@ class TextFormatFragment: Fragment() {
             noteContentIsEditing.observe(viewLifecycleOwner){
 
                 setShouldOpenFormatter(it)
+            }
+
+            isContentSelectionEmpty.observe(viewLifecycleOwner){
+
+                if (it == true) {
+
+                    generalButtonIVHelper.disableButtonIV(textFormatViewBinding.clearFormatsButtonIV,
+                        requireContext())
+                    generalButtonIVHelper.disableButtonIV(textFormatViewBinding.boldButtonIV,
+                        requireContext())
+                    generalButtonIVHelper.disableButtonIV(textFormatViewBinding.italicsButtonIV,
+                        requireContext())
+                    generalButtonIVHelper.disableButtonIV(textFormatViewBinding.underlineButtonIV,
+                        requireContext())
+                }
+                else {
+
+                    generalButtonIVHelper.enableButtonIV(textFormatViewBinding.clearFormatsButtonIV,
+                        requireContext())
+                    generalButtonIVHelper.enableButtonIV(textFormatViewBinding.boldButtonIV,
+                        requireContext())
+                    generalButtonIVHelper.enableButtonIV(textFormatViewBinding.italicsButtonIV,
+                        requireContext())
+                    generalButtonIVHelper.enableButtonIV(textFormatViewBinding.underlineButtonIV,
+                        requireContext())
+                }
             }
 
             shouldOpenFormatter.observe(viewLifecycleOwner){

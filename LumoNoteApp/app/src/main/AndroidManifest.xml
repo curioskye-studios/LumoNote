@@ -16,9 +16,6 @@
         android:theme="@style/Theme.LumoNote"
         tools:targetApi="31">
         <activity
-            android:name=".ui.home.NotePreviewActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.home.HomeViewActivity"
             android:exported="false" />
         <activity

@@ -161,7 +161,7 @@
             </TextView>
 
 
-            <com.ckestudios.lumonote.ui.noteview.other.SelectableEditText
+            <com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
                 android:id="@+id/noteTitleET"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -181,13 +181,15 @@
 
                 app:layout_constraintTop_toBottomOf="@+id/modifiedDateTV" />
 
-            <com.ckestudios.lumonote.ui.noteview.other.SpanningSelectableEditText
-                android:id="@+id/noteContentET"
+            <com.ckestudios.lumonote.ui.noteview.other.SpannedCustomSelectionET
+                android:id="@+id/noteEditContentET"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+
                 android:background="@android:color/transparent"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:textIsSelectable="true"
                 android:fontFamily="@font/inter"
                 android:gravity="start|top"
                 android:hint="Make a note..."
@@ -203,8 +205,7 @@
                 android:textSize="15sp"
 
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/noteTitleET"
-                tools:layout_editor_absoluteX="32dp" />
+                app:layout_constraintTop_toBottomOf="@+id/noteTitleET"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

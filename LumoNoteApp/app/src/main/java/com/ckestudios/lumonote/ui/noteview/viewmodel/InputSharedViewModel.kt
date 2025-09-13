@@ -13,6 +13,8 @@ class InputSharedViewModel : ViewModel() {
     private val _noteContentIsEditing = MutableLiveData(false)
     val noteContentIsEditing: LiveData<Boolean> get() = _noteContentIsEditing
 
+    private val _isContentSelectionEmpty = MutableLiveData(false)
+    val isContentSelectionEmpty: LiveData<Boolean> get() = _isContentSelectionEmpty
 
     fun setShouldOpenFormatter(open: Boolean) {
 
@@ -22,5 +24,10 @@ class InputSharedViewModel : ViewModel() {
     fun setNoteContentIsEditing(focused: Boolean) {
 
         _noteContentIsEditing.value = focused
+    }
+
+    fun setContentSelectionIsEmpty(isEmpty: Boolean) {
+
+        _isContentSelectionEmpty.value = isEmpty
     }
 }

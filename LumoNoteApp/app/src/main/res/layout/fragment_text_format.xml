@@ -89,6 +89,25 @@
         android:paddingRight="10dp">
 
         <ImageView
+            android:id="@+id/bulletButtonIV"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:paddingTop="11dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+
+
+            android:src="@drawable/baseline_format_list_bulleted_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/clearFormatsButtonIV"
+            app:tint="@color/light_grey_1" />
+
+
+        <ImageView
             android:id="@+id/clearFormatsButtonIV"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -100,9 +119,10 @@
 
             android:src="@drawable/baseline_format_clear_24"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/boldButtonIV"
+            app:layout_constraintStart_toEndOf="@id/bulletButtonIV"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
             app:tint="@color/light_grey_1" />
 
 
@@ -117,6 +137,7 @@
             android:paddingRight="4dp"
 
             android:src="@drawable/baseline_format_bold_24"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/italicsButtonIV"
             app:layout_constraintStart_toEndOf="@id/clearFormatsButtonIV"
@@ -136,13 +157,13 @@
             android:paddingRight="4dp"
 
             android:src="@drawable/baseline_format_italic_24"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/underlineButtonIV"
             app:layout_constraintStart_toEndOf="@id/boldButtonIV"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.5"
             app:tint="@color/light_grey_1" />
-
 
         <ImageView
             android:id="@+id/underlineButtonIV"
@@ -154,28 +175,12 @@
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
 
+
             android:src="@drawable/baseline_format_underlined_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/bulletButtonIV"
-            app:layout_constraintStart_toEndOf="@id/italicsButtonIV"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            app:tint="@color/light_grey_1" />
 
-        <ImageView
-            android:id="@+id/bulletButtonIV"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:paddingTop="11dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-
-            android:src="@drawable/baseline_format_list_bulleted_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/underlineButtonIV"
+            app:layout_constraintStart_toEndOf="@id/italicsButtonIV"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.5"
             app:tint="@color/light_grey_1" />

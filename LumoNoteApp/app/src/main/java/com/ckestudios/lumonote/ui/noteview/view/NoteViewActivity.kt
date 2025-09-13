@@ -1,6 +1,7 @@
 package com.ckestudios.lumonote.ui.noteview.view
 
 import android.os.Bundle
+import android.text.method.TextKeyListener
 import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -8,7 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.ckestudios.lumonote.data.database.NoteRepository
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.data.models.TextSize
-import com.ckestudios.lumonote.data.models.TextStyle
 import com.ckestudios.lumonote.databinding.ActivityNoteViewBinding
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
@@ -59,7 +59,7 @@ class NoteViewActivity : AppCompatActivity() {
         inputSharedViewModel = ViewModelProvider(this).get(InputSharedViewModel::class.java)
 
         editContentSharedViewModel = ViewModelProvider(this).get(EditContentSharedViewModel::class.java)
-        editContentSharedViewModel.setNoteContentEditTextView(noteViewBinding.noteContentET)
+        editContentSharedViewModel.setNoteContentEditTextView(noteViewBinding.noteEditContentET)
 
 
         // Check if working with existing note
@@ -78,7 +78,7 @@ class NoteViewActivity : AppCompatActivity() {
 
         basicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteTitleET,
             noteViewBinding.root)
-        basicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteContentET,
+        basicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteEditContentET,
             noteViewBinding.root)
 
         notifyIfEditing()
@@ -89,6 +89,8 @@ class NoteViewActivity : AppCompatActivity() {
 
         observeNoteAppVMValues()
 
+        observeInputVMValues()
+
         finalNoteFeedback()
     }
 
@@ -96,41 +98,35 @@ class NoteViewActivity : AppCompatActivity() {
     private fun notifyIfEditing() {
 
         // For removing text formatter when text content not being edited
-        noteViewBinding.noteContentET.setOnFocusChangeListener {_, hasFocus ->
+        noteViewBinding.noteEditContentET.setOnFocusChangeListener { view, hasFocus ->
 
             inputSharedViewModel.setNoteContentIsEditing(hasFocus)
-
-//            Log.d("textFormatButtonEditingContent",
-//                "content:" + inputSharedViewModel.noteContentIsEditing.value.toString())
-
         }
     }
 
     private fun detectSelectionFormattingOnChange() {
 
-        noteViewBinding.noteContentET.onSelectionChange = { selectStart, selectEnd ->
+        noteViewBinding.noteEditContentET.onSelectionChange = { selectStart, selectEnd ->
 
-            noteViewBinding.noteContentET.getSpanChecker().apply {
+            if (selectStart == selectEnd) {
+
+                inputSharedViewModel.setContentSelectionIsEmpty(true)
+            }
+            else {
+
+                inputSharedViewModel.setContentSelectionIsEmpty(false)
+            }
+
+            noteViewBinding.noteEditContentET.getSpanChecker().apply {
 
                 setSelection(selectStart, selectEnd)
 
                 when (getTextSizingType()) {
 
                     TextSize.H1 -> editContentSharedViewModel.setIsHeader1Sized(true)
-                    TextSize.H2 ->  editContentSharedViewModel.setIsHeader2Sized(true)
-                    TextSize.NORMAL ->  editContentSharedViewModel.setIsNormalSized(true)
+                    TextSize.H2 -> editContentSharedViewModel.setIsHeader2Sized(true)
+                    TextSize.NORMAL -> editContentSharedViewModel.setIsNormalSized(true)
                 }
-
-                val styleIsPresentValues =
-                    getTextStylePresentValues(noteViewBinding.noteContentET.getStyleHelper())
-
-                val isBold = styleIsPresentValues[TextStyle.BOLD] as Boolean
-                val isItalics = styleIsPresentValues[TextStyle.ITALICS] as Boolean
-                val isUnderlined = styleIsPresentValues[TextStyle.UNDERLINE] as Boolean
-
-                editContentSharedViewModel.setIsBold(isBold)
-                editContentSharedViewModel.setIsItalics(isItalics)
-                editContentSharedViewModel.setIsUnderlined(isUnderlined)
             }
 
         }
@@ -174,7 +170,7 @@ class NoteViewActivity : AppCompatActivity() {
             // Populate the view note activity UI w/ the pre-existing note data
             noteViewBinding.modifiedDateTV.text = retrievedNoteDate
             noteViewBinding.noteTitleET.setText(retrievedNote.noteTitle)
-            noteViewBinding.noteContentET.setText(retrievedNote.noteContent)
+            noteViewBinding.noteEditContentET.setText(retrievedNote.noteContent)
 
             noteViewBinding.pinButtonIV.tag = retrievedNote.notePinned
 
@@ -193,74 +189,104 @@ class NoteViewActivity : AppCompatActivity() {
 
     private fun setOnClickListeners(){
 
-        noteViewBinding.backButtonIV.setOnClickListener {
+        noteViewBinding.apply {
 
-            collectNoteData()
+            backButtonIV.setOnClickListener {
 
-            finish()
-        }
+                collectNoteData()
 
-
-        // Calls reference to the button of id deleteButton in note_item.xml
-        noteViewBinding.deleteButtonIV.setOnClickListener {
-
-            noteAppSharedViewModel.deleteNote(noteID)
-        }
-
-
-        // Calls reference to the button of id pinButton in activity_note_view.xml
-        noteViewBinding.pinButtonIV.setOnClickListener {
-
-            val pinnedFlag = noteViewBinding.pinButtonIV.tag as Boolean
-
-            noteViewBinding.pinButtonIV.tag = !pinnedFlag
-
-            noteAppSharedViewModel.updateCurrentPinStatus(!pinnedFlag)
-        }
-
-
-        // Calls reference to the save button of id saveButton in activity_note_view.xml
-        noteViewBinding.saveButtonIV.setOnClickListener {
-
-            collectNoteData()
-        }
-
-
-        val backButtonPressedCallback =
-            object : OnBackPressedCallback(true) {
-
-                override fun handleOnBackPressed() {
-                    // Custom logic for back button press
-                    collectNoteData()
-                }
+                finish()
             }
-        onBackPressedDispatcher.addCallback(this, backButtonPressedCallback)
+
+
+            deleteButtonIV.setOnClickListener {
+
+                noteAppSharedViewModel.deleteNote(noteID)
+            }
+
+
+            pinButtonIV.setOnClickListener {
+
+                val pinnedFlag = pinButtonIV.tag as Boolean
+
+                pinButtonIV.tag = !pinnedFlag
+
+                noteAppSharedViewModel.updateCurrentPinStatus(!pinnedFlag)
+            }
+
+
+            saveButtonIV.setOnClickListener {
+
+                collectNoteData()
+            }
+
+
+            val backButtonPressedCallback =
+                object : OnBackPressedCallback(true) {
+
+                    override fun handleOnBackPressed() {
+                        // Custom logic for back button press
+                        collectNoteData()
+                    }
+                }
+            onBackPressedDispatcher.addCallback(this@NoteViewActivity, backButtonPressedCallback)
+
+        }
+
+
     }
 
 
     private fun observeNoteAppVMValues() {
 
-        noteAppSharedViewModel.currentNotePinned.observe(this){
+        noteAppSharedViewModel.apply {
 
-            generalButtonIVHelper.updatePinHighlight(noteViewBinding.pinButtonIV, this)
+            currentNotePinned.observe(this@NoteViewActivity){
 
-            val pinStateFeedback =
-                if (it == true) { "Note Pinned" }
+                generalButtonIVHelper.updatePinHighlight(noteViewBinding.pinButtonIV,
+                    this@NoteViewActivity)
 
-                else { "Note Unpinned" }
+                val pinStateFeedback =
+                    if (it == true) { "Note Pinned" }
 
-            generalUIHelper.displayFeedbackToast(this, pinStateFeedback, false)
+                    else { "Note Unpinned" }
+
+                generalUIHelper.displayFeedbackToast(this@NoteViewActivity,
+                    pinStateFeedback, false)
+            }
+        }
+
+    }
+
+    private fun observeInputVMValues() {
+
+        inputSharedViewModel.apply {
+
+            noteContentIsEditing.observe(this@NoteViewActivity){
+
+                if (it == true) {
+
+                    noteViewBinding.noteEditContentET.isCursorVisible = true          // show cursor
+                    noteViewBinding.noteEditContentET.keyListener =
+                        TextKeyListener.getInstance()  // re-enable typing
+                } else {
+
+                    noteViewBinding.noteEditContentET.isCursorVisible = false      // hide cursor
+                    noteViewBinding.noteEditContentET.keyListener = null           // disables input method
+                }
+            }
+
         }
     }
 
 
 
-    // Submits note to database upon clicking save button
+    // Collects and submits note to database upon clicking save button
     private fun collectNoteData() {
 
         // Collect data from input fields, store in note object
         val title =  noteViewBinding.noteTitleET.text.toString()
-        val content =  noteViewBinding.noteContentET.text.toString()
+        val content =  noteViewBinding.noteEditContentET.text.toString()
         val pinned: Boolean =  (noteViewBinding.pinButtonIV.tag as Boolean)
 
         Log.d("collectNoteData", pinned.toString())
