@@ -15,6 +15,7 @@ import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.general.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.general.GeneralUIHelper
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
+import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 
 class TextFormatFragment: Fragment() {
@@ -37,6 +38,7 @@ class TextFormatFragment: Fragment() {
 
     private lateinit var noteContentET: SpannedCustomSelectionET
     private lateinit var basicTextFormatter: BasicTextFormatter
+    private lateinit var underlineTextFormatter: UnderlineTextFormatter
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -67,8 +69,11 @@ class TextFormatFragment: Fragment() {
 
         super.onViewCreated(view, savedInstanceState)
 
-        noteContentET = editContentSharedViewModel.noteContentEditTextView.value as SpannedCustomSelectionET
+        noteContentET =
+            editContentSharedViewModel.noteContentEditTextView.value as SpannedCustomSelectionET
+
         basicTextFormatter = BasicTextFormatter(noteContentET)
+        underlineTextFormatter = UnderlineTextFormatter(noteContentET)
 
         setOnClickListeners()
 
@@ -107,19 +112,27 @@ class TextFormatFragment: Fragment() {
             boldButtonIV.setOnClickListener {
 
                 //noteContentET.getStyleHelper().formatText(TextStyle.BOLD)
-                basicTextFormatter.applyFormatting(noteContentET.selectionStart,
+                basicTextFormatter.processFormatting(noteContentET.selectionStart,
                     noteContentET.selectionEnd, TextStyle.BOLD)
 
+                updateBasicFormatActive(TextStyle.BOLD)
             }
             italicsButtonIV.setOnClickListener {
 
                 //noteContentET.getStyleHelper().formatText(TextStyle.ITALICS)
-                basicTextFormatter.applyFormatting(noteContentET.selectionStart,
+                basicTextFormatter.processFormatting(noteContentET.selectionStart,
                     noteContentET.selectionEnd, TextStyle.ITALICS)
+
+                updateBasicFormatActive(TextStyle.ITALICS)
             }
+
             underlineButtonIV.setOnClickListener {
 
-                noteContentET.getStyleHelper().formatText(TextStyle.UNDERLINE)
+                //noteContentET.getStyleHelper().formatText(TextStyle.UNDERLINE)
+                underlineTextFormatter.processFormatting(noteContentET.selectionStart,
+                    noteContentET.selectionEnd)
+
+                updateUnderlineActive()
             }
 
 
@@ -145,40 +158,27 @@ class TextFormatFragment: Fragment() {
 
         inputSharedViewModel.apply {
 
-            noteContentIsEditing.observe(viewLifecycleOwner){
+            noteContentIsEditing.observe(viewLifecycleOwner){ isEditing ->
 
-                setShouldOpenFormatter(it)
+                setShouldOpenFormatter(isEditing)
             }
 
-            isContentSelectionEmpty.observe(viewLifecycleOwner){
+            isContentSelectionEmpty.observe(viewLifecycleOwner){ isEmpty ->
 
-                if (it == true) {
+                toggleButtonsDisplay(isEmpty)
 
-                    generalButtonIVHelper.disableButtonIV(textFormatViewBinding.clearFormatsButtonIV,
-                        requireContext())
-                    generalButtonIVHelper.disableButtonIV(textFormatViewBinding.boldButtonIV,
-                        requireContext())
-                    generalButtonIVHelper.disableButtonIV(textFormatViewBinding.italicsButtonIV,
-                        requireContext())
-                    generalButtonIVHelper.disableButtonIV(textFormatViewBinding.underlineButtonIV,
-                        requireContext())
-                }
-                else {
+                if (!isEmpty) {
 
-                    generalButtonIVHelper.enableButtonIV(textFormatViewBinding.clearFormatsButtonIV,
-                        requireContext())
-                    generalButtonIVHelper.enableButtonIV(textFormatViewBinding.boldButtonIV,
-                        requireContext())
-                    generalButtonIVHelper.enableButtonIV(textFormatViewBinding.italicsButtonIV,
-                        requireContext())
-                    generalButtonIVHelper.enableButtonIV(textFormatViewBinding.underlineButtonIV,
-                        requireContext())
+                    updateBasicFormatActive(TextStyle.BOLD)
+                    updateBasicFormatActive(TextStyle.ITALICS)
+                    updateUnderlineActive()
                 }
             }
 
-            shouldOpenFormatter.observe(viewLifecycleOwner){
+            shouldOpenFormatter.observe(viewLifecycleOwner){ shouldOpen ->
 
-                generalUIHelper.changeViewVisibility(textFormatViewBinding.formatTextSectionRL, it)
+                generalUIHelper.changeViewVisibility(
+                    textFormatViewBinding.formatTextSectionRL, shouldOpen)
             }
 
         }
@@ -227,6 +227,64 @@ class TextFormatFragment: Fragment() {
             }
         }
 
+    }
+
+    private fun updateBasicFormatActive(spanType: TextStyle) {
+
+        val isFullySpanned =
+            when (spanType) {
+
+                TextStyle.BOLD -> basicTextFormatter.checkIfFullyBold(noteContentET.selectionStart,
+                    noteContentET.selectionEnd)
+                TextStyle.ITALICS -> basicTextFormatter.checkIfFullyItalics(noteContentET.selectionStart,
+                    noteContentET.selectionEnd)
+                else -> null
+            }
+
+        if (isFullySpanned != null) {
+
+            when (spanType) {
+
+                TextStyle.BOLD -> editContentSharedViewModel.setIsBold(isFullySpanned)
+                TextStyle.ITALICS -> editContentSharedViewModel.setIsItalics(isFullySpanned)
+                else -> null
+            }
+        }
+    }
+
+    private fun updateUnderlineActive() {
+
+        val isFullySpanned =
+            underlineTextFormatter.checkIfFullyUnderlined(noteContentET.selectionStart,
+                noteContentET.selectionEnd)
+
+        editContentSharedViewModel.setIsUnderlined(isFullySpanned)
+    }
+
+    private fun toggleButtonsDisplay(shouldDisableButtons: Boolean) {
+
+        if (shouldDisableButtons) {
+
+            generalButtonIVHelper.disableButtonIV(textFormatViewBinding.clearFormatsButtonIV,
+                requireContext())
+            generalButtonIVHelper.disableButtonIV(textFormatViewBinding.boldButtonIV,
+                requireContext())
+            generalButtonIVHelper.disableButtonIV(textFormatViewBinding.italicsButtonIV,
+                requireContext())
+            generalButtonIVHelper.disableButtonIV(textFormatViewBinding.underlineButtonIV,
+                requireContext())
+        }
+        else {
+
+            generalButtonIVHelper.enableButtonIV(textFormatViewBinding.clearFormatsButtonIV,
+                requireContext())
+            generalButtonIVHelper.enableButtonIV(textFormatViewBinding.boldButtonIV,
+                requireContext())
+            generalButtonIVHelper.enableButtonIV(textFormatViewBinding.italicsButtonIV,
+                requireContext())
+            generalButtonIVHelper.enableButtonIV(textFormatViewBinding.underlineButtonIV,
+                requireContext())
+        }
     }
 
 }

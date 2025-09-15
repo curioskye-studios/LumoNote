@@ -241,13 +241,13 @@ class NoteViewActivity : AppCompatActivity() {
 
         noteAppSharedViewModel.apply {
 
-            currentNotePinned.observe(this@NoteViewActivity){
+            currentNotePinned.observe(this@NoteViewActivity){ currentlyPinned ->
 
                 generalButtonIVHelper.updatePinHighlight(noteViewBinding.pinButtonIV,
                     this@NoteViewActivity)
 
                 val pinStateFeedback =
-                    if (it == true) { "Note Pinned" }
+                    if (currentlyPinned) { "Note Pinned" }
 
                     else { "Note Unpinned" }
 

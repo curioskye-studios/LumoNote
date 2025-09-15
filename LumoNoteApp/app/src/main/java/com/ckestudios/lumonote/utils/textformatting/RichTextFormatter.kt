@@ -5,6 +5,4 @@ import android.widget.EditText
 interface RichTextFormatter {
 
     val editTextView: EditText
-
-    fun normalizeFormatting()
 }

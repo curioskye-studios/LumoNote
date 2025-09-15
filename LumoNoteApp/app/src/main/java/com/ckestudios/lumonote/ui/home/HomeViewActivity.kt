@@ -2,6 +2,7 @@ package com.ckestudios.lumonote.ui.home
 
 import android.os.Bundle
 import android.widget.ImageView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -34,6 +35,7 @@ class HomeViewActivity : AppCompatActivity() {
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
 
+        // Setup fragments
         supportFragmentManager.beginTransaction().apply {
 
             add(homeViewBinding.currentHomeFragmentFL.id, calendarViewFragment)
@@ -44,6 +46,18 @@ class HomeViewActivity : AppCompatActivity() {
 
         homeViewModel.setNotePreviewActive(true)
         switchToFragment(notePreviewViewFragment, calendarViewFragment, settingsViewFragment)
+
+
+        // Prevent navigation to main activity on back button press
+        consumeBackButtonPress()
+
+        // Other setup
+        setOnClickListeners()
+
+        observeHomeVMValues()
+    }
+
+    private fun setOnClickListeners() {
 
         homeViewBinding.notesViewIV.setOnClickListener {
 
@@ -62,7 +76,10 @@ class HomeViewActivity : AppCompatActivity() {
             homeViewModel.setSettingsActive(true)
             switchToFragment(settingsViewFragment, notePreviewViewFragment, calendarViewFragment)
         }
+    }
 
+
+    private fun observeHomeVMValues() {
 
         homeViewModel.notePreviewActive.observe(this) { active ->
 
@@ -104,6 +121,19 @@ class HomeViewActivity : AppCompatActivity() {
 
             generalButtonIVHelper.changeButtonIVResTint(this, buttonImageView, R.color.light_grey_2)
         }
+    }
+
+
+    private fun consumeBackButtonPress() {
+
+        val backButtonPressedCallback =
+            object : OnBackPressedCallback(true) {
+
+                override fun handleOnBackPressed() {
+                }
+            }
+
+        onBackPressedDispatcher.addCallback(this, backButtonPressedCallback)
     }
 
 }
