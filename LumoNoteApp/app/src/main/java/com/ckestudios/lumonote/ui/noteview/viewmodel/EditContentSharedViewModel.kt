@@ -3,12 +3,12 @@ package com.ckestudios.lumonote.ui.noteview.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.ckestudios.lumonote.ui.noteview.other.SpannedCustomSelectionET
+import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 
 class EditContentSharedViewModel : ViewModel() {
 
-    private val _noteContentEditTextView = MutableLiveData<SpannedCustomSelectionET>()
-    val noteContentEditTextView : LiveData<SpannedCustomSelectionET>
+    private val _noteContentEditTextView = MutableLiveData<CustomSelectionET>()
+    val noteContentEditTextView : LiveData<CustomSelectionET>
         get() = _noteContentEditTextView
 
 
@@ -29,7 +29,7 @@ class EditContentSharedViewModel : ViewModel() {
 
 
 
-    fun setNoteContentEditTextView(noteContentET: SpannedCustomSelectionET) {
+    fun setNoteContentEditTextView(noteContentET: CustomSelectionET) {
 
         _noteContentEditTextView.value = noteContentET
     }

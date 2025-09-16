@@ -11,7 +11,7 @@ import android.widget.EditText
 
 class TextBulletHelper(private val editTextView: EditText) {
 
-    fun formatBullet(textStyleHelper: TextStyleHelper) {
+    fun formatBullet() {
 
         val stringBuilder: Editable? = editTextView.text
         var setSpan: CharacterStyle? = null
@@ -47,12 +47,8 @@ class TextBulletHelper(private val editTextView: EditText) {
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
-        textStyleHelper.removeUnintendedUnderlines(stringBuilder)
-
         editTextView.text = stringBuilder
         editTextView.setSelection(cursorIndex)
-
-
     }
 
 

@@ -1,4 +1,4 @@
-package com.ckestudios.lumonote.utils.edittexthelper
+package com.ckestudios.lumonote.utils.textformatting
 
 import android.graphics.Typeface
 import android.text.style.RelativeSizeSpan
@@ -63,7 +63,9 @@ class TextSpanChecker (private val editTextView: EditText) {
     }
 
 
-    fun getTextStylePresentValues(textStyleHelper: TextStyleHelper) : MutableMap<TextStyle, Boolean> {
+    fun getTextStylePresentValues(basicTextFormatter: BasicTextFormatter,
+          underlineTextFormatter: UnderlineTextFormatter)
+            : MutableMap<TextStyle, Boolean> {
 
         val styleIsPresentValues =
             mutableMapOf(TextStyle.BOLD to false, TextStyle.ITALICS to false,
@@ -73,21 +75,23 @@ class TextSpanChecker (private val editTextView: EditText) {
             editTextView.text?.getSpans<StyleSpan>(selectionStart, selectionEnd)
 
         val underlineSpans = editTextView.text?.
-        getSpans<TextStyleHelper.CustomUnderlineSpan>(selectionStart, selectionEnd)
+        getSpans<UnderlineTextFormatter.CustomUnderlineSpan>(selectionStart, selectionEnd)
 
         Log.d("styleSpans", styleSpans?.contentToString() ?: "null")
         Log.d("underlineSpans", underlineSpans?.contentToString() ?: "null")
 
         if (styleSpans?.isNotEmpty() == true) {
 
-            if (textStyleHelper.isAllSpanned(TextStyle.BOLD) ||
+            if (basicTextFormatter.isSelectionFullySpanned(selectionStart,
+                    selectionEnd, TextStyle.BOLD) ||
                 (styleSpans.any { it.style == Typeface.BOLD } &&
                         selectionStart == selectionEnd)) {
 
                 styleIsPresentValues[TextStyle.BOLD] = true
             }
 
-            if (textStyleHelper.isAllSpanned(TextStyle.ITALICS) ||
+            if (basicTextFormatter.isSelectionFullySpanned(selectionStart,
+                    selectionEnd, TextStyle.ITALICS) ||
                 (styleSpans.any { it.style == Typeface.ITALIC } &&
                         selectionStart == selectionEnd)) {
 
@@ -97,8 +101,8 @@ class TextSpanChecker (private val editTextView: EditText) {
 
         if (underlineSpans?.isNotEmpty() == true) {
 
-            if (textStyleHelper.isAllSpanned(TextStyle.UNDERLINE) ||
-                (underlineSpans.isNotEmpty() &&
+            if (underlineTextFormatter.isSelectionFullySpanned(selectionStart,
+                selectionEnd) || (underlineSpans.isNotEmpty() &&
                         selectionStart == selectionEnd)) {
 
                 styleIsPresentValues[TextStyle.UNDERLINE] = true

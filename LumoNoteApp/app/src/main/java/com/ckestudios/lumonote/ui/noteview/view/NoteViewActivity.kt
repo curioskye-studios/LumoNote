@@ -18,6 +18,7 @@ import com.ckestudios.lumonote.utils.general.BasicUtilityHelper
 import com.ckestudios.lumonote.utils.general.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.general.GeneralTextHelper
 import com.ckestudios.lumonote.utils.general.GeneralUIHelper
+import com.ckestudios.lumonote.utils.textformatting.TextSpanChecker
 import java.time.LocalDate
 
 
@@ -40,6 +41,8 @@ class NoteViewActivity : AppCompatActivity() {
     private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
     private var editInputFragment: EditInputFragment = EditInputFragment()
 
+    private lateinit var textSpanChecker: TextSpanChecker
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -58,7 +61,8 @@ class NoteViewActivity : AppCompatActivity() {
 
         inputSharedViewModel = ViewModelProvider(this).get(InputSharedViewModel::class.java)
 
-        editContentSharedViewModel = ViewModelProvider(this).get(EditContentSharedViewModel::class.java)
+        editContentSharedViewModel =
+            ViewModelProvider(this).get(EditContentSharedViewModel::class.java)
         editContentSharedViewModel.setNoteContentEditTextView(noteViewBinding.noteEditContentET)
 
 
@@ -75,6 +79,8 @@ class NoteViewActivity : AppCompatActivity() {
 
 
         // Setup Functionality
+
+        textSpanChecker = TextSpanChecker(noteViewBinding.noteEditContentET)
 
         basicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteTitleET,
             noteViewBinding.root)
@@ -117,7 +123,7 @@ class NoteViewActivity : AppCompatActivity() {
                 inputSharedViewModel.setContentSelectionIsEmpty(false)
             }
 
-            noteViewBinding.noteEditContentET.getSpanChecker().apply {
+            textSpanChecker.apply {
 
                 setSelection(selectStart, selectEnd)
 

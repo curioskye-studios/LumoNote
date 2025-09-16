@@ -181,7 +181,7 @@
 
                 app:layout_constraintTop_toBottomOf="@+id/modifiedDateTV" />
 
-            <com.ckestudios.lumonote.ui.noteview.other.SpannedCustomSelectionET
+            <com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
                 android:id="@+id/noteEditContentET"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

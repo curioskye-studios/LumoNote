@@ -9,12 +9,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.ckestudios.lumonote.data.models.TextSize
 import com.ckestudios.lumonote.data.models.TextStyle
 import com.ckestudios.lumonote.databinding.FragmentTextFormatBinding
-import com.ckestudios.lumonote.ui.noteview.other.SpannedCustomSelectionET
+import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
+import com.ckestudios.lumonote.utils.edittexthelper.TextBulletHelper
 import com.ckestudios.lumonote.utils.general.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.general.GeneralUIHelper
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
+import com.ckestudios.lumonote.utils.textformatting.SizeTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 
@@ -36,9 +38,10 @@ class TextFormatFragment: Fragment() {
     private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
 
-    private lateinit var noteContentET: SpannedCustomSelectionET
+    private lateinit var noteContentET: CustomSelectionET
     private lateinit var basicTextFormatter: BasicTextFormatter
     private lateinit var underlineTextFormatter: UnderlineTextFormatter
+    private lateinit var sizeTextFormatter: SizeTextFormatter
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -70,10 +73,12 @@ class TextFormatFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         noteContentET =
-            editContentSharedViewModel.noteContentEditTextView.value as SpannedCustomSelectionET
+            editContentSharedViewModel.noteContentEditTextView.value as CustomSelectionET
 
         basicTextFormatter = BasicTextFormatter(noteContentET)
         underlineTextFormatter = UnderlineTextFormatter(noteContentET)
+        sizeTextFormatter = SizeTextFormatter(noteContentET)
+
 
         setOnClickListeners()
 
@@ -97,38 +102,55 @@ class TextFormatFragment: Fragment() {
 
             normalTextButtonIV.setOnClickListener {
 
-                noteContentET.getSizeHelper().formatAsHeader(TextSize.NORMAL)
+                sizeTextFormatter.setSizeSpanType(TextSize.NORMAL)
+
+                sizeTextFormatter.processFormatting(noteContentET.selectionStart,
+                    noteContentET.selectionEnd)
+
+                updateHeaderActive(TextSize.NORMAL)
             }
             h1ButtonIV.setOnClickListener {
 
-                noteContentET.getSizeHelper().formatAsHeader(TextSize.H1)
+                sizeTextFormatter.setSizeSpanType(TextSize.H1)
+
+                sizeTextFormatter.processFormatting(noteContentET.selectionStart,
+                    noteContentET.selectionEnd)
+
+                updateHeaderActive(TextSize.H1)
+
             }
             h2ButtonIV.setOnClickListener {
 
-                noteContentET.getSizeHelper().formatAsHeader(TextSize.H2)
+                sizeTextFormatter.setSizeSpanType(TextSize.H2)
+
+                sizeTextFormatter.processFormatting(noteContentET.selectionStart,
+                    noteContentET.selectionEnd)
+
+                updateHeaderActive(TextSize.H2)
             }
 
 
             boldButtonIV.setOnClickListener {
 
-                //noteContentET.getStyleHelper().formatText(TextStyle.BOLD)
+                basicTextFormatter.setBasicSpanType(TextStyle.BOLD)
+
                 basicTextFormatter.processFormatting(noteContentET.selectionStart,
-                    noteContentET.selectionEnd, TextStyle.BOLD)
+                    noteContentET.selectionEnd)
 
                 updateBasicFormatActive(TextStyle.BOLD)
             }
             italicsButtonIV.setOnClickListener {
 
-                //noteContentET.getStyleHelper().formatText(TextStyle.ITALICS)
+                basicTextFormatter.setBasicSpanType(TextStyle.ITALICS)
+
                 basicTextFormatter.processFormatting(noteContentET.selectionStart,
-                    noteContentET.selectionEnd, TextStyle.ITALICS)
+                    noteContentET.selectionEnd)
 
                 updateBasicFormatActive(TextStyle.ITALICS)
             }
 
             underlineButtonIV.setOnClickListener {
 
-                //noteContentET.getStyleHelper().formatText(TextStyle.UNDERLINE)
                 underlineTextFormatter.processFormatting(noteContentET.selectionStart,
                     noteContentET.selectionEnd)
 
@@ -138,18 +160,19 @@ class TextFormatFragment: Fragment() {
 
             bulletButtonIV.setOnClickListener {
 
-                noteContentET.getBulletHelper().formatBullet(noteContentET.getStyleHelper())
+                val textBulletHelper = TextBulletHelper(noteContentET)
+
+                textBulletHelper.formatBullet()
             }
         }
 
 
         textFormatViewBinding.clearFormatsButtonIV.setOnClickListener {
 
-            noteContentET.getStyleHelper().clearTextStyles()
+            basicTextFormatter.clearFormatting(noteContentET.selectionStart,
+                noteContentET.selectionEnd)
 
-            editContentSharedViewModel.setIsBold(false)
-            editContentSharedViewModel.setIsItalics(false)
-            editContentSharedViewModel.setIsUnderlined(false)
+            updateBasicFormatActive(TextStyle.NONE)
         }
     }
 
@@ -168,8 +191,9 @@ class TextFormatFragment: Fragment() {
                 toggleButtonsDisplay(isEmpty)
 
                 if (!isEmpty) {
-
+                    basicTextFormatter.setBasicSpanType(TextStyle.BOLD)
                     updateBasicFormatActive(TextStyle.BOLD)
+                    basicTextFormatter.setBasicSpanType(TextStyle.ITALICS)
                     updateBasicFormatActive(TextStyle.ITALICS)
                     updateUnderlineActive()
                 }
@@ -191,8 +215,8 @@ class TextFormatFragment: Fragment() {
 
             isNormalSized.observe(viewLifecycleOwner) {
 
-                generalButtonIVHelper.updateButtonIVHighlight(textFormatViewBinding.normalTextButtonIV,
-                    it, requireContext())
+                generalButtonIVHelper.updateButtonIVHighlight(
+                    textFormatViewBinding.normalTextButtonIV, it, requireContext())
             }
 
             isHeader1Sized.observe(viewLifecycleOwner) {
@@ -229,25 +253,30 @@ class TextFormatFragment: Fragment() {
 
     }
 
+    private fun updateHeaderActive(sizeType: TextSize) {
+
+        when (sizeType) {
+
+            TextSize.H1 -> editContentSharedViewModel.setIsHeader1Sized(true)
+            TextSize.H2 -> editContentSharedViewModel.setIsHeader2Sized(true)
+            TextSize.NORMAL -> editContentSharedViewModel.setIsNormalSized(true)
+        }
+    }
+
     private fun updateBasicFormatActive(spanType: TextStyle) {
 
         val isFullySpanned =
-            when (spanType) {
+            basicTextFormatter.isSelectionFullySpanned(noteContentET.selectionStart,
+                noteContentET.selectionEnd, spanType)
 
-                TextStyle.BOLD -> basicTextFormatter.checkIfFullyBold(noteContentET.selectionStart,
-                    noteContentET.selectionEnd)
-                TextStyle.ITALICS -> basicTextFormatter.checkIfFullyItalics(noteContentET.selectionStart,
-                    noteContentET.selectionEnd)
-                else -> null
-            }
+        when (spanType) {
 
-        if (isFullySpanned != null) {
-
-            when (spanType) {
-
-                TextStyle.BOLD -> editContentSharedViewModel.setIsBold(isFullySpanned)
-                TextStyle.ITALICS -> editContentSharedViewModel.setIsItalics(isFullySpanned)
-                else -> null
+            TextStyle.BOLD -> editContentSharedViewModel.setIsBold(isFullySpanned)
+            TextStyle.ITALICS -> editContentSharedViewModel.setIsItalics(isFullySpanned)
+            else -> {
+                editContentSharedViewModel.setIsBold(false)
+                editContentSharedViewModel.setIsItalics(false)
+                editContentSharedViewModel.setIsUnderlined(false)
             }
         }
     }
@@ -255,7 +284,7 @@ class TextFormatFragment: Fragment() {
     private fun updateUnderlineActive() {
 
         val isFullySpanned =
-            underlineTextFormatter.checkIfFullyUnderlined(noteContentET.selectionStart,
+            underlineTextFormatter.isSelectionFullySpanned(noteContentET.selectionStart,
                 noteContentET.selectionEnd)
 
         editContentSharedViewModel.setIsUnderlined(isFullySpanned)
