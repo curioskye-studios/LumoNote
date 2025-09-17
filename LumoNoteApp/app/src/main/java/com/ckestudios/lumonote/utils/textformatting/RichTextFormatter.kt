@@ -11,6 +11,10 @@ interface RichTextFormatter<T> {
     val editTextView: EditText
     var etvSpannableContent: Editable
 
+    fun updateSpannableContent() {
+        etvSpannableContent = editTextView.text
+    }
+
     fun processFormatting(selectStart: Int, selectEnd: Int)
 
     fun getSelectionSpans(selectStart: Int, selectEnd: Int): Array<T>
@@ -157,6 +161,7 @@ interface RichTextFormatter<T> {
             etvSpannableContent.removeSpan(currentSpan)
         }
     }
+
 
     fun clearFormatting(selectStart: Int, selectEnd: Int) {
 

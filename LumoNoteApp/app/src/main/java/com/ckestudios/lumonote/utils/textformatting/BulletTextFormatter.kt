@@ -3,11 +3,14 @@ package com.ckestudios.lumonote.utils.textformatting
 import android.text.Editable
 import android.text.style.RelativeSizeSpan
 import android.widget.EditText
+import com.ckestudios.lumonote.utils.general.TextFormatHelper
 
 class BulletTextFormatter(override val editTextView: EditText)
     : RichTextFormatter<RelativeSizeSpan> {
 
     override lateinit var etvSpannableContent: Editable
+
+    private val textFormatHelper = TextFormatHelper()
 
 
     override fun processFormatting(selectStart: Int, selectEnd: Int) {

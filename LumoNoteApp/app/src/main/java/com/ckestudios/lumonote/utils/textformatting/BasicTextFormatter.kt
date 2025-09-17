@@ -20,7 +20,7 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
 
     override fun processFormatting(selectStart: Int, selectEnd: Int) {
 
-        etvSpannableContent = editTextView.text
+        updateSpannableContent()
 
         val allSelectionStyleSpans =
             getSelectionSpans(selectStart, selectEnd)
@@ -115,7 +115,7 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
     fun isSelectionFullySpanned(selectStart: Int, selectEnd: Int,
                                          spanType: TextStyle): Boolean {
 
-        etvSpannableContent = editTextView.text
+        updateSpannableContent()
 
         // Ensure safe use only
         if (selectStart == selectEnd || selectStart < 0 || selectEnd < 0 ||

@@ -16,7 +16,7 @@ class UnderlineTextFormatter(override val editTextView: EditText)
 
     override fun processFormatting(selectStart: Int, selectEnd: Int) {
 
-        etvSpannableContent = editTextView.text
+        updateSpannableContent()
 
         val allSelectionSpans =
             getSelectionSpans(selectStart, selectEnd)
@@ -80,7 +80,7 @@ class UnderlineTextFormatter(override val editTextView: EditText)
 
     override fun isSelectionFullySpanned(selectStart: Int, selectEnd: Int): Boolean {
 
-        etvSpannableContent = editTextView.text
+        updateSpannableContent()
 
         if (selectStart == selectEnd || selectStart < 0 || selectEnd < 0 ||
             selectStart > selectEnd || selectEnd > etvSpannableContent.length)
