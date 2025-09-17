@@ -1,4 +1,4 @@
-package com.ckestudios.lumonote.utils.general
+package com.ckestudios.lumonote.utils.helpers
 
 import android.util.Log
 

@@ -12,7 +12,7 @@ import com.ckestudios.lumonote.databinding.FragmentEditInputBinding
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditInputViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
-import com.ckestudios.lumonote.utils.general.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
 
 
 class EditInputFragment : Fragment() {

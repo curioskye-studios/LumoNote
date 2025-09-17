@@ -1,11 +1,9 @@
-package com.ckestudios.lumonote.utils.general
+package com.ckestudios.lumonote.utils.helpers
 
 import android.util.Log
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Date
 
 class GeneralTextHelper {
     fun formatDate(date: LocalDate) : String {

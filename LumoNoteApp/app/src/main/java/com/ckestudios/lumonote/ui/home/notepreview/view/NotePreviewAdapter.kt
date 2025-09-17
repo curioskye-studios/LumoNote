@@ -10,7 +10,7 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.models.Note
-import com.ckestudios.lumonote.utils.general.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
 
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour

@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.ckestudios.lumonote.data.database.NoteRepository
 import com.ckestudios.lumonote.data.models.Note
-import com.ckestudios.lumonote.utils.general.BasicUtilityHelper
+import com.ckestudios.lumonote.utils.helpers.BasicUtilityHelper
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.Date

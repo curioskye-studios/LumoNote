@@ -13,8 +13,8 @@ import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.edittexthelper.TextBulletHelper
-import com.ckestudios.lumonote.utils.general.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.general.GeneralUIHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.SizeTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter

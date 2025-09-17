@@ -3,7 +3,7 @@ package com.ckestudios.lumonote.utils.textformatting
 import android.text.Editable
 import android.text.style.RelativeSizeSpan
 import android.widget.EditText
-import com.ckestudios.lumonote.utils.general.TextFormatHelper
+import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
 
 class BulletTextFormatter(override val editTextView: EditText)
     : RichTextFormatter<RelativeSizeSpan> {

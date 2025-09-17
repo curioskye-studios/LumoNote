@@ -14,10 +14,10 @@ import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
-import com.ckestudios.lumonote.utils.general.BasicUtilityHelper
-import com.ckestudios.lumonote.utils.general.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.general.GeneralTextHelper
-import com.ckestudios.lumonote.utils.general.GeneralUIHelper
+import com.ckestudios.lumonote.utils.helpers.BasicUtilityHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralTextHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.textformatting.TextSpanChecker
 import java.time.LocalDate
 

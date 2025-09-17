@@ -6,7 +6,7 @@ import android.text.style.RelativeSizeSpan
 import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.TextSize
-import com.ckestudios.lumonote.utils.general.TextFormatHelper
+import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
 
 class SizeTextFormatter(override val editTextView: EditText)
     : RichTextFormatter<RelativeSizeSpan> {
