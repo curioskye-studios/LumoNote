@@ -11,182 +11,30 @@
 
     android:clickable="true"
 
-    tools:context=".ui.noteview.view.TextFormatFragment">
+    tools:context=".ui.noteview.view.textformatting.TextFormatFragment">
 
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/textSizeSectionCL"
+        android:name=
+            "com.ckestudios.lumonote.ui.noteview.view.textformatting.SizeFormatFragment"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+
         android:layout_weight="1"
-        android:background="@drawable/grey_toolbar_left"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:layout_marginRight="3.5dp"
-        >
+        android:layout_gravity="left"
+        android:layout_marginEnd="3.5dp"/>
 
 
-        <ImageView
-            android:id="@+id/normalTextButtonIV"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:padding="7dp"
-
-            android:src="@drawable/match_case_24px"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/h1ButtonIV"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/gold" />
-
-        <ImageView
-            android:id="@+id/h1ButtonIV"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-
-            android:src="@drawable/format_h1_24px"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            app:layout_constraintStart_toEndOf="@id/normalTextButtonIV"
-            app:layout_constraintEnd_toStartOf="@id/h2ButtonIV"
-            app:tint="@color/light_grey_1"
-            tools:layout_editor_absoluteX="16dp"
-            />
-
-
-        <ImageView
-            android:id="@+id/h2ButtonIV"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-
-            android:src="@drawable/format_h2_24px"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/h1ButtonIV"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            app:tint="@color/light_grey_1" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/textStyleSectionCL"
+        android:name=
+            "com.ckestudios.lumonote.ui.noteview.view.textformatting.StyleFormatFragment"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:background="@drawable/grey_toolbar_right"
-        android:layout_weight="1.5"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp">
 
-        <ImageView
-            android:id="@+id/bulletButtonIV"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:paddingTop="11dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
+        android:layout_gravity="left"
 
-
-            android:src="@drawable/baseline_format_list_bulleted_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/clearFormatsButtonIV"
-            app:tint="@color/light_grey_1" />
-
-
-        <ImageView
-            android:id="@+id/clearFormatsButtonIV"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-
-            android:src="@drawable/baseline_format_clear_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/boldButtonIV"
-            app:layout_constraintStart_toEndOf="@id/bulletButtonIV"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            app:tint="@color/light_grey_1" />
-
-
-        <ImageView
-            android:id="@+id/boldButtonIV"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:paddingTop="10dp"
-            android:paddingBottom="7dp"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-
-            android:src="@drawable/baseline_format_bold_24"
-
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/italicsButtonIV"
-            app:layout_constraintStart_toEndOf="@id/clearFormatsButtonIV"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            app:tint="@color/light_grey_1" />
-
-
-        <ImageView
-            android:id="@+id/italicsButtonIV"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:paddingTop="12dp"
-            android:paddingBottom="9dp"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-
-            android:src="@drawable/baseline_format_italic_24"
-
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/underlineButtonIV"
-            app:layout_constraintStart_toEndOf="@id/boldButtonIV"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            app:tint="@color/light_grey_1" />
-
-        <ImageView
-            android:id="@+id/underlineButtonIV"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:paddingTop="12dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-
-
-            android:src="@drawable/baseline_format_underlined_24"
-
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/italicsButtonIV"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            app:tint="@color/light_grey_1" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+        android:layout_weight="1.5" />
 
 </LinearLayout>

@@ -1,4 +1,4 @@
-package com.ckestudios.lumonote.ui.noteview.view
+package com.ckestudios.lumonote.ui.noteview.view.textformatting
 
 import android.app.AlertDialog
 import android.os.Bundle

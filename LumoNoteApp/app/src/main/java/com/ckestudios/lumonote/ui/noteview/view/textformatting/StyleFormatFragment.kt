@@ -1,4 +1,4 @@
-package com.ckestudios.lumonote.ui.noteview.view
+package com.ckestudios.lumonote.ui.noteview.view.textformatting
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,14 +6,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.models.BulletType
-import com.ckestudios.lumonote.data.models.TextSize
 import com.ckestudios.lumonote.data.models.TextStyle
-import com.ckestudios.lumonote.databinding.FragmentTextFormatBinding
+import com.ckestudios.lumonote.databinding.FragmentStyleFormatBinding
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletResource
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
@@ -22,21 +20,13 @@ import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.BulletTextFormatter
-import com.ckestudios.lumonote.utils.textformatting.SizeTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 
-class TextFormatFragment: Fragment() {
+class StyleFormatFragment: Fragment() {
 
-    // Real binding variable that can be null when the view is destroyed
-    // Naming it with an underscore (_textFormatViewBinding) is just a convention
-    // → It signals: "don’t use me directly, I’m just the backing field"
-    private var _textFormatViewBinding: FragmentTextFormatBinding? = null
-
-    // Safe-to-use version of binding
-    // Uses Kotlin’s getter so we don’t need to write _textFormatViewBinding!! everywhere
-    // The "!!" means it assumes _textFormatViewBinding is not null between onCreateView & onDestroyView
-    private val textFormatViewBinding get() = _textFormatViewBinding!!
+    private var _styleFormatViewBinding: FragmentStyleFormatBinding? = null
+    private val styleFormatViewBinding get() = _styleFormatViewBinding!!
 
 
     private lateinit var inputSharedViewModel: InputSharedViewModel
@@ -48,11 +38,7 @@ class TextFormatFragment: Fragment() {
     private lateinit var noteContentET: CustomSelectionET
     private lateinit var basicTextFormatter: BasicTextFormatter
     private lateinit var underlineTextFormatter: UnderlineTextFormatter
-    private lateinit var sizeTextFormatter: SizeTextFormatter
     private lateinit var bulletTextFormatter: BulletTextFormatter
-
-    private lateinit var customBulletLauncher: ActivityResultLauncher<Intent>
-    private lateinit var textFormatCompanion: TextFormatCompanion
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -73,8 +59,8 @@ class TextFormatFragment: Fragment() {
     ): View? {
 
         // Inflate the layout for requireContext() fragment
-        _textFormatViewBinding = FragmentTextFormatBinding.inflate(inflater, container, false)
-        return textFormatViewBinding.root // return the root view for the fragment
+        _styleFormatViewBinding = FragmentStyleFormatBinding.inflate(inflater, container, false)
+        return styleFormatViewBinding.root // return the root view for the fragment
     }
 
     // Called when the Fragment creates its view
@@ -85,12 +71,8 @@ class TextFormatFragment: Fragment() {
         noteContentET =
             editContentSharedViewModel.noteContentEditTextView.value as CustomSelectionET
 
-        textFormatCompanion = TextFormatCompanion(requireContext(), textFormatViewBinding,
-            editContentSharedViewModel, noteContentET)
-
         basicTextFormatter = BasicTextFormatter(noteContentET)
         underlineTextFormatter = UnderlineTextFormatter(noteContentET)
-        sizeTextFormatter = SizeTextFormatter(noteContentET)
         bulletTextFormatter = BulletTextFormatter(noteContentET)
 
 
@@ -108,43 +90,13 @@ class TextFormatFragment: Fragment() {
     override fun onDestroyView() {
 
         super.onDestroyView()
-        _textFormatViewBinding = null // prevent memory leaks by clearing reference
+        _styleFormatViewBinding = null // prevent memory leaks by clearing reference
     }
 
 
     private fun setOnClickListeners() {
 
-        textFormatViewBinding.apply {
-
-            normalTextButtonIV.setOnClickListener {
-
-                sizeTextFormatter.setSizeSpanType(TextSize.NORMAL)
-
-                sizeTextFormatter.processFormatting(noteContentET.selectionStart,
-                    noteContentET.selectionEnd)
-
-                textFormatCompanion.updateHeaderActive(TextSize.NORMAL)
-            }
-            h1ButtonIV.setOnClickListener {
-
-                sizeTextFormatter.setSizeSpanType(TextSize.H1)
-
-                sizeTextFormatter.processFormatting(noteContentET.selectionStart,
-                    noteContentET.selectionEnd)
-
-                textFormatCompanion.updateHeaderActive(TextSize.H1)
-
-            }
-            h2ButtonIV.setOnClickListener {
-
-                sizeTextFormatter.setSizeSpanType(TextSize.H2)
-
-                sizeTextFormatter.processFormatting(noteContentET.selectionStart,
-                    noteContentET.selectionEnd)
-
-                textFormatCompanion.updateHeaderActive(TextSize.H2)
-            }
-
+        styleFormatViewBinding.apply {
 
             boldButtonIV.setOnClickListener {
 
@@ -153,8 +105,9 @@ class TextFormatFragment: Fragment() {
                 basicTextFormatter.processFormatting(noteContentET.selectionStart,
                     noteContentET.selectionEnd)
 
-                textFormatCompanion.updateBasicFormatActive(TextStyle.BOLD)
+                updateBasicFormatActive(TextStyle.BOLD)
             }
+
             italicsButtonIV.setOnClickListener {
 
                 basicTextFormatter.setBasicSpanType(TextStyle.ITALICS)
@@ -162,7 +115,7 @@ class TextFormatFragment: Fragment() {
                 basicTextFormatter.processFormatting(noteContentET.selectionStart,
                     noteContentET.selectionEnd)
 
-                textFormatCompanion.updateBasicFormatActive(TextStyle.ITALICS)
+                updateBasicFormatActive(TextStyle.ITALICS)
             }
 
             underlineButtonIV.setOnClickListener {
@@ -170,7 +123,7 @@ class TextFormatFragment: Fragment() {
                 underlineTextFormatter.processFormatting(noteContentET.selectionStart,
                     noteContentET.selectionEnd)
 
-                textFormatCompanion.updateUnderlineActive()
+                updateUnderlineActive()
             }
 
 
@@ -207,12 +160,12 @@ class TextFormatFragment: Fragment() {
         }
 
 
-        textFormatViewBinding.clearFormatsButtonIV.setOnClickListener {
+        styleFormatViewBinding.clearFormatsButtonIV.setOnClickListener {
 
             basicTextFormatter.clearFormatting(noteContentET.selectionStart,
                 noteContentET.selectionEnd)
 
-            textFormatCompanion.updateBasicFormatActive(TextStyle.NONE)
+            updateBasicFormatActive(TextStyle.NONE)
         }
     }
 
@@ -233,28 +186,20 @@ class TextFormatFragment: Fragment() {
 
         inputSharedViewModel.apply {
 
-            noteContentIsEditing.observe(viewLifecycleOwner){ isEditing ->
-
-                setShouldOpenFormatter(isEditing)
-            }
-
             isContentSelectionEmpty.observe(viewLifecycleOwner){ isEmpty ->
 
                 toggleButtonsDisplay(isEmpty)
 
                 if (!isEmpty) {
+
                     basicTextFormatter.setBasicSpanType(TextStyle.BOLD)
-                    textFormatCompanion.updateBasicFormatActive(TextStyle.BOLD)
+                    updateBasicFormatActive(TextStyle.BOLD)
+
                     basicTextFormatter.setBasicSpanType(TextStyle.ITALICS)
-                    textFormatCompanion.updateBasicFormatActive(TextStyle.ITALICS)
-                    textFormatCompanion.updateUnderlineActive()
+                    updateBasicFormatActive(TextStyle.ITALICS)
+
+                    updateUnderlineActive()
                 }
-            }
-
-            shouldOpenFormatter.observe(viewLifecycleOwner){ shouldOpen ->
-
-                generalUIHelper.changeViewVisibility(
-                    textFormatViewBinding.formatTextSectionRL, shouldOpen)
             }
 
         }
@@ -265,50 +210,31 @@ class TextFormatFragment: Fragment() {
 
         editContentSharedViewModel.apply {
 
-            isNormalSized.observe(viewLifecycleOwner) {
-
-                generalButtonIVHelper.updateButtonIVHighlight(
-                    textFormatViewBinding.normalTextButtonIV, it, requireContext())
-            }
-
-            isHeader1Sized.observe(viewLifecycleOwner) {
-
-                generalButtonIVHelper.updateButtonIVHighlight(textFormatViewBinding.h1ButtonIV,
-                    it, requireContext())
-            }
-
-            isHeader2Sized.observe(viewLifecycleOwner) {
-
-                generalButtonIVHelper.updateButtonIVHighlight(textFormatViewBinding.h2ButtonIV,
-                    it, requireContext())
-            }
-
-
             isBold.observe(viewLifecycleOwner) {
 
-                generalButtonIVHelper.updateButtonIVHighlight(textFormatViewBinding.boldButtonIV,
+                generalButtonIVHelper.updateButtonIVHighlight(styleFormatViewBinding.boldButtonIV,
                     it, requireContext())
             }
 
             isItalics.observe(viewLifecycleOwner) {
 
-                generalButtonIVHelper.updateButtonIVHighlight(textFormatViewBinding.italicsButtonIV,
+                generalButtonIVHelper.updateButtonIVHighlight(styleFormatViewBinding.italicsButtonIV,
                     it, requireContext())
             }
 
             isUnderlined.observe(viewLifecycleOwner) {
 
-                generalButtonIVHelper.updateButtonIVHighlight(textFormatViewBinding.underlineButtonIV,
-                   it, requireContext())
+                generalButtonIVHelper.updateButtonIVHighlight(styleFormatViewBinding.underlineButtonIV,
+                    it, requireContext())
             }
 
             wasBulletBtnClicked.observe(viewLifecycleOwner){ wasClicked ->
 
                 if (wasClicked) {
-                    generalButtonIVHelper.changeButtonIVImage(textFormatViewBinding.bulletButtonIV,
+                    generalButtonIVHelper.changeButtonIVImage(styleFormatViewBinding.bulletButtonIV,
                         R.drawable.baseline_format_list_numbered_24)
                 } else {
-                    generalButtonIVHelper.changeButtonIVImage(textFormatViewBinding.bulletButtonIV,
+                    generalButtonIVHelper.changeButtonIVImage(styleFormatViewBinding.bulletButtonIV,
                         R.drawable.baseline_format_list_bulleted_24)
                 }
             }
@@ -316,30 +242,58 @@ class TextFormatFragment: Fragment() {
 
     }
 
-    fun toggleButtonsDisplay(shouldDisableButtons: Boolean) {
+    private fun toggleButtonsDisplay(shouldDisableButtons: Boolean) {
 
         if (shouldDisableButtons) {
 
-            generalButtonIVHelper.disableButtonIV(textFormatViewBinding.clearFormatsButtonIV,
+            generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.clearFormatsButtonIV,
                 requireContext())
-            generalButtonIVHelper.disableButtonIV(textFormatViewBinding.boldButtonIV,
+            generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.boldButtonIV,
                 requireContext())
-            generalButtonIVHelper.disableButtonIV(textFormatViewBinding.italicsButtonIV,
+            generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.italicsButtonIV,
                 requireContext())
-            generalButtonIVHelper.disableButtonIV(textFormatViewBinding.underlineButtonIV,
+            generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.underlineButtonIV,
                 requireContext())
         }
         else {
 
-            generalButtonIVHelper.enableButtonIV(textFormatViewBinding.clearFormatsButtonIV,
+            generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.clearFormatsButtonIV,
                 requireContext())
-            generalButtonIVHelper.enableButtonIV(textFormatViewBinding.boldButtonIV,
+            generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.boldButtonIV,
                 requireContext())
-            generalButtonIVHelper.enableButtonIV(textFormatViewBinding.italicsButtonIV,
+            generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.italicsButtonIV,
                 requireContext())
-            generalButtonIVHelper.enableButtonIV(textFormatViewBinding.underlineButtonIV,
+            generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.underlineButtonIV,
                 requireContext())
         }
+    }
+
+
+    private fun updateBasicFormatActive(spanType: TextStyle) {
+
+        val isFullySpanned =
+            basicTextFormatter.isSelectionFullySpanned(noteContentET.selectionStart,
+                noteContentET.selectionEnd, spanType)
+
+        when (spanType) {
+
+            TextStyle.BOLD -> editContentSharedViewModel.setIsBold(isFullySpanned)
+            TextStyle.ITALICS -> editContentSharedViewModel.setIsItalics(isFullySpanned)
+            else -> {
+                editContentSharedViewModel.setIsBold(false)
+                editContentSharedViewModel.setIsItalics(false)
+                editContentSharedViewModel.setIsUnderlined(false)
+            }
+        }
+    }
+
+    private fun updateUnderlineActive() {
+
+        val isFullySpanned =
+            underlineTextFormatter.isSelectionFullySpanned(noteContentET.selectionStart,
+                noteContentET.selectionEnd)
+
+        editContentSharedViewModel.setIsUnderlined(isFullySpanned)
     }
 
 }
