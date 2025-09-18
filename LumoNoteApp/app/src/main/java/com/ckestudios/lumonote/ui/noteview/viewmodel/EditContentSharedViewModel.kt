@@ -27,6 +27,8 @@ class EditContentSharedViewModel : ViewModel() {
     private val _isUnderlined = MutableLiveData(false)
     val isUnderlined: LiveData<Boolean> get() = _isUnderlined
 
+    private val _wasBulletBtnClicked = MutableLiveData(false)
+    val wasBulletBtnClicked : LiveData<Boolean> get() = _wasBulletBtnClicked
 
 
     fun setNoteContentEditTextView(noteContentET: CustomSelectionET) {
@@ -70,6 +72,12 @@ class EditContentSharedViewModel : ViewModel() {
     fun setIsUnderlined(isFullyUnderlined: Boolean) {
 
         _isUnderlined.value = isFullyUnderlined
+    }
+
+
+    fun setWasBulletBtnClicked (wasClicked: Boolean) {
+
+        _wasBulletBtnClicked.value = wasClicked
     }
 
 }

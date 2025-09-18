@@ -13,6 +13,11 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
     override lateinit var etvSpannableContent: Editable
     private var spanType: TextStyle? = null
 
+    override fun updateSpannableContent() {
+
+        etvSpannableContent = editTextView.text
+    }
+
     fun setBasicSpanType(basicSpanType: TextStyle) {
 
         spanType = basicSpanType

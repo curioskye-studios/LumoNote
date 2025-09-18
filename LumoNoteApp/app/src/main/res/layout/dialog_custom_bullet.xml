@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/black"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/dialogTitleTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter Custom Bullet"
+            android:textSize="18sp"
+            android:textColor="@color/light_grey_1"
+            android:layout_marginBottom="12dp"
+            >
+
+        </TextView>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayoutTL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="eg. ->"
+            android:textColorHint="@color/light_grey_2"
+            app:hintTextColor="@color/light_grey_2">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/textInputET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/light_grey_2"
+                android:textSize="16sp"
+                android:fontFamily="@font/inter"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/cancelButtonBN"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:text="Cancel"
+                android:textSize="16sp"
+                android:textColor="@color/light_grey_1"/>
+
+            <Button
+                android:id="@+id/okButtonBN"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:text="OK"
+                android:textSize="16sp"
+                android:textColor="@color/gold"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

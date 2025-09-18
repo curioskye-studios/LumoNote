@@ -11,9 +11,7 @@ interface RichTextFormatter<T> {
     val editTextView: EditText
     var etvSpannableContent: Editable
 
-    fun updateSpannableContent() {
-        etvSpannableContent = editTextView.text
-    }
+    fun updateSpannableContent()
 
     fun processFormatting(selectStart: Int, selectEnd: Int)
 

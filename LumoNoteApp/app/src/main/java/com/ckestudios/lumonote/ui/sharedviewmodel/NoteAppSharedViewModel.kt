@@ -18,6 +18,8 @@ import java.util.Date
 class NoteAppSharedViewModel(application: Application, private val noteRepository: NoteRepository)
     : AndroidViewModel(application) {
 
+    private val basicUtilityHelper = BasicUtilityHelper()
+
     private val _notes = MutableLiveData<List<Note>>()
     val notes: LiveData<List<Note>> = _notes
     private val _notesOnDate = MutableLiveData<List<Note>>()
@@ -43,7 +45,6 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
     private val _currentPreviewNoteID = MutableLiveData(-1)
     val currentPreviewNoteID: LiveData<Int> = _currentPreviewNoteID
 
-    val basicUtilityHelper = BasicUtilityHelper()
 
     init {
 

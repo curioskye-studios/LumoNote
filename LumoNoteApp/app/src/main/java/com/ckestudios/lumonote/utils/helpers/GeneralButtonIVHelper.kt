@@ -11,6 +11,10 @@ class GeneralButtonIVHelper {
 
         buttonIV.setBackgroundColor(ContextCompat.getColor(context, color))
     }
+    fun changeButtonIVImage(buttonIV: ImageView, drawable: Int) {
+
+        buttonIV.setImageResource(drawable)
+    }
 
     fun changeButtonIVResTint(context: Context, buttonIV: ImageView, color: Int) {
 

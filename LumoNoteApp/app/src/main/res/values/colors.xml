@@ -9,4 +9,6 @@
     <color name="yellow">#FBE134</color>
     <color name="gold">#E4B61A</color>
     <color name="translucent_black">#C11C1F22</color>
+    <color name="transparent">#001C1F22</color>
+
 </resources>

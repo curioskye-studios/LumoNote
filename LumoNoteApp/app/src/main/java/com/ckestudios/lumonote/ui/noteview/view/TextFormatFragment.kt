@@ -1,21 +1,27 @@
 package com.ckestudios.lumonote.ui.noteview.view
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.ckestudios.lumonote.R
+import com.ckestudios.lumonote.data.models.BulletType
 import com.ckestudios.lumonote.data.models.TextSize
 import com.ckestudios.lumonote.data.models.TextStyle
 import com.ckestudios.lumonote.databinding.FragmentTextFormatBinding
+import com.ckestudios.lumonote.ui.noteview.other.CustomBulletResource
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
-import com.ckestudios.lumonote.utils.edittexthelper.TextBulletHelper
 import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
+import com.ckestudios.lumonote.utils.textformatting.BulletTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.SizeTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
@@ -32,16 +38,21 @@ class TextFormatFragment: Fragment() {
     // The "!!" means it assumes _textFormatViewBinding is not null between onCreateView & onDestroyView
     private val textFormatViewBinding get() = _textFormatViewBinding!!
 
-    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
-    private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
 
     private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
+
+    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
+    private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
 
     private lateinit var noteContentET: CustomSelectionET
     private lateinit var basicTextFormatter: BasicTextFormatter
     private lateinit var underlineTextFormatter: UnderlineTextFormatter
     private lateinit var sizeTextFormatter: SizeTextFormatter
+    private lateinit var bulletTextFormatter: BulletTextFormatter
+
+    private lateinit var customBulletLauncher: ActivityResultLauncher<Intent>
+    private lateinit var textFormatCompanion: TextFormatCompanion
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -53,7 +64,6 @@ class TextFormatFragment: Fragment() {
 
         editContentSharedViewModel =
             ViewModelProvider(requireActivity()).get(EditContentSharedViewModel::class.java)
-
     }
 
     // Called when the view is created (safe place to interact with UI)
@@ -75,12 +85,18 @@ class TextFormatFragment: Fragment() {
         noteContentET =
             editContentSharedViewModel.noteContentEditTextView.value as CustomSelectionET
 
+        textFormatCompanion = TextFormatCompanion(requireContext(), textFormatViewBinding,
+            editContentSharedViewModel, noteContentET)
+
         basicTextFormatter = BasicTextFormatter(noteContentET)
         underlineTextFormatter = UnderlineTextFormatter(noteContentET)
         sizeTextFormatter = SizeTextFormatter(noteContentET)
+        bulletTextFormatter = BulletTextFormatter(noteContentET)
 
 
         setOnClickListeners()
+
+        observeCustomBulletValues()
 
         observeInputSharedVMValues()
 
@@ -107,7 +123,7 @@ class TextFormatFragment: Fragment() {
                 sizeTextFormatter.processFormatting(noteContentET.selectionStart,
                     noteContentET.selectionEnd)
 
-                updateHeaderActive(TextSize.NORMAL)
+                textFormatCompanion.updateHeaderActive(TextSize.NORMAL)
             }
             h1ButtonIV.setOnClickListener {
 
@@ -116,7 +132,7 @@ class TextFormatFragment: Fragment() {
                 sizeTextFormatter.processFormatting(noteContentET.selectionStart,
                     noteContentET.selectionEnd)
 
-                updateHeaderActive(TextSize.H1)
+                textFormatCompanion.updateHeaderActive(TextSize.H1)
 
             }
             h2ButtonIV.setOnClickListener {
@@ -126,7 +142,7 @@ class TextFormatFragment: Fragment() {
                 sizeTextFormatter.processFormatting(noteContentET.selectionStart,
                     noteContentET.selectionEnd)
 
-                updateHeaderActive(TextSize.H2)
+                textFormatCompanion.updateHeaderActive(TextSize.H2)
             }
 
 
@@ -137,7 +153,7 @@ class TextFormatFragment: Fragment() {
                 basicTextFormatter.processFormatting(noteContentET.selectionStart,
                     noteContentET.selectionEnd)
 
-                updateBasicFormatActive(TextStyle.BOLD)
+                textFormatCompanion.updateBasicFormatActive(TextStyle.BOLD)
             }
             italicsButtonIV.setOnClickListener {
 
@@ -146,7 +162,7 @@ class TextFormatFragment: Fragment() {
                 basicTextFormatter.processFormatting(noteContentET.selectionStart,
                     noteContentET.selectionEnd)
 
-                updateBasicFormatActive(TextStyle.ITALICS)
+                textFormatCompanion.updateBasicFormatActive(TextStyle.ITALICS)
             }
 
             underlineButtonIV.setOnClickListener {
@@ -154,15 +170,39 @@ class TextFormatFragment: Fragment() {
                 underlineTextFormatter.processFormatting(noteContentET.selectionStart,
                     noteContentET.selectionEnd)
 
-                updateUnderlineActive()
+                textFormatCompanion.updateUnderlineActive()
             }
 
 
-            bulletButtonIV.setOnClickListener {
+            bulletButtonIV.apply {
 
-                val textBulletHelper = TextBulletHelper(noteContentET)
+                setOnClickListener {
 
-                textBulletHelper.formatBullet()
+//                    val textBulletHelper = TextBulletHelper(noteContentET)
+//                    textBulletHelper.formatBullet()
+
+                    editContentSharedViewModel.apply {
+
+                        setWasBulletBtnClicked(!wasBulletBtnClicked.value!!)
+                    }
+
+                    bulletTextFormatter.setBulletType(BulletType.DEFAULT)
+
+                    bulletTextFormatter.processFormatting(noteContentET.selectionStart,
+                        noteContentET.selectionEnd)
+
+//                    generalUIHelper.displayFeedbackToast(requireContext(),
+//                        "Long press for Custom Bullet", true)
+                }
+
+                setOnLongClickListener {
+
+                    var intent = Intent(requireContext(), CustomBulletInputActivity::class.java)
+                    startActivity(intent)
+
+                    true // return true to indicate the event was consumed
+                }
+
             }
         }
 
@@ -172,10 +212,22 @@ class TextFormatFragment: Fragment() {
             basicTextFormatter.clearFormatting(noteContentET.selectionStart,
                 noteContentET.selectionEnd)
 
-            updateBasicFormatActive(TextStyle.NONE)
+            textFormatCompanion.updateBasicFormatActive(TextStyle.NONE)
         }
     }
 
+
+    private fun observeCustomBulletValues() {
+
+        CustomBulletResource.customBullet.observe(viewLifecycleOwner){ bullet ->
+
+            generalUIHelper.displayFeedbackToast(requireContext(),
+                bullet.toString(), true)
+
+            Log.d("textformatfrag", "tff bullet: $bullet")
+        }
+
+    }
 
     private fun observeInputSharedVMValues() {
 
@@ -192,10 +244,10 @@ class TextFormatFragment: Fragment() {
 
                 if (!isEmpty) {
                     basicTextFormatter.setBasicSpanType(TextStyle.BOLD)
-                    updateBasicFormatActive(TextStyle.BOLD)
+                    textFormatCompanion.updateBasicFormatActive(TextStyle.BOLD)
                     basicTextFormatter.setBasicSpanType(TextStyle.ITALICS)
-                    updateBasicFormatActive(TextStyle.ITALICS)
-                    updateUnderlineActive()
+                    textFormatCompanion.updateBasicFormatActive(TextStyle.ITALICS)
+                    textFormatCompanion.updateUnderlineActive()
                 }
             }
 
@@ -249,48 +301,22 @@ class TextFormatFragment: Fragment() {
                 generalButtonIVHelper.updateButtonIVHighlight(textFormatViewBinding.underlineButtonIV,
                    it, requireContext())
             }
-        }
 
-    }
+            wasBulletBtnClicked.observe(viewLifecycleOwner){ wasClicked ->
 
-    private fun updateHeaderActive(sizeType: TextSize) {
-
-        when (sizeType) {
-
-            TextSize.H1 -> editContentSharedViewModel.setIsHeader1Sized(true)
-            TextSize.H2 -> editContentSharedViewModel.setIsHeader2Sized(true)
-            TextSize.NORMAL -> editContentSharedViewModel.setIsNormalSized(true)
-        }
-    }
-
-    private fun updateBasicFormatActive(spanType: TextStyle) {
-
-        val isFullySpanned =
-            basicTextFormatter.isSelectionFullySpanned(noteContentET.selectionStart,
-                noteContentET.selectionEnd, spanType)
-
-        when (spanType) {
-
-            TextStyle.BOLD -> editContentSharedViewModel.setIsBold(isFullySpanned)
-            TextStyle.ITALICS -> editContentSharedViewModel.setIsItalics(isFullySpanned)
-            else -> {
-                editContentSharedViewModel.setIsBold(false)
-                editContentSharedViewModel.setIsItalics(false)
-                editContentSharedViewModel.setIsUnderlined(false)
+                if (wasClicked) {
+                    generalButtonIVHelper.changeButtonIVImage(textFormatViewBinding.bulletButtonIV,
+                        R.drawable.baseline_format_list_numbered_24)
+                } else {
+                    generalButtonIVHelper.changeButtonIVImage(textFormatViewBinding.bulletButtonIV,
+                        R.drawable.baseline_format_list_bulleted_24)
+                }
             }
         }
+
     }
 
-    private fun updateUnderlineActive() {
-
-        val isFullySpanned =
-            underlineTextFormatter.isSelectionFullySpanned(noteContentET.selectionStart,
-                noteContentET.selectionEnd)
-
-        editContentSharedViewModel.setIsUnderlined(isFullySpanned)
-    }
-
-    private fun toggleButtonsDisplay(shouldDisableButtons: Boolean) {
+    fun toggleButtonsDisplay(shouldDisableButtons: Boolean) {
 
         if (shouldDisableButtons) {
 

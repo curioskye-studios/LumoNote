@@ -14,6 +14,12 @@ class UnderlineTextFormatter(override val editTextView: EditText)
     override lateinit var etvSpannableContent: Editable
 
 
+    override fun updateSpannableContent() {
+
+        etvSpannableContent = editTextView.text
+    }
+
+
     override fun processFormatting(selectStart: Int, selectEnd: Int) {
 
         updateSpannableContent()

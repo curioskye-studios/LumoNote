@@ -16,6 +16,12 @@ class SizeTextFormatter(override val editTextView: EditText)
     private val textFormatHelper = TextFormatHelper()
 
 
+    override fun updateSpannableContent() {
+
+        etvSpannableContent = editTextView.text
+    }
+
+
     fun setSizeSpanType(sizeSpanType: TextSize) {
 
         sizeType = sizeSpanType

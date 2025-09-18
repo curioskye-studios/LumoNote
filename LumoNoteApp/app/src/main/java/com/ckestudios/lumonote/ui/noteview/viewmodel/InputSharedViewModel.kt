@@ -16,6 +16,7 @@ class InputSharedViewModel : ViewModel() {
     private val _isContentSelectionEmpty = MutableLiveData(false)
     val isContentSelectionEmpty: LiveData<Boolean> get() = _isContentSelectionEmpty
 
+
     fun setShouldOpenFormatter(open: Boolean) {
 
         _shouldOpenFormatter.value = open
@@ -30,4 +31,5 @@ class InputSharedViewModel : ViewModel() {
 
         _isContentSelectionEmpty.value = isEmpty
     }
+
 }
