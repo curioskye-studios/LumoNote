@@ -186,7 +186,7 @@ class TextFormatFragment: Fragment() {
                         setWasBulletBtnClicked(!wasBulletBtnClicked.value!!)
                     }
 
-                    bulletTextFormatter.setBulletType(BulletType.DEFAULT)
+                    bulletTextFormatter.setBulletType(BulletType.DEFAULT, null, null)
 
                     bulletTextFormatter.processFormatting(noteContentET.selectionStart,
                         noteContentET.selectionEnd)
