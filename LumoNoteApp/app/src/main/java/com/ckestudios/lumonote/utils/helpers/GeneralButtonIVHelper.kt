@@ -40,22 +40,22 @@ class GeneralButtonIVHelper {
     fun highlightButtonIV(buttonIV: ImageView, context: Context) {
 
         changeButtonIVResTint(context, buttonIV, R.color.gold)
-        //changeButtonIVResBackground(context, buttonIV, R.color.black)
     }
 
     fun unhighlightButtonIV(buttonIV: ImageView, context: Context) {
 
         changeButtonIVResTint(context, buttonIV, R.color.light_grey_1)
-        //buttonIV.setBackgroundResource(0)
     }
 
     fun updateButtonIVHighlight(buttonIV: ImageView, isActive: Boolean, context: Context) {
 
-        if (isActive) {
+        if (!buttonIV.isEnabled) {
+            return
+        }
 
+        if (isActive) {
             highlightButtonIV(buttonIV, context)
         } else {
-
             unhighlightButtonIV(buttonIV, context)
         }
     }

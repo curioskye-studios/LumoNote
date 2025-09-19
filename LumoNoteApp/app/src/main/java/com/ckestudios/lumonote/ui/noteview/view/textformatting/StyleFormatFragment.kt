@@ -2,14 +2,11 @@ package com.ckestudios.lumonote.ui.noteview.view.textformatting
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.ckestudios.lumonote.R
-import com.ckestudios.lumonote.data.models.BulletType
 import com.ckestudios.lumonote.data.models.TextStyle
 import com.ckestudios.lumonote.databinding.FragmentStyleFormatBinding
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletResource
@@ -18,6 +15,7 @@ import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.BulletTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
@@ -39,6 +37,8 @@ class StyleFormatFragment: Fragment() {
     private lateinit var basicTextFormatter: BasicTextFormatter
     private lateinit var underlineTextFormatter: UnderlineTextFormatter
     private lateinit var bulletTextFormatter: BulletTextFormatter
+
+    private val textFormatHelper = TextFormatHelper()
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -94,26 +94,23 @@ class StyleFormatFragment: Fragment() {
     }
 
 
+
     private fun setOnClickListeners() {
 
         styleFormatViewBinding.apply {
 
             boldButtonIV.setOnClickListener {
 
-                basicTextFormatter.setBasicSpanType(TextStyle.BOLD)
-
-                basicTextFormatter.processFormatting(noteContentET.selectionStart,
-                    noteContentET.selectionEnd)
+                basicTextFormatter.setBasicSpanType(TextStyle.BOLD,
+                    noteContentET.selectionStart, noteContentET.selectionEnd)
 
                 updateBasicFormatActive(TextStyle.BOLD)
             }
 
             italicsButtonIV.setOnClickListener {
 
-                basicTextFormatter.setBasicSpanType(TextStyle.ITALICS)
-
-                basicTextFormatter.processFormatting(noteContentET.selectionStart,
-                    noteContentET.selectionEnd)
+                basicTextFormatter.setBasicSpanType(TextStyle.ITALICS,
+                    noteContentET.selectionStart, noteContentET.selectionEnd)
 
                 updateBasicFormatActive(TextStyle.ITALICS)
             }
@@ -131,27 +128,18 @@ class StyleFormatFragment: Fragment() {
 
                 setOnClickListener {
 
-//                    val textBulletHelper = TextBulletHelper(noteContentET)
-//                    textBulletHelper.formatBullet()
-
-                    editContentSharedViewModel.apply {
-
-                        setWasBulletBtnClicked(!wasBulletBtnClicked.value!!)
-                    }
-
-                    bulletTextFormatter.setBulletType(BulletType.DEFAULT, null, null)
-
-                    bulletTextFormatter.processFormatting(noteContentET.selectionStart,
+                    bulletTextFormatter.processAsDefaultBullet(noteContentET.selectionStart,
                         noteContentET.selectionEnd)
 
-//                    generalUIHelper.displayFeedbackToast(requireContext(),
-//                        "Long press for Custom Bullet", true)
+                    updateBulletedActive()
                 }
 
                 setOnLongClickListener {
 
-                    var intent = Intent(requireContext(), CustomBulletInputActivity::class.java)
+                    val intent = Intent(requireContext(), CustomBulletInputActivity::class.java)
                     startActivity(intent)
+
+                    updateBulletedActive()
 
                     true // return true to indicate the event was consumed
                 }
@@ -162,10 +150,12 @@ class StyleFormatFragment: Fragment() {
 
         styleFormatViewBinding.clearFormatsButtonIV.setOnClickListener {
 
-            basicTextFormatter.clearFormatting(noteContentET.selectionStart,
-                noteContentET.selectionEnd)
+            textFormatHelper.clearBasicFormatting(noteContentET.selectionStart,
+                noteContentET.selectionEnd, noteContentET.text!!)
 
-            updateBasicFormatActive(TextStyle.NONE)
+            editContentSharedViewModel.setIsBold(false)
+            editContentSharedViewModel.setIsItalics(false)
+            editContentSharedViewModel.setIsUnderlined(false)
         }
     }
 
@@ -174,12 +164,9 @@ class StyleFormatFragment: Fragment() {
 
         CustomBulletResource.customBullet.observe(viewLifecycleOwner){ bullet ->
 
-            generalUIHelper.displayFeedbackToast(requireContext(),
-                bullet.toString(), true)
-
-            Log.d("textformatfrag", "tff bullet: $bullet")
+            bulletTextFormatter.processAsCustomBullet(noteContentET.selectionStart,
+                noteContentET.selectionEnd, bullet)
         }
-
     }
 
     private fun observeInputSharedVMValues() {
@@ -188,61 +175,70 @@ class StyleFormatFragment: Fragment() {
 
             isContentSelectionEmpty.observe(viewLifecycleOwner){ isEmpty ->
 
-                toggleButtonsDisplay(isEmpty)
+                toggleStyleButtonsDisplay(isEmpty)
 
                 if (!isEmpty) {
 
-                    basicTextFormatter.setBasicSpanType(TextStyle.BOLD)
-                    updateBasicFormatActive(TextStyle.BOLD)
-
-                    basicTextFormatter.setBasicSpanType(TextStyle.ITALICS)
-                    updateBasicFormatActive(TextStyle.ITALICS)
-
                     updateUnderlineActive()
+                    updateBasicFormatActive(TextStyle.BOLD)
+                    updateBasicFormatActive(TextStyle.ITALICS)
                 }
             }
 
-        }
+            currentLineHasText.observe(viewLifecycleOwner){ hasText ->
 
+                toggleBulletButtonDisplay(hasText)
+
+                updateBulletedActive()
+            }
+        }
     }
 
     private fun observeEditContentVMValues() {
 
         editContentSharedViewModel.apply {
 
-            isBold.observe(viewLifecycleOwner) {
+            isBold.observe(viewLifecycleOwner) { isTrue ->
 
-                generalButtonIVHelper.updateButtonIVHighlight(styleFormatViewBinding.boldButtonIV,
-                    it, requireContext())
+                generalButtonIVHelper.updateButtonIVHighlight(
+                    styleFormatViewBinding.boldButtonIV, isTrue, requireContext())
             }
 
-            isItalics.observe(viewLifecycleOwner) {
+            isItalics.observe(viewLifecycleOwner) { isTrue ->
 
-                generalButtonIVHelper.updateButtonIVHighlight(styleFormatViewBinding.italicsButtonIV,
-                    it, requireContext())
+                generalButtonIVHelper.updateButtonIVHighlight(
+                    styleFormatViewBinding.italicsButtonIV, isTrue, requireContext())
             }
 
-            isUnderlined.observe(viewLifecycleOwner) {
+            isUnderlined.observe(viewLifecycleOwner) { isTrue ->
 
-                generalButtonIVHelper.updateButtonIVHighlight(styleFormatViewBinding.underlineButtonIV,
-                    it, requireContext())
+                generalButtonIVHelper.updateButtonIVHighlight(
+                    styleFormatViewBinding.underlineButtonIV, isTrue, requireContext())
             }
 
-            wasBulletBtnClicked.observe(viewLifecycleOwner){ wasClicked ->
+            isBulleted.observe(viewLifecycleOwner){ isTrue ->
 
-                if (wasClicked) {
-                    generalButtonIVHelper.changeButtonIVImage(styleFormatViewBinding.bulletButtonIV,
-                        R.drawable.baseline_format_list_numbered_24)
-                } else {
-                    generalButtonIVHelper.changeButtonIVImage(styleFormatViewBinding.bulletButtonIV,
-                        R.drawable.baseline_format_list_bulleted_24)
-                }
+                generalButtonIVHelper.updateButtonIVHighlight(
+                    styleFormatViewBinding.bulletButtonIV, isTrue, requireContext())
             }
         }
 
     }
 
-    private fun toggleButtonsDisplay(shouldDisableButtons: Boolean) {
+    private fun toggleBulletButtonDisplay(shouldDisable: Boolean) {
+
+        if (shouldDisable) {
+
+            generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.bulletButtonIV,
+                requireContext())
+        } else {
+
+            generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.bulletButtonIV,
+                requireContext())
+        }
+    }
+
+    private fun toggleStyleButtonsDisplay(shouldDisableButtons: Boolean) {
 
         if (shouldDisableButtons) {
 
@@ -254,8 +250,7 @@ class StyleFormatFragment: Fragment() {
                 requireContext())
             generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.underlineButtonIV,
                 requireContext())
-        }
-        else {
+        } else {
 
             generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.clearFormatsButtonIV,
                 requireContext())
@@ -271,29 +266,39 @@ class StyleFormatFragment: Fragment() {
 
     private fun updateBasicFormatActive(spanType: TextStyle) {
 
-        val isFullySpanned =
+        val isFullyBasicSpanned =
             basicTextFormatter.isSelectionFullySpanned(noteContentET.selectionStart,
                 noteContentET.selectionEnd, spanType)
 
+//        Log.d("styleformatfrag", "isFullyBasicSpanned: $isFullyBasicSpanned")
+
         when (spanType) {
 
-            TextStyle.BOLD -> editContentSharedViewModel.setIsBold(isFullySpanned)
-            TextStyle.ITALICS -> editContentSharedViewModel.setIsItalics(isFullySpanned)
-            else -> {
-                editContentSharedViewModel.setIsBold(false)
-                editContentSharedViewModel.setIsItalics(false)
-                editContentSharedViewModel.setIsUnderlined(false)
-            }
+            TextStyle.BOLD -> editContentSharedViewModel.setIsBold(isFullyBasicSpanned)
+            TextStyle.ITALICS -> editContentSharedViewModel.setIsItalics(isFullyBasicSpanned)
+            else -> {}
         }
     }
 
     private fun updateUnderlineActive() {
 
-        val isFullySpanned =
+        val isUnderlined =
             underlineTextFormatter.isSelectionFullySpanned(noteContentET.selectionStart,
                 noteContentET.selectionEnd)
 
-        editContentSharedViewModel.setIsUnderlined(isFullySpanned)
+//        Log.d("styleformatfrag", "isFullyUnderlinedSpanned: $isUnderlined")
+
+        editContentSharedViewModel.setIsUnderlined(isUnderlined)
     }
+
+    private fun updateBulletedActive() {
+
+        val isBulleted =
+            bulletTextFormatter.isSelectionFullySpanned(noteContentET.selectionStart,
+                noteContentET.selectionEnd)
+
+        editContentSharedViewModel.setIsBulleted(isBulleted!!)
+    }
+
 
 }

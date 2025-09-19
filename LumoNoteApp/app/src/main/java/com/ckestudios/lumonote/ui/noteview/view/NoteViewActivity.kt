@@ -1,14 +1,12 @@
 package com.ckestudios.lumonote.ui.noteview.view
 
 import android.os.Bundle
-import android.text.method.TextKeyListener
 import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.ckestudios.lumonote.data.database.NoteRepository
 import com.ckestudios.lumonote.data.models.Note
-import com.ckestudios.lumonote.data.models.TextSize
 import com.ckestudios.lumonote.databinding.ActivityNoteViewBinding
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
@@ -18,7 +16,6 @@ import com.ckestudios.lumonote.utils.helpers.BasicUtilityHelper
 import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.helpers.GeneralTextHelper
 import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
-import com.ckestudios.lumonote.utils.textformatting.TextSpanChecker
 import java.time.LocalDate
 
 
@@ -39,9 +36,6 @@ class NoteViewActivity : AppCompatActivity() {
     private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
     private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
-    private var editInputFragment: EditInputFragment = EditInputFragment()
-
-    private lateinit var textSpanChecker: TextSpanChecker
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,8 +47,8 @@ class NoteViewActivity : AppCompatActivity() {
 
 
         // Set up view models
-        var noteRepository = NoteRepository(this)
-        var appSharedViewFactory = AppSharedViewFactory(noteRepository)
+        val noteRepository = NoteRepository(this)
+        val appSharedViewFactory = AppSharedViewFactory(noteRepository)
 
         noteAppSharedViewModel = ViewModelProvider(this, appSharedViewFactory)
             .get(NoteAppSharedViewModel::class.java)
@@ -80,16 +74,13 @@ class NoteViewActivity : AppCompatActivity() {
 
         // Setup Functionality
 
-        textSpanChecker = TextSpanChecker(noteViewBinding.noteEditContentET)
-
         basicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteTitleET,
             noteViewBinding.root)
         basicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteEditContentET,
             noteViewBinding.root)
 
-        notifyIfEditing()
 
-        detectSelectionFormattingOnChange()
+        notifyIfEditing()
 
         setOnClickListeners()
 
@@ -104,37 +95,9 @@ class NoteViewActivity : AppCompatActivity() {
     private fun notifyIfEditing() {
 
         // For removing text formatter when text content not being edited
-        noteViewBinding.noteEditContentET.setOnFocusChangeListener { view, hasFocus ->
+        noteViewBinding.noteEditContentET.setOnFocusChangeListener { _, hasFocus ->
 
             inputSharedViewModel.setNoteContentIsEditing(hasFocus)
-        }
-    }
-
-    private fun detectSelectionFormattingOnChange() {
-
-        noteViewBinding.noteEditContentET.onSelectionChange = { selectStart, selectEnd ->
-
-            if (selectStart == selectEnd) {
-
-                inputSharedViewModel.setContentSelectionIsEmpty(true)
-            }
-            else {
-
-                inputSharedViewModel.setContentSelectionIsEmpty(false)
-            }
-
-            textSpanChecker.apply {
-
-                setSelection(selectStart, selectEnd)
-
-                when (getTextSizingType()) {
-
-                    TextSize.H1 -> editContentSharedViewModel.setIsHeader1Sized(true)
-                    TextSize.H2 -> editContentSharedViewModel.setIsHeader2Sized(true)
-                    TextSize.NORMAL -> editContentSharedViewModel.setIsNormalSized(true)
-                }
-            }
-
         }
     }
 
@@ -268,19 +231,9 @@ class NoteViewActivity : AppCompatActivity() {
 
         inputSharedViewModel.apply {
 
-            noteContentIsEditing.observe(this@NoteViewActivity){
+            noteContentIsEditing.observe(this@NoteViewActivity){ isTrue ->
 
-                if (it == true) {
-
-                    noteViewBinding.noteEditContentET.isCursorVisible = true          // show cursor
-                    noteViewBinding.noteEditContentET.keyListener =
-                        TextKeyListener.getInstance()  // re-enable typing
-                } else {
-
-                    noteViewBinding.noteEditContentET.isCursorVisible = false      // hide cursor
-                    noteViewBinding.noteEditContentET.keyListener = null           // disables input method
-                }
-            }
+                noteViewBinding.noteEditContentET.isCursorVisible = isTrue            }
 
         }
     }
@@ -300,8 +253,8 @@ class NoteViewActivity : AppCompatActivity() {
         // Format: YYYY-MM-DD
         val currentDate = LocalDate.now().toString()
 
-        var created = currentDate
-        var modified = currentDate
+        val created = currentDate
+        val modified = currentDate
 
 
         // If an existing note was clicked on rather than the create button
@@ -309,7 +262,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             noteAppSharedViewModel.setIsNewNote(false)
 
-            var updatedNote = Note(retrievedNote.noteID, title, content, retrievedNote.noteCreatedDate,
+            val updatedNote = Note(retrievedNote.noteID, title, content, retrievedNote.noteCreatedDate,
                 modified, pinned
             )
 
@@ -319,7 +272,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             noteAppSharedViewModel.setIsNewNote(true)
 
-            var newNote = Note(0, title, content, created, modified, pinned)
+            val newNote = Note(0, title, content, created, modified, pinned)
 
             noteAppSharedViewModel.saveNote(newNote)
         }
@@ -329,27 +282,27 @@ class NoteViewActivity : AppCompatActivity() {
 
     private fun finalNoteFeedback() {
 
-        noteAppSharedViewModel.noteWasCreated.observe(this){
+        noteAppSharedViewModel.noteWasCreated.observe(this){ isTrue ->
 
-            if (it == true) {
+            if (isTrue) {
 
                 generalUIHelper.closeActivityWithFeedback("Note Created", this,
                     this, true)
             }
         }
 
-        noteAppSharedViewModel.noteWasUpdated.observe(this){
+        noteAppSharedViewModel.noteWasUpdated.observe(this){ isTrue ->
 
-            if (it == true) {
+            if (isTrue) {
 
                 generalUIHelper.closeActivityWithFeedback("Note Updated", this,
                     this, true)
             }
         }
 
-        noteAppSharedViewModel.noteWasDeleted.observe(this){
+        noteAppSharedViewModel.noteWasDeleted.observe(this){ isTrue ->
 
-            if (it == true) {
+            if (isTrue) {
 
                 generalUIHelper.closeActivityWithFeedback("Note Deleted", this,
                     this, true)

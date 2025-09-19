@@ -16,6 +16,9 @@ class InputSharedViewModel : ViewModel() {
     private val _isContentSelectionEmpty = MutableLiveData(false)
     val isContentSelectionEmpty: LiveData<Boolean> get() = _isContentSelectionEmpty
 
+    private val _currentLineHasText = MutableLiveData(false)
+    val currentLineHasText: LiveData<Boolean> get() = _currentLineHasText
+
 
     fun setShouldOpenFormatter(open: Boolean) {
 
@@ -30,6 +33,11 @@ class InputSharedViewModel : ViewModel() {
     fun setContentSelectionIsEmpty(isEmpty: Boolean) {
 
         _isContentSelectionEmpty.value = isEmpty
+    }
+
+    fun setCurrentLineHasText(hasText: Boolean) {
+
+        _currentLineHasText.value = hasText
     }
 
 }

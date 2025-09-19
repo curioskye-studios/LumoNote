@@ -131,11 +131,11 @@ class EditInputFragment : Fragment() {
 
         inputSharedViewModel.apply {
 
-            noteContentIsEditing.observe(viewLifecycleOwner){
+            noteContentIsEditing.observe(viewLifecycleOwner){ isTrue ->
 
                 // disable buttons when not editing note content
 
-                if (it == true) {
+                if (isTrue) {
 
                     generalButtonIVHelper.enableButtonIV(editInputViewBinding.colorButtonIV,
                         requireContext())
@@ -171,30 +171,30 @@ class EditInputFragment : Fragment() {
 
         editInputViewModel.apply {
 
-            colorBtnIsActive.observe(viewLifecycleOwner) {
+            colorBtnIsActive.observe(viewLifecycleOwner) { isTrue ->
 
                 if (editInputViewBinding.colorButtonIV.isEnabled) {
 
                     generalButtonIVHelper.updateButtonIVHighlight(editInputViewBinding.colorButtonIV,
-                        it, requireContext())
+                        isTrue, requireContext())
                 }
             }
 
-            checklistBtnIsActive.observe(viewLifecycleOwner) {
+            checklistBtnIsActive.observe(viewLifecycleOwner) { isTrue ->
 
                 if (editInputViewBinding.checkListButtonIV.isEnabled) {
 
                     generalButtonIVHelper.updateButtonIVHighlight(editInputViewBinding.checkListButtonIV,
-                        it, requireContext())
+                        isTrue, requireContext())
                 }
             }
 
-            textFormatBtnIsActive.observe(viewLifecycleOwner) {
+            textFormatBtnIsActive.observe(viewLifecycleOwner) { isTrue ->
 
                 if (editInputViewBinding.textFormatButtonIV.isEnabled) {
 
                     generalButtonIVHelper.updateButtonIVHighlight(editInputViewBinding.textFormatButtonIV,
-                        it, requireContext())
+                        isTrue, requireContext())
                 }
             }
 

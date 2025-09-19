@@ -64,7 +64,6 @@ class SizeFormatFragment: Fragment() {
 
         sizeTextFormatter = SizeTextFormatter(noteContentET)
 
-
         setOnClickListeners()
 
         observeEditContentVMValues()
@@ -87,33 +86,29 @@ class SizeFormatFragment: Fragment() {
 
                 sizeTextFormatter.setSizeSpanType(TextSize.NORMAL)
 
-                sizeTextFormatter.processFormatting(
-                    noteContentET.selectionStart,
-                    noteContentET.selectionEnd
-                )
+                sizeTextFormatter.processFormatting(noteContentET.selectionStart,
+                    noteContentET.selectionEnd)
 
                 updateHeaderActive(TextSize.NORMAL)
             }
+
             h1ButtonIV.setOnClickListener {
 
                 sizeTextFormatter.setSizeSpanType(TextSize.H1)
 
-                sizeTextFormatter.processFormatting(
-                    noteContentET.selectionStart,
-                    noteContentET.selectionEnd
-                )
+                sizeTextFormatter.processFormatting(noteContentET.selectionStart,
+                    noteContentET.selectionEnd)
 
                 updateHeaderActive(TextSize.H1)
 
             }
+
             h2ButtonIV.setOnClickListener {
 
                 sizeTextFormatter.setSizeSpanType(TextSize.H2)
 
-                sizeTextFormatter.processFormatting(
-                    noteContentET.selectionStart,
-                    noteContentET.selectionEnd
-                )
+                sizeTextFormatter.processFormatting(noteContentET.selectionStart,
+                    noteContentET.selectionEnd)
 
                 updateHeaderActive(TextSize.H2)
             }

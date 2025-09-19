@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
+import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
 
 class EditContentSharedViewModel : ViewModel() {
 
@@ -27,8 +28,10 @@ class EditContentSharedViewModel : ViewModel() {
     private val _isUnderlined = MutableLiveData(false)
     val isUnderlined: LiveData<Boolean> get() = _isUnderlined
 
-    private val _wasBulletBtnClicked = MutableLiveData(false)
-    val wasBulletBtnClicked : LiveData<Boolean> get() = _wasBulletBtnClicked
+    private val _isBulleted = MutableLiveData(false)
+    val isBulleted : LiveData<Boolean> get() = _isBulleted
+
+    private val textFormatHelper = TextFormatHelper()
 
 
     fun setNoteContentEditTextView(noteContentET: CustomSelectionET) {
@@ -75,9 +78,9 @@ class EditContentSharedViewModel : ViewModel() {
     }
 
 
-    fun setWasBulletBtnClicked (wasClicked: Boolean) {
+    fun setIsBulleted(isBulleted: Boolean) {
 
-        _wasBulletBtnClicked.value = wasClicked
+        _isBulleted.value = isBulleted
     }
 
 }

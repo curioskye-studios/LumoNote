@@ -13,29 +13,32 @@ class BulletTextFormatter(override val editTextView: EditText)
 
     override lateinit var etvSpannableContent: Editable
 
-    private val textFormatHelper = TextFormatHelper()
+//    private val textFormatHelper = TextFormatHelper()
     private var bulletType: BulletType? = null
-    private var customBullet: String = ""
-    private var numberBullet: Int = 0
+    private var customBullet: String? = null
+    private val textFormatHelper = TextFormatHelper()
 
     override fun updateSpannableContent() {
 
         etvSpannableContent = editTextView.text
     }
 
-    fun setBulletType(newBulletType: BulletType, bullet: String?, number: Int?) {
+    fun processAsDefaultBullet(selectStart: Int, selectEnd: Int) {
 
-        bulletType = newBulletType
+        bulletType = BulletType.DEFAULT
 
-        if (bullet != null) {
+        customBullet = null
 
-            customBullet = bullet
-        }
+        processFormatting(selectStart, selectEnd)
+    }
 
-        if (number != null) {
+    fun processAsCustomBullet(selectStart: Int, selectEnd: Int, bullet: String) {
 
-            numberBullet = number
-        }
+        bulletType = BulletType.CUSTOM
+
+        customBullet = bullet
+
+        processFormatting(selectStart, selectEnd)
     }
 
 
@@ -46,17 +49,20 @@ class BulletTextFormatter(override val editTextView: EditText)
         val bulletSpans =
             getSelectionSpans(selectStart, selectEnd)
 
+        Log.d("bullettextformatter", "bulletSpans.isEmpty():" +
+                "${bulletSpans.isEmpty()}")
+
         if (bulletSpans.isEmpty()) {
 
-            assessProcessMethod(selectStart, selectEnd, bulletSpans,
-                true)
+            assessProcessMethod(selectStart, selectEnd)
         } else {
 
-            assessProcessMethod(selectStart, selectEnd, bulletSpans,
-                false)
+            assessProcessMethod(selectStart, selectEnd)
         }
 
-        fixLineHeight()
+        textFormatHelper.fixLineHeight(editTextView)
+
+        normalizeFormatting()
     }
 
     override fun getSelectionSpans(selectStart: Int, selectEnd: Int)
@@ -66,82 +72,85 @@ class BulletTextFormatter(override val editTextView: EditText)
             etvSpannableContent.getSpans(0, etvSpannableContent.length,
                 CustomBulletSpan::class.java)
 
-        // Ensure only current paragraph
         return bulletSpans.filter {
-
             val start = etvSpannableContent.getSpanStart(it)
             val end = etvSpannableContent.getSpanEnd(it)
-            start < selectEnd && end > selectStart
+
+            // include spans intersecting selection OR if selection is zero-length
+            (selectStart <= end && selectEnd >= start) ||
+                    (selectStart == selectEnd && start == selectStart)
         }.toTypedArray()
     }
 
-    private fun assessProcessMethod(selectStart: Int, selectEnd: Int,
-                                    spansList: Array<CustomBulletSpan>, shouldApply: Boolean) {
-
-        //val items = listOf("First point", "Second point", "Third point")
-        //val spannable = SpannableStringBuilder()
-        //
-        //items.forEachIndexed { index, item ->
-        //    val start = spannable.length
-        //    spannable.append(item).append("\n")
-        //    spannable.setSpan(
-        //        NumberedBulletSpan(index + 1),
-        //        start,
-        //        spannable.length,
-        //        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-        //    )
-        //}
-        //
-        //textView.text = spannable
+    private fun assessProcessMethod(selectStart: Int, selectEnd: Int) {
 
         val paragraphIndices =
             textFormatHelper.getSelectionParagraphIndices(selectStart, selectEnd,
                 etvSpannableContent.length, etvSpannableContent.toString())
 
-        if (paragraphIndices.size == 2) {
+        for (index in 0 until paragraphIndices.size - 1) {
 
-            if (shouldApply) {
+            val paraStart = paragraphIndices[index]
+            val paraEnd = paragraphIndices[index + 1]
 
-                applyFormatting(paragraphIndices[0], paragraphIndices[1])
-            } else {
+            // Get all bullet spans in this paragraph
+            val paraSpans = etvSpannableContent.getSpans(
+                paraStart, paraEnd, CustomBulletSpan::class.java)
 
-                removeFormatting(paragraphIndices[0], paragraphIndices[1], spansList)
+            if (paraSpans.isEmpty()) {
+
+                applyFormatting(paraStart, paraEnd)
             }
-        }
 
-        else {
+            else {
 
-            for (index in paragraphIndices.indices){
+                var shouldApplyNew = true
 
-                Log.d("sizetextformatter", "index: $index")
+                for (span in paraSpans) {
 
-                if (index + 1 <= paragraphIndices.size - 1) {
+                    val sameBulletType =
+                        span.getBulletType() == bulletType &&
+                            (bulletType != BulletType.CUSTOM ||
+                            span.getCustomBullet() == customBullet)
 
-                    val applyStart = paragraphIndices[index]
-                    val applyEnd = paragraphIndices[index + 1]
+                    shouldApplyNew = if (sameBulletType) {
 
-                    Log.d("sizetextformatter", "applyStart: $applyStart")
-                    Log.d("sizetextformatter", "applyEnd: $applyEnd")
-
-                    if (shouldApply) {
-
-                        applyFormatting(applyStart, applyEnd)
+                        removeFormatting(selectStart, selectEnd, arrayOf(span))
+                        false
                     } else {
 
-                        removeFormatting(applyStart, applyEnd, spansList)
+                        removeFormatting(selectStart, selectEnd, arrayOf(span))
+                        true
                     }
+                }
+
+                if (shouldApplyNew) {
+
+                    applyFormatting(paraStart, paraEnd)
                 }
             }
 
         }
-
     }
+
+
+
 
     override fun applyFormatting(start: Int, end: Int) {
 
-        var bulletSpan= when (bulletType) {
-            BulletType.DEFAULT -> CustomBulletSpan(30, 6f)
-            BulletType.CUSTOM -> CustomBulletSpan(30, 6f)
+        // Ensure end does not exceed text length
+        val safeEnd = if (start >= etvSpannableContent.length) etvSpannableContent.length
+        else if (start == end) end + 1
+        else end
+
+        val bulletSpan = when (bulletType) {
+
+            BulletType.DEFAULT ->
+                CustomBulletSpan(30, 6f, BulletType.DEFAULT, null)
+
+            BulletType.CUSTOM ->
+                CustomBulletSpan(30, 6f, BulletType.CUSTOM, customBullet)
+
             else -> null
         }
 
@@ -150,33 +159,66 @@ class BulletTextFormatter(override val editTextView: EditText)
             etvSpannableContent.setSpan(
                 bulletSpan,
                 start,
-                end,
+                safeEnd,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
+
     }
+
 
     override fun removeFormatting(selectStart: Int, selectEnd: Int,
                                   spansList: Array<CustomBulletSpan>) {
 
-        for (span in spansList) {
-
-            etvSpannableContent.removeSpan(span)
-        }
-
-        if (bulletType == BulletType.DEFAULT || bulletType == BulletType.CUSTOM) {
-
-            applyFormatting(selectStart, selectEnd)
-        }
+        for (span in spansList) etvSpannableContent.removeSpan(span)
     }
 
 
     override fun normalizeFormatting() {
 
+        val bulletSpans = getSelectionSpans(0,
+            etvSpannableContent.length)
+
+        for (span in bulletSpans) {
+
+            val spanStart = etvSpannableContent.getSpanStart(span)
+            val spanEnd = etvSpannableContent.getSpanEnd(span)
+
+            if (spanStart == spanEnd) {
+
+                etvSpannableContent.removeSpan(span)
+            }
+        }
     }
 
+
     override fun isSelectionFullySpanned(selectStart: Int, selectEnd: Int): Boolean? {
-        return null
+
+        updateSpannableContent()
+
+        val newLinePosBeforeSelection = etvSpannableContent.lastIndexOf("\n",
+            selectStart - 1)
+
+        val skipNewLineSpace = 1
+
+        // Exclude newline char itself to indicate current line
+        val safeStart =
+            if (newLinePosBeforeSelection != -1) newLinePosBeforeSelection + skipNewLineSpace
+            else 0
+
+        val bulletedSpans =
+            editTextView.text?.getSpans(safeStart, selectEnd,
+                CustomBulletSpan::class.java)
+
+        Log.d("bulletedSpans", bulletedSpans?.contentToString() ?: "null")
+
+
+        if (!bulletedSpans.isNullOrEmpty()) {
+
+            return true
+        }
+
+        return false
     }
 
 }

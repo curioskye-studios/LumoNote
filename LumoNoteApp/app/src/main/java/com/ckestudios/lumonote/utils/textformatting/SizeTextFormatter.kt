@@ -44,6 +44,8 @@ class SizeTextFormatter(override val editTextView: EditText)
            assessProcessMethod(selectStart, selectEnd, relativeSizeSpans,
                false)
         }
+
+        textFormatHelper.fixLineHeight(editTextView)
     }
 
     override fun getSelectionSpans(selectStart: Int, selectEnd: Int)
@@ -58,7 +60,10 @@ class SizeTextFormatter(override val editTextView: EditText)
 
             val start = etvSpannableContent.getSpanStart(it)
             val end = etvSpannableContent.getSpanEnd(it)
-            start < selectEnd && end > selectStart
+
+            // include spans intersecting selection OR if selection is zero-length
+            (selectStart <= end && selectEnd >= start) ||
+                (selectStart == selectEnd && start == selectStart)
         }.toTypedArray()
     }
 
@@ -111,6 +116,8 @@ class SizeTextFormatter(override val editTextView: EditText)
 
     override fun applyFormatting(start: Int, end: Int) {
 
+        val safeEnd = if (start == end) end + 1 else end
+
         var relativeSpan= when (sizeType) {
             TextSize.H1 -> RelativeSizeSpan(TextSize.H1.scaleFactor)
             TextSize.H2 -> RelativeSizeSpan(TextSize.H2.scaleFactor)
@@ -122,8 +129,8 @@ class SizeTextFormatter(override val editTextView: EditText)
             etvSpannableContent.setSpan(
                 relativeSpan,
                 start,
-                end,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                safeEnd,
+                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
             )
         }
     }

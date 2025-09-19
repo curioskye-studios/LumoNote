@@ -4,7 +4,9 @@ import android.text.Editable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.UnderlineSpan
+import android.util.Log
 import android.widget.EditText
+import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
 
 class UnderlineTextFormatter(override val editTextView: EditText)
     : RichTextFormatter<UnderlineTextFormatter.CustomUnderlineSpan> {
@@ -12,11 +14,14 @@ class UnderlineTextFormatter(override val editTextView: EditText)
     class CustomUnderlineSpan : UnderlineSpan()
 
     override lateinit var etvSpannableContent: Editable
+    private val textFormatHelper = TextFormatHelper()
 
 
     override fun updateSpannableContent() {
 
         etvSpannableContent = editTextView.text
+
+        removeUnintendedUnderlines()
     }
 
 
@@ -43,12 +48,12 @@ class UnderlineTextFormatter(override val editTextView: EditText)
 
     override fun getSelectionSpans(selectStart: Int, selectEnd: Int): Array<CustomUnderlineSpan> {
 
-        val allStyleSpans =
+        val allUnderlineSpans =
             etvSpannableContent.getSpans(0, etvSpannableContent.length,
                 CustomUnderlineSpan::class.java)
 
         // Ensure only within range
-        return allStyleSpans.filter {
+        return allUnderlineSpans.filter {
 
             val start = etvSpannableContent.getSpanStart(it)
             val end = etvSpannableContent.getSpanEnd(it)
@@ -76,10 +81,12 @@ class UnderlineTextFormatter(override val editTextView: EditText)
 
         if (newUnderlineSpans != null) {
 
-            val sortedSpans = quickSortSpans(newUnderlineSpans)
+            val sortedSpans = textFormatHelper.sortSpans(newUnderlineSpans,
+                etvSpannableContent)
 
             // Combine adjacent or overlapping spans
-            fixOverlappingSpans(sortedSpans)
+            textFormatHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
+                ::applyFormatting)
         }
     }
 
@@ -100,6 +107,9 @@ class UnderlineTextFormatter(override val editTextView: EditText)
 
         val underlineSpans =
             etvSpannableContent.getSpans(selectStart, selectEnd, CustomUnderlineSpan::class.java)
+
+        Log.d("underlineSpans", underlineSpans.contentToString())
+
 
         if (underlineSpans.isEmpty()) return false
 

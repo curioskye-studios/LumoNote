@@ -12,6 +12,10 @@ import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
+import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
+import com.ckestudios.lumonote.utils.textformatting.BulletTextFormatter
+import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 
 class TextFormatFragment: Fragment() {
@@ -34,6 +38,11 @@ class TextFormatFragment: Fragment() {
     private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
 
     private lateinit var noteContentET: CustomSelectionET
+    private lateinit var basicTextFormatter: BasicTextFormatter
+    private lateinit var underlineTextFormatter: UnderlineTextFormatter
+    private lateinit var bulletTextFormatter: BulletTextFormatter
+
+    private val textFormatHelper = TextFormatHelper()
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -66,6 +75,13 @@ class TextFormatFragment: Fragment() {
         noteContentET =
             editContentSharedViewModel.noteContentEditTextView.value as CustomSelectionET
 
+        basicTextFormatter = BasicTextFormatter(noteContentET)
+        underlineTextFormatter = UnderlineTextFormatter(noteContentET)
+        bulletTextFormatter = BulletTextFormatter(noteContentET)
+
+
+        detectSelectionFormattingOnChange()
+
         observeInputSharedVMValues()
     }
 
@@ -76,6 +92,27 @@ class TextFormatFragment: Fragment() {
         super.onDestroyView()
         _textFormatViewBinding = null // prevent memory leaks by clearing reference
     }
+
+    private fun detectSelectionFormattingOnChange() {
+
+        noteContentET.onSelectionChange = { selectStart, selectEnd ->
+
+            if (selectStart == selectEnd || noteContentET.text.isNullOrEmpty()) {
+
+                inputSharedViewModel.setContentSelectionIsEmpty(true)
+            }
+            else {
+
+                inputSharedViewModel.setContentSelectionIsEmpty(false)
+            }
+
+
+            inputSharedViewModel.setCurrentLineHasText(
+                textFormatHelper.checkIfCurrentLineHasText(noteContentET)
+            )
+        }
+    }
+
 
 
 

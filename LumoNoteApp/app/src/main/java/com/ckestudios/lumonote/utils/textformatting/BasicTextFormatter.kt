@@ -7,20 +7,24 @@ import android.text.Spanned
 import android.text.style.StyleSpan
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.TextStyle
+import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
 
 class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatter<StyleSpan> {
 
     override lateinit var etvSpannableContent: Editable
     private var spanType: TextStyle? = null
+    private val textFormatHelper = TextFormatHelper()
 
     override fun updateSpannableContent() {
 
         etvSpannableContent = editTextView.text
     }
 
-    fun setBasicSpanType(basicSpanType: TextStyle) {
+    fun setBasicSpanType(basicSpanType: TextStyle, selectStart: Int, selectEnd: Int) {
 
         spanType = basicSpanType
+
+        processFormatting(selectStart, selectEnd)
     }
 
     override fun processFormatting(selectStart: Int, selectEnd: Int) {
@@ -41,7 +45,7 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
 
         normalizeFormatting()
 
-        fixLineHeight() // Keep line spacing consistent
+        textFormatHelper.fixLineHeight(editTextView) // Keep line spacing consistent
     }
 
 
@@ -106,10 +110,12 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
 
         if (newDesiredSpans != null) {
 
-            val sortedSpans = quickSortSpans(newDesiredSpans)
+            val sortedSpans = textFormatHelper.sortSpans(newDesiredSpans,
+                etvSpannableContent)
 
             // Combine adjacent or overlapping spans
-            fixOverlappingSpans(sortedSpans)
+            textFormatHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
+                ::applyFormatting)
         }
     }
 

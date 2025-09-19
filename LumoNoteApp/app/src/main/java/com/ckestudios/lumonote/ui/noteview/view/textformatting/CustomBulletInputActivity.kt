@@ -9,11 +9,6 @@ import androidx.core.text.isDigitsOnly
 import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.databinding.ActivityCustomBulletBinding
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletResource
-import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
-import com.ckestudios.lumonote.utils.helpers.BasicUtilityHelper
-import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.helpers.GeneralTextHelper
-import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
@@ -21,13 +16,6 @@ import com.google.android.material.textfield.TextInputLayout
 class CustomBulletInputActivity() : AppCompatActivity() {
 
     private lateinit var customBulletBinding: ActivityCustomBulletBinding
-
-    private val generalTextHelper: GeneralTextHelper = GeneralTextHelper()
-    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
-    private val basicUtilityHelper = BasicUtilityHelper()
-    private val generalUIHelper = GeneralUIHelper()
-
-    private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
 
     private var userInput = ""
 
@@ -75,7 +63,12 @@ class CustomBulletInputActivity() : AppCompatActivity() {
             if (userInput.isNullOrEmpty()) {
 
                 inputLayout.error = "Bullet cannot be empty"
-            } else if (userInput.isDigitsOnly()) {
+            }
+            else if (userInput.length > 3) {
+
+                inputLayout.error = "Bullet cannot be more than 3 characters"
+            }
+            else if (userInput.isDigitsOnly()) {
 
                 inputLayout.error = "Bullet cannot be primarily numbers"
             } else {
@@ -91,6 +84,5 @@ class CustomBulletInputActivity() : AppCompatActivity() {
 
         dialog.show()
     }
-
 
 }
