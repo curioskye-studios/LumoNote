@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.databinding.FragmentEditInputBinding
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
@@ -261,9 +262,33 @@ class EditInputFragment : Fragment() {
 
         val hasChecklist =
             simpleChecklistFormatter.checkCurrentLineHasChecklist(noteContentET.selectionStart)
-
         editInputViewModel.setChecklistBtnActive(hasChecklist)
+
+        if (hasChecklist) {
+
+            val checkedState =
+                simpleChecklistFormatter.getCheckedState(noteContentET.selectionStart)
+
+            when (checkedState) {
+                ("☐") -> {
+                    generalButtonIVHelper.changeButtonIVImage(editInputViewBinding.checkListButtonIV,
+                        R.drawable.check_box_outline_blank_24px)
+                }
+                ("☑") -> {
+                    generalButtonIVHelper.changeButtonIVImage(editInputViewBinding.checkListButtonIV,
+                        R.drawable.check_box_24px)
+                }
+                null -> {}
+            }
+        }
+        else {
+
+            generalButtonIVHelper.changeButtonIVImage(editInputViewBinding.checkListButtonIV,
+                R.drawable.check_box_24px)
+        }
     }
+
+
 
 
 }

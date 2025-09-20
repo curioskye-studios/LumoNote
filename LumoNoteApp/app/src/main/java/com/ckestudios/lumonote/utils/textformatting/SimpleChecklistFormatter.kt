@@ -159,10 +159,36 @@ class SimpleChecklistFormatter(private val editTextView: EditText) {  // no span
     }
 
 
+    fun getCheckedState(selectStart: Int): String? {
+
+        updateSpannableContent()
+
+        val line = getCurrentLine(selectStart)
+        val hasChecklist = checkCurrentLineHasChecklist(selectStart)
+
+        return when {
+
+            line.startsWith("☐") && hasChecklist ->
+                line[line.indexOf("☐")].toString()
+
+            line.startsWith("☑") && hasChecklist ->
+                line[line.indexOf("☑")].toString()
+
+            else -> null
+        }
+    }
+
+
     fun checkCurrentLineHasChecklist(selectStart: Int): Boolean {
 
         updateSpannableContent()
 
+        val line = getCurrentLine(selectStart)
+
+        return line.startsWith("☐") || line.startsWith("☑")
+    }
+
+    private fun getCurrentLine(selectStart: Int): String {
 
         val newLineBeforeCursor =
             etvSpannableContent.lastIndexOf('\n', selectStart - 1)
@@ -177,8 +203,6 @@ class SimpleChecklistFormatter(private val editTextView: EditText) {  // no span
             if (newLineAfterCursor == -1) etvSpannableContent.length
             else newLineAfterCursor
 
-        val line = etvSpannableContent.substring(lineStart, lineEnd).trimStart()
-
-        return line.startsWith("☐") || line.startsWith("☑")
+        return etvSpannableContent.substring(lineStart, lineEnd).trimStart()
     }
 }
