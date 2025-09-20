@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
-import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
 
 class EditContentSharedViewModel : ViewModel() {
 
@@ -31,7 +30,10 @@ class EditContentSharedViewModel : ViewModel() {
     private val _isBulleted = MutableLiveData(false)
     val isBulleted : LiveData<Boolean> get() = _isBulleted
 
-    private val textFormatHelper = TextFormatHelper()
+    private val _removeChecklist = MutableLiveData(false)
+    val removeChecklist : LiveData<Boolean> get() = _removeChecklist
+
+
 
 
     fun setNoteContentEditTextView(noteContentET: CustomSelectionET) {
@@ -81,6 +83,11 @@ class EditContentSharedViewModel : ViewModel() {
     fun setIsBulleted(isBulleted: Boolean) {
 
         _isBulleted.value = isBulleted
+    }
+
+    fun setRemoveChecklist(removeChecklist: Boolean) {
+
+        _removeChecklist.value = removeChecklist
     }
 
 }

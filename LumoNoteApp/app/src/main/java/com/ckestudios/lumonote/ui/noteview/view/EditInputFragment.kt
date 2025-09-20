@@ -9,10 +9,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.ckestudios.lumonote.databinding.FragmentEditInputBinding
+import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditInputViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.textformatting.SimpleChecklistFormatter
 
 
 class EditInputFragment : Fragment() {
@@ -27,11 +30,16 @@ class EditInputFragment : Fragment() {
     // The "!!" means it assumes _editInputViewBinding is not null between onCreateView & onDestroyView
     private val editInputViewBinding get() = _editInputViewBinding!!
 
-    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
-
     private lateinit var editInputViewModel: EditInputViewModel
     private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
+
+    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
+    private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
+
+    private lateinit var noteContentET: CustomSelectionET
+    private lateinit var simpleChecklistFormatter: SimpleChecklistFormatter
+
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -63,6 +71,12 @@ class EditInputFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         super.onViewCreated(view, savedInstanceState)
+
+        noteContentET =
+            editContentSharedViewModel.noteContentEditTextView.value as CustomSelectionET
+
+
+        simpleChecklistFormatter = SimpleChecklistFormatter(noteContentET)
 
         setOnClickListeners()
 
@@ -96,12 +110,34 @@ class EditInputFragment : Fragment() {
             }
 
 
-            checkListButtonIV.setOnClickListener {
+            checkListButtonIV.apply {
 
-                val checklistActiveStatus =
-                    editInputViewModel.checklistBtnIsActive.value as Boolean
+                setOnClickListener {
 
-                editInputViewModel.setChecklistBtnActive(!checklistActiveStatus)
+                    simpleChecklistFormatter.processFormatting(noteContentET.selectionStart,
+                        noteContentET.selectionEnd)
+
+                    updateChecklistActive()
+                }
+
+                setOnLongClickListener {
+
+                    val hasChecklist =
+                        simpleChecklistFormatter.checkCurrentLineHasChecklist(
+                            noteContentET.selectionStart)
+
+                    if (hasChecklist) {
+
+                        editContentSharedViewModel.setRemoveChecklist(true)
+
+                        simpleChecklistFormatter.processFormatting(noteContentET.selectionStart,
+                            noteContentET.selectionEnd)
+                    }
+
+                    updateChecklistActive()
+
+                    true
+                }
             }
 
 
@@ -114,6 +150,7 @@ class EditInputFragment : Fragment() {
                     generalButtonIVHelper.unhighlightButtonIV(imageButtonIV, requireContext())
                 }, 1000) // 1000 ms = 1 seconds
             }
+
 
             textFormatButtonIV.setOnClickListener {
 
@@ -149,6 +186,7 @@ class EditInputFragment : Fragment() {
                     // since automatically opens textformatter when editing
                     editInputViewModel.setTextFormatBtnActive(true)
                 }
+
                 else {
 
                     generalButtonIVHelper.disableButtonIV(editInputViewBinding.colorButtonIV,
@@ -160,7 +198,11 @@ class EditInputFragment : Fragment() {
                     generalButtonIVHelper.disableButtonIV(editInputViewBinding.textFormatButtonIV,
                         requireContext())
                 }
+            }
 
+            isContentSelectionEmpty.observe(viewLifecycleOwner){
+
+                updateChecklistActive()
             }
         }
     }
@@ -206,9 +248,21 @@ class EditInputFragment : Fragment() {
 
         editContentSharedViewModel.apply {
 
+            removeChecklist.observe(viewLifecycleOwner) { shouldRemove ->
 
+                simpleChecklistFormatter.updateRemoveChecklist(shouldRemove)
+            }
         }
 
+    }
+
+
+    private fun updateChecklistActive() {
+
+        val hasChecklist =
+            simpleChecklistFormatter.checkCurrentLineHasChecklist(noteContentET.selectionStart)
+
+        editInputViewModel.setChecklistBtnActive(hasChecklist)
     }
 
 

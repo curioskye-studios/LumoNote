@@ -7,6 +7,7 @@ import android.text.Layout
 import android.text.style.LeadingMarginSpan
 import com.ckestudios.lumonote.data.models.BulletType
 
+
 class CustomBulletSpan(private val gapWidth: Int, private val bulletRadius: Float,
                        private val bulletType: BulletType, bullet: String?)
     : LeadingMarginSpan {
@@ -62,7 +63,8 @@ class CustomBulletSpan(private val gapWidth: Int, private val bulletRadius: Floa
 
                 BulletType.DEFAULT -> {
 
-                    drawCircleBullet(c, p, x + dir * bulletRadius, centerY, bulletRadius)
+                    drawCircleBullet(c, p, x + dir * bulletRadius, centerY,
+                        bulletRadius)
                 }
 
                 BulletType.CUSTOM -> {
@@ -76,7 +78,8 @@ class CustomBulletSpan(private val gapWidth: Int, private val bulletRadius: Floa
                         c.drawText(customBullet!!, x.toFloat(), textBaseline, p)
                     } else {
 
-                        drawCircleBullet(c, p, x + dir * bulletRadius, centerY, bulletRadius)
+                        drawCircleBullet(c, p, x + dir * bulletRadius, centerY,
+                            bulletRadius)
                     }
                 }
 
