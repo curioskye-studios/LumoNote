@@ -186,6 +186,8 @@ class EditInputFragment : Fragment() {
 
                     // since automatically opens textformatter when editing
                     editInputViewModel.setTextFormatBtnActive(true)
+
+                    updateChecklistActive()
                 }
 
                 else {
@@ -205,6 +207,8 @@ class EditInputFragment : Fragment() {
 
                 updateChecklistActive()
             }
+
+
         }
     }
 
@@ -262,7 +266,6 @@ class EditInputFragment : Fragment() {
 
         val hasChecklist =
             simpleChecklistFormatter.checkCurrentLineHasChecklist(noteContentET.selectionStart)
-        editInputViewModel.setChecklistBtnActive(hasChecklist)
 
         if (hasChecklist) {
 
@@ -286,6 +289,8 @@ class EditInputFragment : Fragment() {
             generalButtonIVHelper.changeButtonIVImage(editInputViewBinding.checkListButtonIV,
                 R.drawable.check_box_24px)
         }
+
+        editInputViewModel.setChecklistBtnActive(hasChecklist)
     }
 
 

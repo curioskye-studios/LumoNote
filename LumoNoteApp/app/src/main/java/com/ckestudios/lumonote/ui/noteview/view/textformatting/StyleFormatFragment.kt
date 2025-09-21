@@ -260,6 +260,11 @@ class StyleFormatFragment: Fragment() {
                 requireContext())
             generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.underlineButtonIV,
                 requireContext())
+
+            updateUnderlineActive()
+            updateBasicFormatActive(TextStyle.BOLD)
+            updateBasicFormatActive(TextStyle.ITALICS)
+            updateBulletedActive()
         }
     }
 
