@@ -85,8 +85,7 @@ class BulletTextFormatter(override val editTextView: EditText)
     private fun assessProcessMethod(selectStart: Int, selectEnd: Int) {
 
         val paragraphIndices =
-            textFormatHelper.getSelectionParagraphIndices(selectStart, selectEnd,
-                etvSpannableContent.length, etvSpannableContent.toString())
+            textFormatHelper.getSelectionParagraphIndices(editTextView)
 
         for (index in 0 until paragraphIndices.size - 1) {
 

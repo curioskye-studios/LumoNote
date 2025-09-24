@@ -37,7 +37,7 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotePreviewViewHolder {
 
-        val notePreviewView = LayoutInflater.from(parent.context).inflate(R.layout.item_note,
+        val notePreviewView = LayoutInflater.from(parent.context).inflate(R.layout.item_note_preview,
             parent, false)
 
         return NotePreviewViewHolder(notePreviewView)

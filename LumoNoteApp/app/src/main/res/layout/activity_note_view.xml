@@ -196,7 +196,7 @@
 
                 android:inputType="textMultiLine"
                 android:textColorHighlight="@color/light_grey_3"
-                android:lineSpacingMultiplier="1.3"
+                android:lineSpacingMultiplier="1.1"
                 android:minHeight="48dp"
                 android:paddingRight="10dp"
                 android:paddingBottom="150dp"

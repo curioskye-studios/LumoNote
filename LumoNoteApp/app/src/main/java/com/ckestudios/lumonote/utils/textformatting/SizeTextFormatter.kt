@@ -72,8 +72,7 @@ class SizeTextFormatter(override val editTextView: EditText)
             spansList: Array<RelativeSizeSpan>, shouldApply: Boolean) {
 
         val paragraphIndices =
-            textFormatHelper.getSelectionParagraphIndices(selectStart, selectEnd,
-                etvSpannableContent.length, etvSpannableContent.toString())
+            textFormatHelper.getSelectionParagraphIndices(editTextView)
 
         if (paragraphIndices.size == 2) {
 

@@ -108,8 +108,15 @@ class TextFormatFragment: Fragment() {
 
 
             inputSharedViewModel.setCurrentLineHasText(
+
                 textFormatHelper.checkIfCurrentLineHasText(noteContentET)
             )
+
+            inputSharedViewModel.setCurrentLineHasImage(
+
+                textFormatHelper.checkIfCurrentLineHasImage(noteContentET)
+            )
+
         }
     }
 

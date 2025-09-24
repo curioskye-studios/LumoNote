@@ -8,8 +8,8 @@ class EditInputViewModel : ViewModel() {
 
     private val _textFormatBtnIsActive = MutableLiveData(false)
     val textFormatBtnIsActive: LiveData<Boolean> get() = _textFormatBtnIsActive
-    private val _colorBtnIsActive = MutableLiveData(false)
-    val colorBtnIsActive: LiveData<Boolean> get() = _colorBtnIsActive
+    private val _imageBtnIsActive = MutableLiveData(false)
+    val imageBtnIsActive: LiveData<Boolean> get() = _imageBtnIsActive
     private val _checklistBtnIsActive = MutableLiveData(false)
     val checklistBtnIsActive: LiveData<Boolean> get() = _checklistBtnIsActive
 
@@ -20,9 +20,9 @@ class EditInputViewModel : ViewModel() {
         _textFormatBtnIsActive.value = isActive
     }
 
-    fun setColorBtnActive(isActive: Boolean) {
+    fun setImageBtnIsActive(isActive: Boolean) {
 
-        _colorBtnIsActive.value = isActive
+        _imageBtnIsActive.value = isActive
     }
 
     fun setChecklistBtnActive(isActive: Boolean) {

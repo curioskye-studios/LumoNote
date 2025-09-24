@@ -11,11 +11,10 @@ import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.ui.noteview.other.CustomItalicsSpan
 import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
 
-class SimpleChecklistFormatter(private val editTextView: EditText) {  // no span type needed
+class SimpleChecklistFormatter(private val editTextView: EditText) {
 
     private lateinit var etvSpannableContent: Editable
     private var shouldRemoveChecklist = false
-
     private val textFormatHelper = TextFormatHelper()
 
     private fun updateSpannableContent() {
@@ -28,13 +27,11 @@ class SimpleChecklistFormatter(private val editTextView: EditText) {  // no span
         shouldRemoveChecklist = shouldRemove
     }
 
-    fun processFormatting(selectStart: Int, selectEnd: Int) {
+    fun processFormatting() {
 
         updateSpannableContent()
 
-        val paragraphIndices =
-            textFormatHelper.getSelectionParagraphIndices(selectStart, selectEnd,
-                etvSpannableContent.length, etvSpannableContent.toString())
+        val paragraphIndices = textFormatHelper.getSelectionParagraphIndices(editTextView)
 
         for (i in 0 until paragraphIndices.size - 1) {
 
@@ -66,18 +63,13 @@ class SimpleChecklistFormatter(private val editTextView: EditText) {  // no span
             else -> line
         }
 
-        val spans = etvSpannableContent.getSpans(
-            start, start + newLine.length,
-            CharacterStyle::class.java
-        ).filter {
-            it is StrikethroughSpan || it is CustomItalicsSpan ||
-                    it is ForegroundColorSpan
-        }
+        // Remove only checklist-related spans
+        val spans =
+            etvSpannableContent.getSpans(start, end, CharacterStyle::class.java)
+            .filter { it is StrikethroughSpan || it is CustomItalicsSpan ||
+                    it is ForegroundColorSpan }
 
-        for (span in spans) {
-
-            etvSpannableContent.removeSpan(span)
-        }
+        spans.forEach { etvSpannableContent.removeSpan(it) }
 
         etvSpannableContent.replace(start, end, newLine)
     }
@@ -87,7 +79,7 @@ class SimpleChecklistFormatter(private val editTextView: EditText) {  // no span
         updateSpannableContent()
 
         val line = etvSpannableContent.substring(start, end).trimStart()
-        var newLine: String
+        val newLine: String
 
         when {
 
@@ -96,35 +88,16 @@ class SimpleChecklistFormatter(private val editTextView: EditText) {  // no span
                 newLine = line.replaceFirst("☐", "☑")
                 etvSpannableContent.replace(start, end, newLine)
 
-                // apply strikethrough AFTER replacement
-                val textStart = start + 3 // skip "☑ "
-                val textEnd = start + newLine.length
-
-                setCheckedSpans(textStart, textEnd)
+                setCheckedSpans(start, start + newLine.length)
             }
-
             line.startsWith("☑") -> {
 
                 newLine = line.replaceFirst("☑", "☐")
                 etvSpannableContent.replace(start, end, newLine)
 
-                // remove strikethrough AFTER replacement
-                val spans = etvSpannableContent.getSpans(
-                    start, start + newLine.length,
-                    CharacterStyle::class.java
-                ).filter {
-                    it is StrikethroughSpan || it is CustomItalicsSpan ||
-                            it is ForegroundColorSpan
-                }
-
-                for (span in spans) {
-
-                    etvSpannableContent.removeSpan(span)
-                }
+                removeFormatting(start, end)
             }
-
             else -> {
-
                 newLine = "☐  $line"
                 etvSpannableContent.replace(start, end, newLine)
             }
@@ -147,62 +120,42 @@ class SimpleChecklistFormatter(private val editTextView: EditText) {  // no span
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
-        val checkedColor = ContextCompat.getColor(editTextView.context,
-            R.color.light_grey_2)
+        val checkedColor =
+            ContextCompat.getColor(editTextView.context, R.color.light_grey_2)
 
         etvSpannableContent.setSpan(
             ForegroundColorSpan(checkedColor),
-            start - 3,
+            start,
             end,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
     }
 
-
     fun getCheckedState(selectStart: Int): String? {
 
         updateSpannableContent()
 
-        val line = getCurrentLine(selectStart)
+        val (lineStart, lineEnd) = textFormatHelper.getCurrentLineIndices(editTextView)
+
+        val line =  etvSpannableContent.substring(lineStart, lineEnd).trimStart()
+
         val hasChecklist = checkCurrentLineHasChecklist(selectStart)
 
         return when {
-
-            line.startsWith("☐") && hasChecklist ->
-                line[line.indexOf("☐")].toString()
-
-            line.startsWith("☑") && hasChecklist ->
-                line[line.indexOf("☑")].toString()
-
+            line.startsWith("☐") && hasChecklist -> "☐"
+            line.startsWith("☑") && hasChecklist -> "☑"
             else -> null
         }
     }
-
 
     fun checkCurrentLineHasChecklist(selectStart: Int): Boolean {
 
         updateSpannableContent()
 
-        val line = getCurrentLine(selectStart)
+        val (lineStart, lineEnd) = textFormatHelper.getCurrentLineIndices(editTextView)
+
+        val line =  etvSpannableContent.substring(lineStart, lineEnd).trimStart()
 
         return line.startsWith("☐") || line.startsWith("☑")
-    }
-
-    private fun getCurrentLine(selectStart: Int): String {
-
-        val newLineBeforeCursor =
-            etvSpannableContent.lastIndexOf('\n', selectStart - 1)
-        val newLineAfterCursor =
-            etvSpannableContent.indexOf('\n', selectStart)
-
-        val lineStart =
-            if (newLineBeforeCursor == -1) 0
-            else newLineBeforeCursor + 1
-
-        val lineEnd =
-            if (newLineAfterCursor == -1) etvSpannableContent.length
-            else newLineAfterCursor
-
-        return etvSpannableContent.substring(lineStart, lineEnd).trimStart()
     }
 }

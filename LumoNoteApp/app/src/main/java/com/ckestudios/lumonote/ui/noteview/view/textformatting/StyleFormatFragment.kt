@@ -175,7 +175,7 @@ class StyleFormatFragment: Fragment() {
 
             isContentSelectionEmpty.observe(viewLifecycleOwner){ isEmpty ->
 
-                toggleStyleButtonsDisplay(isEmpty)
+                toggleStyleButtonsDisplay()
 
                 if (!isEmpty) {
 
@@ -185,11 +185,14 @@ class StyleFormatFragment: Fragment() {
                 }
             }
 
-            currentLineHasText.observe(viewLifecycleOwner){ hasText ->
+            currentLineHasText.observe(viewLifecycleOwner){
 
-                toggleBulletButtonDisplay(hasText)
+                toggleBulletButtonDisplay()
+            }
 
-                updateBulletedActive()
+            currentLineHasImage.observe(viewLifecycleOwner) {
+
+                toggleBulletButtonDisplay()
             }
         }
     }
@@ -225,22 +228,30 @@ class StyleFormatFragment: Fragment() {
 
     }
 
-    private fun toggleBulletButtonDisplay(shouldDisable: Boolean) {
+    private fun toggleBulletButtonDisplay() {
 
-        if (shouldDisable) {
+        val hasImage = inputSharedViewModel.currentLineHasImage.value!!
+        val hasText = inputSharedViewModel.currentLineHasText.value!!
 
-            generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.bulletButtonIV,
+        if (!hasImage && hasText) {
+
+            generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.bulletButtonIV,
                 requireContext())
         } else {
 
-            generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.bulletButtonIV,
+            generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.bulletButtonIV,
                 requireContext())
         }
     }
 
-    private fun toggleStyleButtonsDisplay(shouldDisableButtons: Boolean) {
 
-        if (shouldDisableButtons) {
+    private fun toggleStyleButtonsDisplay() {
+
+        val selectionIsEmpty = inputSharedViewModel.isContentSelectionEmpty.value!!
+        val hasImage = inputSharedViewModel.currentLineHasImage.value!!
+
+
+        if (selectionIsEmpty || hasImage) {
 
             generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.clearFormatsButtonIV,
                 requireContext())
@@ -275,8 +286,6 @@ class StyleFormatFragment: Fragment() {
             basicTextFormatter.isSelectionFullySpanned(noteContentET.selectionStart,
                 noteContentET.selectionEnd, spanType)
 
-//        Log.d("styleformatfrag", "isFullyBasicSpanned: $isFullyBasicSpanned")
-
         when (spanType) {
 
             TextStyle.BOLD -> editContentSharedViewModel.setIsBold(isFullyBasicSpanned)
@@ -290,8 +299,6 @@ class StyleFormatFragment: Fragment() {
         val isUnderlined =
             underlineTextFormatter.isSelectionFullySpanned(noteContentET.selectionStart,
                 noteContentET.selectionEnd)
-
-//        Log.d("styleformatfrag", "isFullyUnderlinedSpanned: $isUnderlined")
 
         editContentSharedViewModel.setIsUnderlined(isUnderlined)
     }

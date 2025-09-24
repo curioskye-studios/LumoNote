@@ -5,26 +5,24 @@ import android.text.style.CharacterStyle
 import android.text.style.StyleSpan
 import android.util.Log
 import android.widget.EditText
+import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 class TextFormatHelper {
 
-    fun getSelectionParagraphIndices(selectStart: Int, selectEnd: Int, editTextViewEnd: Int,
-                 etvContentString: String) : MutableList<Int>{
+    fun getSelectionParagraphIndices(editTextView: EditText) : MutableList<Int>{
+
+        val etvContentString = editTextView.text.toString()
 
         val paragraphIndices = mutableListOf<Int>()
 
-        val firstAndLastIndices = getFirstAndLastIndices(selectStart, selectEnd,
-            editTextViewEnd, etvContentString)
+        val firstAndLastIndices = getCurrentLineIndices(editTextView)
 
         val firstNewLineIndex = firstAndLastIndices.first
         val lastNewLineIndex = firstAndLastIndices.second
 
         val selectionAsString =
             etvContentString.subSequence(firstNewLineIndex, lastNewLineIndex).toString()
-        Log.d("bullettextformatter", "selection: " +
-                selectionAsString.replace("\n", "\\n"))
-
 
         // Create a Regex object and index offset
         val regex = Regex("\n")
@@ -55,8 +53,12 @@ class TextFormatHelper {
     }
 
 
-    private fun getFirstAndLastIndices(selectStart: Int, selectEnd: Int, editTextViewEnd: Int,
-               etvContentString: String): Pair<Int, Int> {
+    fun getCurrentLineIndices(editTextView: EditText): Pair<Int, Int> {
+
+        val selectStart = editTextView.selectionStart
+        val selectEnd = editTextView.selectionEnd
+        val etvContentString = editTextView.text.toString()
+        val editTextViewEnd = editTextView.text.length
 
         // Subtract 1 so the search starts before the inserted "\n", not after the
         // cursor jump on pressing Enter
@@ -81,6 +83,8 @@ class TextFormatHelper {
 
     fun fixLineHeight(editTextView: EditText) {
 
+        val lineSpaceMultiplier = 1.1f
+
         val oldSelectionStart = editTextView.selectionStart
         val oldSelectionEnd = editTextView.selectionEnd
 
@@ -92,7 +96,7 @@ class TextFormatHelper {
         editTextView.invalidate()
         editTextView.requestLayout()
 
-        editTextView.setLineSpacing(0f, 1.3f)
+        editTextView.setLineSpacing(0f, lineSpaceMultiplier)
 
         // Restore selection
         editTextView.setSelection(oldSelectionStart, oldSelectionEnd)
@@ -180,6 +184,7 @@ class TextFormatHelper {
         val allStyleSpans =
             etvSpannableContent.getSpans(selectStart, selectEnd,
                 StyleSpan::class.java)
+
         val allUnderlineSpans =
             etvSpannableContent.getSpans(selectStart, selectEnd,
                 UnderlineTextFormatter.CustomUnderlineSpan::class.java)
@@ -199,23 +204,25 @@ class TextFormatHelper {
     }
 
 
-    fun checkIfCurrentLineHasText(editTextView: EditText) : Boolean{
+    fun checkIfCurrentLineHasText(editTextView: EditText) : Boolean {
 
-        val cursorPos = editTextView.selectionStart
+        val etvContentString = editTextView.text.toString()
 
-        val text = editTextView.text.toString()
+        val (lineStart, lineEnd) = getCurrentLineIndices(editTextView)
 
-        // Find start of the line (after previous '\n' or 0)
-        val lineStart = text.lastIndexOf('\n', cursorPos - 1).let {
-            if (it == -1) 0 else it + 1 }
+        val lineContent = etvContentString.substring(lineStart, lineEnd)
 
-        // Find end of the line (next '\n' or end of text)
-        val lineEnd = text.indexOf('\n', cursorPos).let {
-            if (it == -1) text.length else it }
+        return lineContent.trim().isNotEmpty()
+    }
 
-        val lineContent = text.substring(lineStart, lineEnd)
+    fun checkIfCurrentLineHasImage(editTextView: EditText) : Boolean {
 
-        return lineContent.trim().isEmpty()
+        val (lineStart, lineEnd) = getCurrentLineIndices(editTextView)
+
+        val spans =
+            editTextView.text.getSpans(lineStart, lineEnd, CustomImageSpan::class.java)
+
+        return spans.isNotEmpty()
     }
 
 }

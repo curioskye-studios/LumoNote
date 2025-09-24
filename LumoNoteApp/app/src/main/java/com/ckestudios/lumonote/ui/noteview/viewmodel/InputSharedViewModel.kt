@@ -19,6 +19,9 @@ class InputSharedViewModel : ViewModel() {
     private val _currentLineHasText = MutableLiveData(false)
     val currentLineHasText: LiveData<Boolean> get() = _currentLineHasText
 
+    private val _currentLineHasImage = MutableLiveData(false)
+    val currentLineHasImage: LiveData<Boolean> get() = _currentLineHasImage
+
 
     fun setShouldOpenFormatter(open: Boolean) {
 
@@ -38,6 +41,11 @@ class InputSharedViewModel : ViewModel() {
     fun setCurrentLineHasText(hasText: Boolean) {
 
         _currentLineHasText.value = hasText
+    }
+
+    fun setCurrentLineHasImage(hasImage: Boolean) {
+
+        _currentLineHasImage.value = hasImage
     }
 
 }
