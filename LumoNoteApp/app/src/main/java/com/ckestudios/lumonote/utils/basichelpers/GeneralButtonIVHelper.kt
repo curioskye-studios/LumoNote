@@ -1,4 +1,4 @@
-package com.ckestudios.lumonote.utils.helpers
+package com.ckestudios.lumonote.utils.basichelpers
 
 import android.content.Context
 import android.widget.ImageView

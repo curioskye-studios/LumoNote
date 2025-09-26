@@ -11,7 +11,7 @@ import com.ckestudios.lumonote.databinding.ActivityHomeViewBinding
 import com.ckestudios.lumonote.ui.home.calendar.view.CalendarViewFragment
 import com.ckestudios.lumonote.ui.home.notepreview.view.NotePreviewViewFragment
 import com.ckestudios.lumonote.ui.home.settings.SettingsViewFragment
-import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
 
 class HomeViewActivity : AppCompatActivity() {
 

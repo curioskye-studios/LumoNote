@@ -11,8 +11,8 @@ import com.ckestudios.lumonote.databinding.FragmentSizeFormatBinding
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
-import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.textformatting.SizeTextFormatter
 
 

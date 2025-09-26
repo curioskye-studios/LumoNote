@@ -7,17 +7,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.ckestudios.lumonote.data.models.TextStyle
+import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.databinding.FragmentStyleFormatBinding
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletResource
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
-import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
-import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.BulletTextFormatter
+import com.ckestudios.lumonote.utils.textformatting.TextFormatHelper
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 
@@ -101,18 +101,18 @@ class StyleFormatFragment: Fragment() {
 
             boldButtonIV.setOnClickListener {
 
-                basicTextFormatter.setBasicSpanType(TextStyle.BOLD,
+                basicTextFormatter.setBasicSpanType(SpanType.BOLD_SPAN,
                     noteContentET.selectionStart, noteContentET.selectionEnd)
 
-                updateBasicFormatActive(TextStyle.BOLD)
+                updateBasicFormatActive(SpanType.BOLD_SPAN)
             }
 
             italicsButtonIV.setOnClickListener {
 
-                basicTextFormatter.setBasicSpanType(TextStyle.ITALICS,
+                basicTextFormatter.setBasicSpanType(SpanType.ITALICS_SPAN,
                     noteContentET.selectionStart, noteContentET.selectionEnd)
 
-                updateBasicFormatActive(TextStyle.ITALICS)
+                updateBasicFormatActive(SpanType.ITALICS_SPAN)
             }
 
             underlineButtonIV.setOnClickListener {
@@ -180,8 +180,8 @@ class StyleFormatFragment: Fragment() {
                 if (!isEmpty) {
 
                     updateUnderlineActive()
-                    updateBasicFormatActive(TextStyle.BOLD)
-                    updateBasicFormatActive(TextStyle.ITALICS)
+                    updateBasicFormatActive(SpanType.BOLD_SPAN)
+                    updateBasicFormatActive(SpanType.ITALICS_SPAN)
                 }
             }
 
@@ -273,14 +273,14 @@ class StyleFormatFragment: Fragment() {
                 requireContext())
 
             updateUnderlineActive()
-            updateBasicFormatActive(TextStyle.BOLD)
-            updateBasicFormatActive(TextStyle.ITALICS)
+            updateBasicFormatActive(SpanType.BOLD_SPAN)
+            updateBasicFormatActive(SpanType.ITALICS_SPAN)
             updateBulletedActive()
         }
     }
 
 
-    private fun updateBasicFormatActive(spanType: TextStyle) {
+    private fun updateBasicFormatActive(spanType: SpanType) {
 
         val isFullyBasicSpanned =
             basicTextFormatter.isSelectionFullySpanned(noteContentET.selectionStart,
@@ -288,8 +288,8 @@ class StyleFormatFragment: Fragment() {
 
         when (spanType) {
 
-            TextStyle.BOLD -> editContentSharedViewModel.setIsBold(isFullyBasicSpanned)
-            TextStyle.ITALICS -> editContentSharedViewModel.setIsItalics(isFullyBasicSpanned)
+            SpanType.BOLD_SPAN -> editContentSharedViewModel.setIsBold(isFullyBasicSpanned)
+            SpanType.ITALICS_SPAN -> editContentSharedViewModel.setIsItalics(isFullyBasicSpanned)
             else -> {}
         }
     }

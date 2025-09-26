@@ -5,18 +5,20 @@ import android.text.Spanned
 import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.BulletType
+import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
-import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
+import com.ckestudios.lumonote.utils.state.StateManager
 
 class BulletTextFormatter(override val editTextView: EditText)
     : RichTextFormatter<CustomBulletSpan> {
 
     override lateinit var etvSpannableContent: Editable
 
-//    private val textFormatHelper = TextFormatHelper()
     private var bulletType: BulletType? = null
     private var customBullet: String? = null
+
     private val textFormatHelper = TextFormatHelper()
+    private val stateManager = StateManager(editTextView)
 
     override fun updateSpannableContent() {
 
@@ -161,6 +163,8 @@ class BulletTextFormatter(override val editTextView: EditText)
                 safeEnd,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
+
+            stateManager.addSpan(bulletSpan, SpanType.BULLET_SPAN)
         }
 
     }
@@ -169,7 +173,12 @@ class BulletTextFormatter(override val editTextView: EditText)
     override fun removeFormatting(selectStart: Int, selectEnd: Int,
                                   spansList: Array<CustomBulletSpan>) {
 
-        for (span in spansList) etvSpannableContent.removeSpan(span)
+        for (span in spansList) {
+
+            stateManager.removeSpan(span, SpanType.BULLET_SPAN)
+
+            etvSpannableContent.removeSpan(span)
+        }
     }
 
 

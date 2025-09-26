@@ -2,20 +2,17 @@ package com.ckestudios.lumonote.utils.textformatting
 
 import android.text.Editable
 import android.text.Spannable
-import android.text.style.CharacterStyle
-import android.text.style.ForegroundColorSpan
-import android.text.style.StrikethroughSpan
 import android.widget.EditText
-import androidx.core.content.ContextCompat
-import com.ckestudios.lumonote.R
-import com.ckestudios.lumonote.ui.noteview.other.CustomItalicsSpan
-import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
+import com.ckestudios.lumonote.data.models.SpanType
+import com.ckestudios.lumonote.ui.noteview.other.ChecklistSpan
+import com.ckestudios.lumonote.utils.state.StateManager
 
 class SimpleChecklistFormatter(private val editTextView: EditText) {
 
     private lateinit var etvSpannableContent: Editable
     private var shouldRemoveChecklist = false
     private val textFormatHelper = TextFormatHelper()
+    private val stateManager = StateManager(editTextView)
 
     private fun updateSpannableContent() {
 
@@ -50,29 +47,7 @@ class SimpleChecklistFormatter(private val editTextView: EditText) {
         if (shouldRemoveChecklist) shouldRemoveChecklist = false
     }
 
-    private fun removeFormatting(start: Int, end: Int) {
 
-        val line = etvSpannableContent.substring(start, end).trimStart()
-
-        val newLine = when {
-
-            line.startsWith("☐") -> line.replaceFirst("☐  ", "")
-
-            line.startsWith("☑") -> line.replaceFirst("☑  ", "")
-
-            else -> line
-        }
-
-        // Remove only checklist-related spans
-        val spans =
-            etvSpannableContent.getSpans(start, end, CharacterStyle::class.java)
-            .filter { it is StrikethroughSpan || it is CustomItalicsSpan ||
-                    it is ForegroundColorSpan }
-
-        spans.forEach { etvSpannableContent.removeSpan(it) }
-
-        etvSpannableContent.replace(start, end, newLine)
-    }
 
     private fun applyFormatting(start: Int, end: Int) {
 
@@ -88,7 +63,16 @@ class SimpleChecklistFormatter(private val editTextView: EditText) {
                 newLine = line.replaceFirst("☐", "☑")
                 etvSpannableContent.replace(start, end, newLine)
 
-                setCheckedSpans(start, start + newLine.length)
+                val span = ChecklistSpan(editTextView.context)
+
+                etvSpannableContent.setSpan(
+                    span,
+                    start,
+                    start + newLine.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                stateManager.addSpan(span, SpanType.CHECKLIST_SPAN)
             }
             line.startsWith("☑") -> {
 
@@ -104,32 +88,33 @@ class SimpleChecklistFormatter(private val editTextView: EditText) {
         }
     }
 
-    private fun setCheckedSpans(start: Int, end: Int) {
+    private fun removeFormatting(start: Int, end: Int) {
 
-        etvSpannableContent.setSpan(
-            StrikethroughSpan(),
-            start,
-            end,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
+        val line = etvSpannableContent.substring(start, end).trimStart()
 
-        etvSpannableContent.setSpan(
-            CustomItalicsSpan(),
-            start,
-            end,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
+        val newLine = when {
 
-        val checkedColor =
-            ContextCompat.getColor(editTextView.context, R.color.light_grey_2)
+            line.startsWith("☐") -> line.replaceFirst("☐  ", "")
 
-        etvSpannableContent.setSpan(
-            ForegroundColorSpan(checkedColor),
-            start,
-            end,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
+            line.startsWith("☑") -> line.replaceFirst("☑  ", "")
+
+            else -> line
+        }
+
+        // Remove only checklist-related spans
+        val spans =
+            etvSpannableContent.getSpans(start, end, ChecklistSpan::class.java)
+
+        spans.forEach {
+
+            stateManager.removeSpan(it, SpanType.CHECKLIST_SPAN)
+
+            etvSpannableContent.removeSpan(it)
+        }
+
+        etvSpannableContent.replace(start, end, newLine)
     }
+
 
     fun getCheckedState(selectStart: Int): String? {
 

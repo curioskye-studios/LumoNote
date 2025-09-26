@@ -3,7 +3,7 @@ package com.ckestudios.lumonote.ui.noteview.other
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
-import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
+import com.ckestudios.lumonote.utils.textformatting.TextFormatHelper
 
 
 /**
@@ -24,7 +24,9 @@ class ImageLineTextWatcher(private val editTextView: EditText) : TextWatcher {
     override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {
 
         if (internalEdit) return
-        beforeText = text ?: ""
+
+        beforeText = when (text) { null -> "" else -> text }
+
     }
 
     override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {
@@ -35,7 +37,8 @@ class ImageLineTextWatcher(private val editTextView: EditText) : TextWatcher {
     override fun afterTextChanged(etvContentSpannable: Editable?) {
 
         if (internalEdit) return
-        etvContentSpannable ?: return
+
+        if (etvContentSpannable == null) return
 
         val cursor = editTextView.selectionStart
         if (cursor < 0) return

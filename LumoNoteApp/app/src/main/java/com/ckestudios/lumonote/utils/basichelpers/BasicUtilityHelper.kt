@@ -1,4 +1,4 @@
-package com.ckestudios.lumonote.utils.helpers
+package com.ckestudios.lumonote.utils.basichelpers
 
 import android.view.View
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET

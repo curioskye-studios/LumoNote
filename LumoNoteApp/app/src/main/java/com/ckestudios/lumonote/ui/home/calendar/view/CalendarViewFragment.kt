@@ -14,10 +14,10 @@ import com.ckestudios.lumonote.ui.home.calendar.viewmodel.CalendarViewModel
 import com.ckestudios.lumonote.ui.noteview.view.NoteViewActivity
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
-import com.ckestudios.lumonote.utils.helpers.BasicUtilityHelper
-import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.helpers.GeneralTextHelper
-import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import java.time.LocalDate
 import java.util.Date
 

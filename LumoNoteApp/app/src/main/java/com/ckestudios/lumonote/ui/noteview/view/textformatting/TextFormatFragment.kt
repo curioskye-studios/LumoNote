@@ -10,9 +10,9 @@ import com.ckestudios.lumonote.databinding.FragmentTextFormatBinding
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
-import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
-import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.textformatting.TextFormatHelper
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.BulletTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter

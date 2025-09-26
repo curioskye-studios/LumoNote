@@ -1,17 +1,16 @@
 package com.ckestudios.lumonote.utils.textformatting
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.text.*
-import android.text.style.ImageSpan
 import android.widget.EditText
+import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.ui.noteview.other.ImageLineTextWatcher
-import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
+import com.ckestudios.lumonote.utils.state.StateManager
 
 class SimpleImageFormatter(private val editTextView: EditText) {
 
@@ -21,6 +20,7 @@ class SimpleImageFormatter(private val editTextView: EditText) {
     private var etvSpannableContent: Editable = editTextView.text
 
     private val textFormatHelper = TextFormatHelper()
+    private val stateManager = StateManager(editTextView)
 
     init {
 
@@ -35,7 +35,7 @@ class SimpleImageFormatter(private val editTextView: EditText) {
         etvSpannableContent = editTextView.text
     }
 
-    fun processFormatting(imageUri: Uri, context: Context) {
+    fun processFormatting(imageUri: Uri) {
 
         updateSpannableContent()
 
@@ -45,13 +45,15 @@ class SimpleImageFormatter(private val editTextView: EditText) {
         removeImageInRange(lineStart, lineEnd)
 
         // Insert the new image
-        insertImage(context, imageUri)
+        insertImage(imageUri)
 
         textFormatHelper.fixLineHeight(editTextView)
     }
 
 
-    private fun insertImage(context: Context, imageUri: Uri) {
+    private fun insertImage(imageUri: Uri) {
+
+        val context = editTextView.context
 
         val cursorPos = editTextView.selectionStart.coerceAtLeast(0)
 
@@ -76,8 +78,11 @@ class SimpleImageFormatter(private val editTextView: EditText) {
 
         val imageText = SpannableStringBuilder("\n$objectCharacter\n")
 
+
         // Apply the CustomImageSpan to the object character
         imageText.setSpan(imageSpan, 1, 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+        stateManager.addSpan(imageSpan, SpanType.IMAGE_SPAN)
 
         etvSpannableContent.insert(cursorPos, imageText)
     }
@@ -86,10 +91,16 @@ class SimpleImageFormatter(private val editTextView: EditText) {
     private fun removeImageInRange(start: Int, end: Int) {
 
         val imageSpans =
-            etvSpannableContent.getSpans(start, end, ImageSpan::class.java)
+            etvSpannableContent.getSpans(start, end, CustomImageSpan::class.java)
 
-        for (span in imageSpans)
+        for (span in imageSpans) {
+            
+            stateManager.removeSpan(span, SpanType.IMAGE_SPAN)
+
             etvSpannableContent.removeSpan(span)
+        }
+
+
     }
 
 

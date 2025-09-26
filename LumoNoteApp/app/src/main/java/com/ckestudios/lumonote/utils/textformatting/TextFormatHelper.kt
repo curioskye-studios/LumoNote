@@ -1,12 +1,13 @@
-package com.ckestudios.lumonote.utils.helpers
+package com.ckestudios.lumonote.utils.textformatting
 
 import android.text.Editable
 import android.text.style.CharacterStyle
 import android.text.style.StyleSpan
 import android.util.Log
 import android.widget.EditText
+import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
-import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
+import com.ckestudios.lumonote.utils.state.StateManager
 
 class TextFormatHelper {
 
@@ -111,6 +112,7 @@ class TextFormatHelper {
 
 
     fun fixOverlappingSpans(sortedSpans: Array<Any>, etvSpannableContent: Editable,
+                            stateManager: StateManager, spanType: SpanType,
                             applyFormattingFunction: (Int, Int) -> Unit) {
 
         for (spanIndex in sortedSpans.indices) {
@@ -139,6 +141,9 @@ class TextFormatHelper {
                     Log.d("basicTextFormatter", "Previous spanIndex overlaps.")
 
                     applyFormattingFunction(prevSpanStart, currentSpanEnd)
+
+                    stateManager.removeSpan(sortedSpans[previousSpanIndex], spanType)
+                    stateManager.removeSpan(sortedSpans[spanIndex], spanType)
 
                     etvSpannableContent.removeSpan(sortedSpans[previousSpanIndex])
                     etvSpannableContent.removeSpan(sortedSpans[spanIndex])

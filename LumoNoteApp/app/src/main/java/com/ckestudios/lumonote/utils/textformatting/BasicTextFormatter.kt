@@ -6,21 +6,22 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
 import android.widget.EditText
-import com.ckestudios.lumonote.data.models.TextStyle
-import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
+import com.ckestudios.lumonote.data.models.SpanType
+import com.ckestudios.lumonote.utils.state.StateManager
 
 class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatter<StyleSpan> {
 
     override lateinit var etvSpannableContent: Editable
-    private var spanType: TextStyle? = null
+    private var spanType: SpanType? = null
     private val textFormatHelper = TextFormatHelper()
+    private val stateManager = StateManager(editTextView)
 
     override fun updateSpannableContent() {
 
         etvSpannableContent = editTextView.text
     }
 
-    fun setBasicSpanType(basicSpanType: TextStyle, selectStart: Int, selectEnd: Int) {
+    fun setBasicSpanType(basicSpanType: SpanType, selectStart: Int, selectEnd: Int) {
 
         spanType = basicSpanType
 
@@ -71,9 +72,9 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
         : Array<StyleSpan>? {
 
         return when (spanType) {
-                TextStyle.BOLD ->
+                SpanType.BOLD_SPAN ->
                     allStyleSpans.filter { it.style == Typeface.BOLD }.toTypedArray()
-                TextStyle.ITALICS ->
+                SpanType.ITALICS_SPAN ->
                     allStyleSpans.filter { it.style == Typeface.ITALIC }.toTypedArray()
                 else -> null
             }
@@ -83,8 +84,8 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
     override fun applyFormatting(start: Int, end: Int) {
 
         val setSpan = when (spanType) {
-                TextStyle.BOLD -> StyleSpan(Typeface.BOLD)
-                TextStyle.ITALICS -> StyleSpan(Typeface.ITALIC)
+                SpanType.BOLD_SPAN -> StyleSpan(Typeface.BOLD)
+                SpanType.ITALICS_SPAN -> StyleSpan(Typeface.ITALIC)
                 else -> null
             }
 
@@ -96,6 +97,40 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
                 end,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
+        }
+
+        stateManager.addSpan(setSpan!!, spanType!!)
+    }
+
+    override fun removeFormatting(selectStart: Int, selectEnd: Int, spansList: Array<StyleSpan>){
+
+        for (span in spansList) {
+
+            val spanStart = etvSpannableContent.getSpanStart(span)
+            val spanEnd = etvSpannableContent.getSpanEnd(span)
+
+            // eg. span: 0-7, selection: 4-9
+            if (spanStart < selectStart) {
+
+                val excludeRemovalStart = spanStart
+                val excludeRemovalEnd = selectStart
+                applyFormatting(excludeRemovalStart, excludeRemovalEnd)
+            }
+
+            // eg. span: 5-8, selection 2-6
+            if (spanEnd > selectEnd) {
+
+                val excludeRemovalStart = selectEnd
+                val excludeRemovalEnd = spanEnd
+                applyFormatting(excludeRemovalStart, excludeRemovalEnd)
+            }
+
+            // eg. span: 1-9, selection 3-6, runs both
+
+            stateManager.removeSpan(span, spanType!!)
+
+            etvSpannableContent.removeSpan(span)
+
         }
     }
 
@@ -115,7 +150,7 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
 
             // Combine adjacent or overlapping spans
             textFormatHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
-                ::applyFormatting)
+                stateManager, spanType!!, ::applyFormatting)
         }
     }
 
@@ -124,7 +159,7 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
     }
 
     fun isSelectionFullySpanned(selectStart: Int, selectEnd: Int,
-                                         spanType: TextStyle): Boolean {
+                                         spanType: SpanType): Boolean {
 
         updateSpannableContent()
 
@@ -139,8 +174,8 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
         val spanFoundTracker = mutableListOf<Boolean>()
 
         val formatTypeToCheck = when (spanType) {
-                TextStyle.BOLD -> Typeface.BOLD
-                TextStyle.ITALICS -> Typeface.ITALIC
+                SpanType.BOLD_SPAN -> Typeface.BOLD
+                SpanType.ITALICS_SPAN -> Typeface.ITALIC
                 else -> null
             }
 

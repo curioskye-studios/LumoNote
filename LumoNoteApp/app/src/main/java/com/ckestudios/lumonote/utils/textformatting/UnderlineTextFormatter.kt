@@ -6,7 +6,8 @@ import android.text.Spanned
 import android.text.style.UnderlineSpan
 import android.util.Log
 import android.widget.EditText
-import com.ckestudios.lumonote.utils.helpers.TextFormatHelper
+import com.ckestudios.lumonote.data.models.SpanType
+import com.ckestudios.lumonote.utils.state.StateManager
 
 class UnderlineTextFormatter(override val editTextView: EditText)
     : RichTextFormatter<UnderlineTextFormatter.CustomUnderlineSpan> {
@@ -15,6 +16,7 @@ class UnderlineTextFormatter(override val editTextView: EditText)
 
     override lateinit var etvSpannableContent: Editable
     private val textFormatHelper = TextFormatHelper()
+    private val stateManager = StateManager(editTextView)
 
 
     override fun updateSpannableContent() {
@@ -64,12 +66,48 @@ class UnderlineTextFormatter(override val editTextView: EditText)
 
     override fun applyFormatting(start: Int, end: Int) {
 
+        val span = CustomUnderlineSpan()
+
         etvSpannableContent.setSpan(
-            CustomUnderlineSpan(),
+            span,
             start,
             end,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
+
+        stateManager.addSpan(span, SpanType.UNDERLINE_SPAN)
+    }
+
+    override fun removeFormatting(selectStart: Int, selectEnd: Int,
+                                  spansList: Array<CustomUnderlineSpan>){
+
+        for (span in spansList) {
+
+            val spanStart = etvSpannableContent.getSpanStart(span)
+            val spanEnd = etvSpannableContent.getSpanEnd(span)
+
+            // eg. span: 0-7, selection: 4-9
+            if (spanStart < selectStart) {
+
+                val excludeRemovalStart = spanStart
+                val excludeRemovalEnd = selectStart
+                applyFormatting(excludeRemovalStart, excludeRemovalEnd)
+            }
+
+            // eg. span: 5-8, selection 2-6
+            if (spanEnd > selectEnd) {
+
+                val excludeRemovalStart = selectEnd
+                val excludeRemovalEnd = spanEnd
+                applyFormatting(excludeRemovalStart, excludeRemovalEnd)
+            }
+
+            // eg. span: 1-9, selection 3-6, runs both
+
+            stateManager.removeSpan(span, SpanType.UNDERLINE_SPAN)
+
+            etvSpannableContent.removeSpan(span)
+        }
     }
 
 
@@ -86,7 +124,7 @@ class UnderlineTextFormatter(override val editTextView: EditText)
 
             // Combine adjacent or overlapping spans
             textFormatHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
-                ::applyFormatting)
+                stateManager, SpanType.UNDERLINE_SPAN, ::applyFormatting)
         }
     }
 
