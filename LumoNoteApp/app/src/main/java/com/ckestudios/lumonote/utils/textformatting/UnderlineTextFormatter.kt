@@ -7,7 +7,7 @@ import android.text.style.UnderlineSpan
 import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
-import com.ckestudios.lumonote.utils.state.StateManager
+import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 
 class UnderlineTextFormatter(override val editTextView: EditText)
     : RichTextFormatter<UnderlineTextFormatter.CustomUnderlineSpan> {
@@ -16,7 +16,7 @@ class UnderlineTextFormatter(override val editTextView: EditText)
 
     override lateinit var etvSpannableContent: Editable
     private val textFormatHelper = TextFormatHelper()
-    private val stateManager = StateManager(editTextView)
+    private val spanStateWatcher = SpanStateWatcher(editTextView)
 
 
     override fun updateSpannableContent() {
@@ -75,7 +75,7 @@ class UnderlineTextFormatter(override val editTextView: EditText)
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
-        stateManager.addSpan(span, SpanType.UNDERLINE_SPAN)
+        spanStateWatcher.addSpan(span, SpanType.UNDERLINE_SPAN)
     }
 
     override fun removeFormatting(selectStart: Int, selectEnd: Int,
@@ -104,7 +104,7 @@ class UnderlineTextFormatter(override val editTextView: EditText)
 
             // eg. span: 1-9, selection 3-6, runs both
 
-            stateManager.removeSpan(span, SpanType.UNDERLINE_SPAN)
+            spanStateWatcher.removeSpan(span, SpanType.UNDERLINE_SPAN)
 
             etvSpannableContent.removeSpan(span)
         }
@@ -124,7 +124,7 @@ class UnderlineTextFormatter(override val editTextView: EditText)
 
             // Combine adjacent or overlapping spans
             textFormatHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
-                stateManager, SpanType.UNDERLINE_SPAN, ::applyFormatting)
+                spanStateWatcher, SpanType.UNDERLINE_SPAN, ::applyFormatting)
         }
     }
 

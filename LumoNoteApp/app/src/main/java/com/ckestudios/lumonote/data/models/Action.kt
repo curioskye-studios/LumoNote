@@ -1,7 +1,10 @@
 package com.ckestudios.lumonote.data.models
 
-enum class Action(val actionName: String) {
-
-    ADD("add"),
-    REMOVE("remove")
-}
+data class Action(
+    val actionPerformed: ActionPerformed,
+    val actionType: ActionType,
+    val actionIsReplacement: Boolean,
+    val actionStart: Int,
+    val actionEnd: Int,
+    val actionInfo: Any?
+)

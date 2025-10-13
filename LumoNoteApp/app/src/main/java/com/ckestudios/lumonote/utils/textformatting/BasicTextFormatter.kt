@@ -7,14 +7,14 @@ import android.text.Spanned
 import android.text.style.StyleSpan
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
-import com.ckestudios.lumonote.utils.state.StateManager
+import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 
 class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatter<StyleSpan> {
 
     override lateinit var etvSpannableContent: Editable
     private var spanType: SpanType? = null
     private val textFormatHelper = TextFormatHelper()
-    private val stateManager = StateManager(editTextView)
+    private val spanStateWatcher = SpanStateWatcher(editTextView)
 
     override fun updateSpannableContent() {
 
@@ -99,7 +99,7 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
             )
         }
 
-        stateManager.addSpan(setSpan!!, spanType!!)
+        spanStateWatcher.addSpan(setSpan!!, spanType!!)
     }
 
     override fun removeFormatting(selectStart: Int, selectEnd: Int, spansList: Array<StyleSpan>){
@@ -127,7 +127,7 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
 
             // eg. span: 1-9, selection 3-6, runs both
 
-            stateManager.removeSpan(span, spanType!!)
+            spanStateWatcher.removeSpan(span, spanType!!)
 
             etvSpannableContent.removeSpan(span)
 
@@ -150,7 +150,7 @@ class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatte
 
             // Combine adjacent or overlapping spans
             textFormatHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
-                stateManager, spanType!!, ::applyFormatting)
+                spanStateWatcher, spanType!!, ::applyFormatting)
         }
     }
 

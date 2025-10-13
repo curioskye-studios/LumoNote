@@ -26,7 +26,6 @@ class ImageLineTextWatcher(private val editTextView: EditText) : TextWatcher {
         if (internalEdit) return
 
         beforeText = when (text) { null -> "" else -> text }
-
     }
 
     override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {

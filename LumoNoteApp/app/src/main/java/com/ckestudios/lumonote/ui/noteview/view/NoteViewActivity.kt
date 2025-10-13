@@ -16,6 +16,7 @@ import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.state.StateManager
 import java.time.LocalDate
 
 
@@ -57,7 +58,11 @@ class NoteViewActivity : AppCompatActivity() {
 
         editContentSharedViewModel =
             ViewModelProvider(this).get(EditContentSharedViewModel::class.java)
+
         editContentSharedViewModel.setNoteContentEditTextView(noteViewBinding.noteEditContentET)
+
+        val stateManager = StateManager(noteViewBinding.noteEditContentET)
+        editContentSharedViewModel.setNoteContentStateManager(stateManager)
 
 
         // Check if working with existing note

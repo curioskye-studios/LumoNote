@@ -4,12 +4,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
+import com.ckestudios.lumonote.utils.state.StateManager
+import com.ckestudios.lumonote.utils.state.TextStateWatcher
 
 class EditContentSharedViewModel : ViewModel() {
 
     private val _noteContentEditTextView = MutableLiveData<CustomSelectionET>()
     val noteContentEditTextView : LiveData<CustomSelectionET>
         get() = _noteContentEditTextView
+
+    private val _noteContentStateManager = MutableLiveData<StateManager>()
+    val noteContentStateManager : LiveData<StateManager>
+        get() = _noteContentStateManager
+
+    private val _noteContentTextStateWatcher = MutableLiveData<TextStateWatcher>()
+    val noteContentTextStateWatcher : LiveData<TextStateWatcher>
+        get() = _noteContentTextStateWatcher
 
 
     private val _isNormalSized = MutableLiveData(true)
@@ -30,15 +40,20 @@ class EditContentSharedViewModel : ViewModel() {
     private val _isBulleted = MutableLiveData(false)
     val isBulleted : LiveData<Boolean> get() = _isBulleted
 
-    private val _removeChecklist = MutableLiveData(false)
-    val removeChecklist : LiveData<Boolean> get() = _removeChecklist
-
-
-
 
     fun setNoteContentEditTextView(noteContentET: CustomSelectionET) {
 
         _noteContentEditTextView.value = noteContentET
+    }
+
+    fun setNoteContentStateManager(stateManager: StateManager) {
+
+        _noteContentStateManager.value = stateManager
+    }
+
+    fun setNoteContentTextWatcher(textStateWatcher: TextStateWatcher) {
+
+        _noteContentTextStateWatcher.value = textStateWatcher
     }
 
 
@@ -83,11 +98,6 @@ class EditContentSharedViewModel : ViewModel() {
     fun setIsBulleted(isBulleted: Boolean) {
 
         _isBulleted.value = isBulleted
-    }
-
-    fun setRemoveChecklist(removeChecklist: Boolean) {
-
-        _removeChecklist.value = removeChecklist
     }
 
 }

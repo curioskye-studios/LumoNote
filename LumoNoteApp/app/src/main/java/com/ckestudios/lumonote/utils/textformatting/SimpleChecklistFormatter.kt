@@ -5,14 +5,14 @@ import android.text.Spannable
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.ChecklistSpan
-import com.ckestudios.lumonote.utils.state.StateManager
+import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 
 class SimpleChecklistFormatter(private val editTextView: EditText) {
 
     private lateinit var etvSpannableContent: Editable
     private var shouldRemoveChecklist = false
     private val textFormatHelper = TextFormatHelper()
-    private val stateManager = StateManager(editTextView)
+    private val spanStateWatcher = SpanStateWatcher(editTextView)
 
     private fun updateSpannableContent() {
 
@@ -72,7 +72,7 @@ class SimpleChecklistFormatter(private val editTextView: EditText) {
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
 
-                stateManager.addSpan(span, SpanType.CHECKLIST_SPAN)
+                spanStateWatcher.addSpan(span, SpanType.CHECKLIST_SPAN)
             }
             line.startsWith("☑") -> {
 
@@ -107,7 +107,7 @@ class SimpleChecklistFormatter(private val editTextView: EditText) {
 
         spans.forEach {
 
-            stateManager.removeSpan(it, SpanType.CHECKLIST_SPAN)
+            spanStateWatcher.removeSpan(it, SpanType.CHECKLIST_SPAN)
 
             etvSpannableContent.removeSpan(it)
         }

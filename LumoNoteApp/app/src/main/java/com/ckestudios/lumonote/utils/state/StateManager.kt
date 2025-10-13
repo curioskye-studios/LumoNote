@@ -1,98 +1,161 @@
 package com.ckestudios.lumonote.utils.state
 
-import android.text.style.StyleSpan
+import android.util.Log
 import android.widget.EditText
-import com.ckestudios.lumonote.data.models.SpanType
-import com.ckestudios.lumonote.ui.noteview.other.ChecklistSpan
-import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
-import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
+import com.ckestudios.lumonote.data.models.Action
+import com.ckestudios.lumonote.data.models.ActionType
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.textformatting.TextFormatHelper
-import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 class StateManager(private val editTextView: EditText) {
 
-    private val undoStack = UndoStateStack()
-    private val redoStack = RedoStateStack()
-
-    private var currentBoldSpans = ArrayList<StyleSpan>()
-    private var currentItalicsSpans = ArrayList<StyleSpan>()
-    private var currentUnderlineSpans = ArrayList<UnderlineTextFormatter.CustomUnderlineSpan>()
-
-    private var currentBulletSpans = ArrayList<CustomBulletSpan>()
-
-    private var currentImageSpans = ArrayList<CustomImageSpan>()
-
-    private var currChecklistSpans = ArrayList<ChecklistSpan>()
+    private val undoStack = ActionStateStack()
+    private val redoStack = ActionStateStack()
+    private var isNewAction = false
 
     private val textFormatHelper = TextFormatHelper()
     private val generalUIHelper = GeneralUIHelper()
+    private lateinit var actionInterpreter: ActionInterpreter
 
-    fun addSpan(span: Any, spanType: SpanType) {
+    private var actionToUndo: Action? = null
+    private var actionToRedo: Action? = null
 
-        when (spanType) {
 
-            SpanType.BOLD_SPAN -> currentBoldSpans.add(span as StyleSpan)
-            SpanType.ITALICS_SPAN -> currentItalicsSpans.add(span as StyleSpan)
-            SpanType.UNDERLINE_SPAN -> {
-                currentUnderlineSpans.add((span as UnderlineTextFormatter.CustomUnderlineSpan))
-            }
+    fun checkIfUndoEmpty(): Boolean {
 
-            SpanType.BULLET_SPAN -> currentBulletSpans.add(span as CustomBulletSpan)
+        return undoStack.isStackEmpty()
+    }
 
-            SpanType.IMAGE_SPAN -> currentImageSpans.add(span as CustomImageSpan)
+    fun checkIfRedoEmpty(): Boolean {
 
-            SpanType.CHECKLIST_SPAN -> currChecklistSpans.add(span as ChecklistSpan)
+        return redoStack.isStackEmpty()
+    }
 
-            else -> {}
+
+    private fun setActionToUndo(action: Action) {
+
+        actionToUndo = action
+        actionToRedo = null
+    }
+
+    private fun setActionToRedo(action: Action) {
+
+        actionToRedo = action
+        actionToUndo = null
+    }
+
+
+    fun addToUndo(undoAction: Action) {
+
+        val inRedoStack = redoStack.getStackContents().contains(undoAction)
+
+        if (!inRedoStack) {
+
+            clearRedoStack()
         }
 
-        val spanStart = editTextView.text.getSpanStart(span)
-        val spanEnd = editTextView.text.getSpanEnd(span)
-
-        generalUIHelper.displayFeedbackToast(editTextView.context,
-            "${spanType.spanName} added at $spanStart-$spanEnd", true)
+        undoStack.pushActionToStack(undoAction)
     }
 
-    fun removeSpan(targetSpan: Any, spanType: SpanType) {
+    private fun addToRedo(redoAction: Action) {
 
-        val spanList =
-            when (spanType) {
+        redoStack.pushActionToStack(redoAction)
+    }
 
-                SpanType.BOLD_SPAN -> currentBoldSpans
-                SpanType.ITALICS_SPAN -> currentItalicsSpans
-                SpanType.UNDERLINE_SPAN -> currentUnderlineSpans
 
-                SpanType.BULLET_SPAN -> currentBulletSpans
+    fun undoAction(actionInterpreter: ActionInterpreter) {
 
-                SpanType.IMAGE_SPAN -> currentImageSpans
+        this.actionInterpreter = actionInterpreter
 
-                SpanType.CHECKLIST_SPAN -> currChecklistSpans
+        val topAction = undoStack.getTopActionOfStack()
 
-                else -> null
-            }
+        Log.d("TextWatcher", "undo: $topAction")
 
-        if (spanList.isNullOrEmpty()) return
+        if (topAction == null) return
 
-        for (span in spanList) {
+        performUndo(topAction)
 
-            if (span == targetSpan) {
 
-                val spanStart = editTextView.text.getSpanStart(span)
-                val spanEnd = editTextView.text.getSpanEnd(span)
+        if (topAction.actionIsReplacement) {
 
-                generalUIHelper.displayFeedbackToast(editTextView.context,
-                    "${spanType.spanName} removed from $spanStart-$spanEnd",
-                    true)
+            val secondAction = undoStack.getTopActionOfStack()
 
-                spanList.remove(span)
-            }
+            Log.d("TextWatcher", "undo2nd: $secondAction")
+
+            if (secondAction == null) return
+
+            performUndo(secondAction)
         }
     }
 
-    fun addToUndo() {
+    fun redoAction() {
 
+        val topAction = redoStack.getTopActionOfStack()
+
+        Log.d("TextWatcher", "redo: $topAction")
+
+        if (topAction == null) return
+
+        performRedo(topAction)
+
+
+        if (topAction.actionIsReplacement) {
+
+            val secondAction = redoStack.getTopActionOfStack()
+
+            Log.d("TextWatcher", "redo2nd: $secondAction")
+
+            if (secondAction == null) return
+
+            performRedo(secondAction)
+        }
     }
 
+
+    private fun performUndo(undoAction: Action) {
+
+        setActionToUndo(undoAction)
+
+        addToRedo(undoAction)
+
+        undoStack.popActionFromStack()
+
+        if (actionToUndo == null) return
+
+
+        when (actionToUndo!!.actionType) {
+
+            ActionType.TEXT -> actionInterpreter.processTextAction(actionToUndo!!,
+                editTextView, true)
+
+            ActionType.SPAN -> {} //actionInterpreter.performSpanAction()
+        }
+    }
+
+    private fun performRedo(redoAction: Action) {
+
+        setActionToRedo(redoAction)
+
+        addToUndo(redoAction)
+
+        redoStack.popActionFromStack()
+
+        if (actionToRedo == null) return
+
+
+        when (actionToRedo!!.actionType) {
+
+            ActionType.TEXT -> actionInterpreter.processTextAction(actionToRedo!!,
+                editTextView, false)
+
+            ActionType.SPAN -> {} //actionInterpreter.performSpanAction()
+        }
+    }
+
+
+    private fun clearRedoStack() {
+
+        redoStack.clearStack()
+    }
 
 }

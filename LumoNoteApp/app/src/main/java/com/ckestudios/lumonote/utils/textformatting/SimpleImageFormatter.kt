@@ -10,7 +10,7 @@ import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.ui.noteview.other.ImageLineTextWatcher
-import com.ckestudios.lumonote.utils.state.StateManager
+import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 
 class SimpleImageFormatter(private val editTextView: EditText) {
 
@@ -20,7 +20,7 @@ class SimpleImageFormatter(private val editTextView: EditText) {
     private var etvSpannableContent: Editable = editTextView.text
 
     private val textFormatHelper = TextFormatHelper()
-    private val stateManager = StateManager(editTextView)
+    private val spanStateWatcher = SpanStateWatcher(editTextView)
 
     init {
 
@@ -82,9 +82,14 @@ class SimpleImageFormatter(private val editTextView: EditText) {
         // Apply the CustomImageSpan to the object character
         imageText.setSpan(imageSpan, 1, 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        stateManager.addSpan(imageSpan, SpanType.IMAGE_SPAN)
-
         etvSpannableContent.insert(cursorPos, imageText)
+
+
+        val insertedImageSpan =
+            etvSpannableContent.getSpans(cursorPos+1, cursorPos+2, CustomImageSpan::class.java)
+
+        if (insertedImageSpan.isNotEmpty())
+            spanStateWatcher.addSpan(insertedImageSpan[0], SpanType.IMAGE_SPAN)
     }
 
 
@@ -94,8 +99,8 @@ class SimpleImageFormatter(private val editTextView: EditText) {
             etvSpannableContent.getSpans(start, end, CustomImageSpan::class.java)
 
         for (span in imageSpans) {
-            
-            stateManager.removeSpan(span, SpanType.IMAGE_SPAN)
+
+            spanStateWatcher.removeSpan(span, SpanType.IMAGE_SPAN)
 
             etvSpannableContent.removeSpan(span)
         }

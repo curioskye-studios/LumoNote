@@ -204,25 +204,25 @@ class StyleFormatFragment: Fragment() {
             isBold.observe(viewLifecycleOwner) { isTrue ->
 
                 generalButtonIVHelper.updateButtonIVHighlight(
-                    styleFormatViewBinding.boldButtonIV, isTrue, requireContext())
+                    styleFormatViewBinding.boldButtonIV, isTrue, requireContext(), null)
             }
 
             isItalics.observe(viewLifecycleOwner) { isTrue ->
 
                 generalButtonIVHelper.updateButtonIVHighlight(
-                    styleFormatViewBinding.italicsButtonIV, isTrue, requireContext())
+                    styleFormatViewBinding.italicsButtonIV, isTrue, requireContext(), null)
             }
 
             isUnderlined.observe(viewLifecycleOwner) { isTrue ->
 
                 generalButtonIVHelper.updateButtonIVHighlight(
-                    styleFormatViewBinding.underlineButtonIV, isTrue, requireContext())
+                    styleFormatViewBinding.underlineButtonIV, isTrue, requireContext(), null)
             }
 
             isBulleted.observe(viewLifecycleOwner){ isTrue ->
 
                 generalButtonIVHelper.updateButtonIVHighlight(
-                    styleFormatViewBinding.bulletButtonIV, isTrue, requireContext())
+                    styleFormatViewBinding.bulletButtonIV, isTrue, requireContext(), null)
             }
         }
 
@@ -236,7 +236,7 @@ class StyleFormatFragment: Fragment() {
         if (!hasImage && hasText) {
 
             generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.bulletButtonIV,
-                requireContext())
+                requireContext(), null)
         } else {
 
             generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.bulletButtonIV,
@@ -264,13 +264,13 @@ class StyleFormatFragment: Fragment() {
         } else {
 
             generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.clearFormatsButtonIV,
-                requireContext())
+                requireContext(), null)
             generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.boldButtonIV,
-                requireContext())
+                requireContext(), null)
             generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.italicsButtonIV,
-                requireContext())
+                requireContext(), null)
             generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.underlineButtonIV,
-                requireContext())
+                requireContext(), null)
 
             updateUnderlineActive()
             updateBasicFormatActive(SpanType.BOLD_SPAN)

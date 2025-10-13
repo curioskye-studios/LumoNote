@@ -17,6 +17,9 @@ import com.ckestudios.lumonote.ui.noteview.viewmodel.EditInputViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.state.ActionInterpreter
+import com.ckestudios.lumonote.utils.state.StateManager
+import com.ckestudios.lumonote.utils.state.TextStateWatcher
 import com.ckestudios.lumonote.utils.textformatting.SimpleChecklistFormatter
 import com.ckestudios.lumonote.utils.textformatting.SimpleImageFormatter
 
@@ -43,6 +46,8 @@ class EditInputFragment : Fragment() {
     private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
 
     private lateinit var noteContentET: CustomSelectionET
+    private lateinit var noteContentStateManager: StateManager
+    private lateinit var noteContentTextWatcher: TextStateWatcher
     private lateinit var simpleChecklistFormatter: SimpleChecklistFormatter
     private lateinit var simpleImageFormatter: SimpleImageFormatter
 //    private lateinit var imageLineGuard: ImageLineGuard
@@ -94,11 +99,15 @@ class EditInputFragment : Fragment() {
 
         noteContentET =
             editContentSharedViewModel.noteContentEditTextView.value as CustomSelectionET
+        noteContentStateManager =
+            editContentSharedViewModel.noteContentStateManager.value as StateManager
 
+        noteContentTextWatcher = TextStateWatcher(noteContentET, noteContentStateManager)
+        noteContentET.addTextChangedListener(noteContentTextWatcher)
+        editContentSharedViewModel.setNoteContentTextWatcher(noteContentTextWatcher)
 
         simpleChecklistFormatter = SimpleChecklistFormatter(noteContentET)
         simpleImageFormatter = SimpleImageFormatter(noteContentET)
-//        imageLineGuard = ImageLineGuard(noteContentET)
 
         setOnClickListeners()
 
@@ -123,14 +132,11 @@ class EditInputFragment : Fragment() {
 
         editInputViewBinding.apply {
 
-            checkListButtonIV.apply {
+            checkListButtonIV.setOnClickListener {
 
-                setOnClickListener {
+                simpleChecklistFormatter.processFormatting()
 
-                    simpleChecklistFormatter.processFormatting()
-
-                    updateChecklistActive()
-                }
+                updateChecklistActive()
             }
 
 
@@ -153,6 +159,22 @@ class EditInputFragment : Fragment() {
                 editInputViewModel.setTextFormatBtnActive(!textFormatActiveStatus)
                 inputSharedViewModel.setShouldOpenFormatter(!textFormatActiveStatus)
             }
+
+            undoButtonIV.setOnClickListener {
+                val actionInterpreter = ActionInterpreter(noteContentTextWatcher)
+
+                noteContentStateManager.undoAction(actionInterpreter)
+
+                editInputViewModel.setUndoBtnActive(!noteContentStateManager.checkIfUndoEmpty())
+                editInputViewModel.setRedoBtnActive(!noteContentStateManager.checkIfRedoEmpty())
+            }
+
+            redoButtonIV.setOnClickListener {
+
+                noteContentStateManager.redoAction()
+                editInputViewModel.setUndoBtnActive(!noteContentStateManager.checkIfUndoEmpty())
+                editInputViewModel.setRedoBtnActive(!noteContentStateManager.checkIfRedoEmpty())
+            }
         }
     }
 
@@ -165,70 +187,43 @@ class EditInputFragment : Fragment() {
 
                 if (isTrue) {
 
-                    val hasText = currentLineHasText.value!!
-                    if (!hasText) {
-                        generalButtonIVHelper.enableButtonIV(editInputViewBinding.imageButtonIV,
-                            requireContext())
-                    }
-
-                    generalButtonIVHelper.enableButtonIV(editInputViewBinding.checkListButtonIV,
-                        requireContext())
                     generalButtonIVHelper.enableButtonIV(editInputViewBinding.textFormatButtonIV,
-                        requireContext())
+                        requireContext(), null)
 
                     // since automatically opens textformatter when editing
                     editInputViewModel.setTextFormatBtnActive(true)
+                } else {
 
-                    updateChecklistActive()
-                }
-
-                else {
-
-                    generalButtonIVHelper.disableButtonIV(editInputViewBinding.imageButtonIV,
-                        requireContext())
-                    generalButtonIVHelper.disableButtonIV(editInputViewBinding.checkListButtonIV,
-                        requireContext())
                     generalButtonIVHelper.disableButtonIV(editInputViewBinding.textFormatButtonIV,
                         requireContext())
                 }
+
+                updateImageBtnDisplay()
+
+                updateChecklistBtnDisplay()
+                updateChecklistActive()
+
+                updateUndoBtnDisplay()
+                updateRedoBtnDisplay()
             }
 
             isContentSelectionEmpty.observe(viewLifecycleOwner){
 
-                updateChecklistActive()
+                updateChecklistBtnDisplay()
+
+                updateUndoBtnDisplay()
+                updateRedoBtnDisplay()
             }
 
-            currentLineHasText.observe(viewLifecycleOwner) { hasText ->
+            currentLineHasText.observe(viewLifecycleOwner) {
 
-                when {
-
-                    !hasText && noteContentIsEditing.value!! ->
-                        generalButtonIVHelper.enableButtonIV(editInputViewBinding.imageButtonIV,
-                            requireContext())
-
-                    else ->
-                        generalButtonIVHelper.disableButtonIV(editInputViewBinding.imageButtonIV,
-                            requireContext())
-                }
+                updateImageBtnDisplay()
             }
 
-            currentLineHasImage.observe(viewLifecycleOwner) { hasImage ->
+            currentLineHasImage.observe(viewLifecycleOwner) {
 
-                when {
-
-                    !hasImage && noteContentIsEditing.value!! -> {
-
-                        generalButtonIVHelper.enableButtonIV(editInputViewBinding.checkListButtonIV,
-                            requireContext())
-                    }
-
-
-                    else ->
-                        generalButtonIVHelper.disableButtonIV(editInputViewBinding.checkListButtonIV,
-                            requireContext())
-                }
-
-                updateChecklistActive()
+                updateImageBtnDisplay()
+                updateChecklistBtnDisplay()
             }
 
         }
@@ -245,7 +240,7 @@ class EditInputFragment : Fragment() {
                 if (editInputViewBinding.imageButtonIV.isEnabled) {
 
                     generalButtonIVHelper.updateButtonIVHighlight(
-                        editInputViewBinding.imageButtonIV, isTrue, requireContext())
+                        editInputViewBinding.imageButtonIV, isTrue, requireContext(), null)
                 }
             }
 
@@ -254,7 +249,7 @@ class EditInputFragment : Fragment() {
                 if (editInputViewBinding.checkListButtonIV.isEnabled) {
 
                     generalButtonIVHelper.updateButtonIVHighlight(
-                        editInputViewBinding.checkListButtonIV, isTrue, requireContext())
+                        editInputViewBinding.checkListButtonIV, isTrue, requireContext(), null)
                 }
             }
 
@@ -263,7 +258,27 @@ class EditInputFragment : Fragment() {
                 if (editInputViewBinding.textFormatButtonIV.isEnabled) {
 
                     generalButtonIVHelper.updateButtonIVHighlight(
-                        editInputViewBinding.textFormatButtonIV, isTrue, requireContext())
+                        editInputViewBinding.textFormatButtonIV, isTrue, requireContext(), null)
+                }
+            }
+
+            undoBtnIsActive.observe(viewLifecycleOwner) { isTrue ->
+
+                if (editInputViewBinding.undoButtonIV.isEnabled) {
+
+                    generalButtonIVHelper.updateButtonIVHighlight(
+                        editInputViewBinding.undoButtonIV, isTrue, requireContext(),
+                            R.color.light_grey_3)
+                }
+            }
+
+            redoBtnIsActive.observe(viewLifecycleOwner) { isTrue ->
+
+                if (editInputViewBinding.redoButtonIV.isEnabled) {
+
+                    generalButtonIVHelper.updateButtonIVHighlight(
+                        editInputViewBinding.redoButtonIV, isTrue, requireContext(),
+                            R.color.light_grey_3)
                 }
             }
 
@@ -274,15 +289,46 @@ class EditInputFragment : Fragment() {
     private fun observeEditContentVMValues() {
 
         editContentSharedViewModel.apply {
-
-            removeChecklist.observe(viewLifecycleOwner) { shouldRemove ->
-
-                simpleChecklistFormatter.updateRemoveChecklist(shouldRemove)
-            }
         }
 
     }
 
+
+    private fun updateImageBtnDisplay() {
+
+        val isEditing = inputSharedViewModel.noteContentIsEditing.value!!
+        val hasImage = inputSharedViewModel.currentLineHasImage.value!!
+        val hasText = inputSharedViewModel.currentLineHasText.value!!
+
+        if (!hasImage && !hasText && isEditing) {
+
+            generalButtonIVHelper.enableButtonIV(editInputViewBinding.imageButtonIV,
+                requireContext(), null)
+        } else {
+
+            generalButtonIVHelper.disableButtonIV(editInputViewBinding.imageButtonIV,
+                requireContext())
+        }
+    }
+
+    private fun updateChecklistBtnDisplay() {
+
+        val isEditing = inputSharedViewModel.noteContentIsEditing.value!!
+        val selectionIsEmpty = inputSharedViewModel.isContentSelectionEmpty.value!!
+        val hasImage = inputSharedViewModel.currentLineHasImage.value!!
+
+        if (selectionIsEmpty && !hasImage && isEditing) {
+
+            generalButtonIVHelper.enableButtonIV(editInputViewBinding.checkListButtonIV,
+                requireContext(), null)
+        } else {
+
+            generalButtonIVHelper.disableButtonIV(editInputViewBinding.checkListButtonIV,
+                requireContext())
+        }
+
+        updateChecklistActive()
+    }
 
     private fun updateChecklistActive() {
 
@@ -318,6 +364,41 @@ class EditInputFragment : Fragment() {
     }
 
 
+    private fun updateUndoBtnDisplay() {
 
+        val isEditing = inputSharedViewModel.noteContentIsEditing.value!!
+        val undoEmpty = noteContentStateManager.checkIfUndoEmpty()
+
+        if (isEditing && !undoEmpty) {
+
+            generalButtonIVHelper.enableButtonIV(editInputViewBinding.undoButtonIV,
+                requireContext(), R.color.light_grey_3)
+
+            editInputViewModel.setUndoBtnActive(!noteContentStateManager.checkIfUndoEmpty())
+        } else {
+
+            generalButtonIVHelper.disableButtonIV(editInputViewBinding.undoButtonIV,
+                requireContext())
+        }
+    }
+
+
+    private fun updateRedoBtnDisplay() {
+
+        val isEditing = inputSharedViewModel.noteContentIsEditing.value!!
+        val redoEmpty = noteContentStateManager.checkIfRedoEmpty()
+
+        if (isEditing && !redoEmpty) {
+
+            generalButtonIVHelper.enableButtonIV(editInputViewBinding.redoButtonIV,
+                requireContext(), R.color.light_grey_3)
+2
+            editInputViewModel.setRedoBtnActive(!noteContentStateManager.checkIfRedoEmpty())
+        } else {
+
+            generalButtonIVHelper.disableButtonIV(editInputViewBinding.redoButtonIV,
+                requireContext())
+        }
+    }
 
 }

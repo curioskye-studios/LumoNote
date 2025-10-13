@@ -16,6 +16,10 @@ open class CustomSelectionET(context: Context, attrs: AttributeSet?)
         onSelectionChange?.invoke(selStart, selEnd)
     }
 
+    fun triggerSelectionChanged() {
+        onSelectionChange?.invoke(selectionStart, selectionEnd)
+    }
+
     fun clearFocusOnKeyboardHide(rootView: View) {
 
         // Variable to track the previous state of the keyboard

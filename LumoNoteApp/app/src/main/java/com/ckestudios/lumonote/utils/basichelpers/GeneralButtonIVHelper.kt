@@ -29,9 +29,15 @@ class GeneralButtonIVHelper {
         buttonIV.isEnabled = false
     }
 
-    fun enableButtonIV(buttonIV: ImageView, context: Context) {
+    fun enableButtonIV(buttonIV: ImageView, context: Context, color: Int?) {
 
-        changeButtonIVResTint(context, buttonIV, R.color.light_grey_1)
+        if (color == null) {
+
+            changeButtonIVResTint(context, buttonIV, R.color.light_grey_1)
+        } else {
+
+            changeButtonIVResTint(context, buttonIV, color)
+        }
 
         buttonIV.isEnabled = true
     }
@@ -42,12 +48,19 @@ class GeneralButtonIVHelper {
         changeButtonIVResTint(context, buttonIV, R.color.gold)
     }
 
-    fun unhighlightButtonIV(buttonIV: ImageView, context: Context) {
+    fun unhighlightButtonIV(buttonIV: ImageView, context: Context, color: Int?) {
 
-        changeButtonIVResTint(context, buttonIV, R.color.light_grey_1)
+        if (color == null) {
+
+            changeButtonIVResTint(context, buttonIV, R.color.light_grey_1)
+        } else {
+
+            changeButtonIVResTint(context, buttonIV, color)
+        }
     }
 
-    fun updateButtonIVHighlight(buttonIV: ImageView, isActive: Boolean, context: Context) {
+    fun updateButtonIVHighlight(buttonIV: ImageView, isActive: Boolean, context: Context,
+                                defaultColor: Int?) {
 
         if (!buttonIV.isEnabled) {
             return
@@ -56,7 +69,7 @@ class GeneralButtonIVHelper {
         if (isActive) {
             highlightButtonIV(buttonIV, context)
         } else {
-            unhighlightButtonIV(buttonIV, context)
+            unhighlightButtonIV(buttonIV, context, defaultColor)
         }
     }
 

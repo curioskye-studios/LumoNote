@@ -124,19 +124,19 @@ class SizeFormatFragment: Fragment() {
             isNormalSized.observe(viewLifecycleOwner) {
 
                 generalButtonIVHelper.updateButtonIVHighlight(
-                    sizeFormatViewBinding.normalTextButtonIV, it, requireContext())
+                    sizeFormatViewBinding.normalTextButtonIV, it, requireContext(), null)
             }
 
             isHeader1Sized.observe(viewLifecycleOwner) {
 
                 generalButtonIVHelper.updateButtonIVHighlight(sizeFormatViewBinding.h1ButtonIV,
-                    it, requireContext())
+                    it, requireContext(), null)
             }
 
             isHeader2Sized.observe(viewLifecycleOwner) {
 
                 generalButtonIVHelper.updateButtonIVHighlight(sizeFormatViewBinding.h2ButtonIV,
-                    it, requireContext())
+                    it, requireContext(), null)
             }
         }
 

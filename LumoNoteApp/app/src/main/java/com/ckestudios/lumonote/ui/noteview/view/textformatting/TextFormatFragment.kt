@@ -12,9 +12,9 @@ import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
-import com.ckestudios.lumonote.utils.textformatting.TextFormatHelper
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.BulletTextFormatter
+import com.ckestudios.lumonote.utils.textformatting.TextFormatHelper
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 
@@ -116,10 +116,8 @@ class TextFormatFragment: Fragment() {
 
                 textFormatHelper.checkIfCurrentLineHasImage(noteContentET)
             )
-
         }
     }
-
 
 
 

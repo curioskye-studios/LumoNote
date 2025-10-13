@@ -7,7 +7,7 @@ import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
-import com.ckestudios.lumonote.utils.state.StateManager
+import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 
 class TextFormatHelper {
 
@@ -112,7 +112,7 @@ class TextFormatHelper {
 
 
     fun fixOverlappingSpans(sortedSpans: Array<Any>, etvSpannableContent: Editable,
-                            stateManager: StateManager, spanType: SpanType,
+                            spanStateWatcher: SpanStateWatcher, spanType: SpanType,
                             applyFormattingFunction: (Int, Int) -> Unit) {
 
         for (spanIndex in sortedSpans.indices) {
@@ -142,8 +142,8 @@ class TextFormatHelper {
 
                     applyFormattingFunction(prevSpanStart, currentSpanEnd)
 
-                    stateManager.removeSpan(sortedSpans[previousSpanIndex], spanType)
-                    stateManager.removeSpan(sortedSpans[spanIndex], spanType)
+                    spanStateWatcher.removeSpan(sortedSpans[previousSpanIndex], spanType)
+                    spanStateWatcher.removeSpan(sortedSpans[spanIndex], spanType)
 
                     etvSpannableContent.removeSpan(sortedSpans[previousSpanIndex])
                     etvSpannableContent.removeSpan(sortedSpans[spanIndex])
