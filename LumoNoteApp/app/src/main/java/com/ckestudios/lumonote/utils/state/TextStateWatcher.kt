@@ -248,17 +248,18 @@ class TextStateWatcher(
         // Length of the shorter text, prevent going out of bounds
         val maxToCompare = minOf(firstText.length, secondText.length)
 
-        var count = 0
+        val firstSpan = firstText.length - 1
+        val secondSpan = secondText.length - 1
+
+        var matchingCharsCount = 0
 
         while (
-            count < maxToCompare &&
-            firstText[firstText.length - 1 - count] == secondText[secondText.length - 1 - count] &&
-            (firstText.length - count) > 0 &&
-            (secondText.length - count) > 0
+            matchingCharsCount < maxToCompare &&
+            firstText[firstSpan - matchingCharsCount] == secondText[secondSpan - matchingCharsCount]
         ) {
-            count++
+            matchingCharsCount++
         }
 
-        return count
+        return matchingCharsCount
     }
 }
