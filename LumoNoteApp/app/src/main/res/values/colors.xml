@@ -6,8 +6,10 @@
     <color name="light_grey_1">#E9EAEC</color>
     <color name="light_grey_2">#B8B8BE</color>
     <color name="light_grey_3">#99999D</color>
+    <color name="light_grey_3_selected">#2399999D</color>
+    <color name="light_grey_3_selected2">#1799999D</color>
     <color name="yellow">#FBE134</color>
-    <color name="gold">#E4B61A</color>
+    <color name="gold">#FFD33C</color>
     <color name="translucent_black">#C11C1F22</color>
     <color name="transparent">#001C1F22</color>
 

@@ -140,14 +140,14 @@ class EditInputFragment : Fragment() {
             }
 
 
-            imageButtonIV.apply {
+            imageButtonIV.setOnClickListener {
 
-                setOnClickListener {
+                generalButtonIVHelper.playSelectionIndication(requireContext(),
+                    imageButtonIV)
 
-                    pickImageLauncher.launch("image/*")
+                pickImageLauncher.launch("image/*")
 
-                    generalButtonIVHelper.highlightButtonIV(imageButtonIV, requireContext())
-                }
+                generalButtonIVHelper.highlightButtonIV(imageButtonIV, requireContext())
             }
 
 

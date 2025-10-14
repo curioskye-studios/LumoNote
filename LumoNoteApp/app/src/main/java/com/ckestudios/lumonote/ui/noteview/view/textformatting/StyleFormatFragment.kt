@@ -150,6 +150,9 @@ class StyleFormatFragment: Fragment() {
 
         styleFormatViewBinding.clearFormatsButtonIV.setOnClickListener {
 
+            generalButtonIVHelper.playSelectionIndication(requireContext(),
+                styleFormatViewBinding.clearFormatsButtonIV)
+
             textFormatHelper.clearBasicFormatting(noteContentET.selectionStart,
                 noteContentET.selectionEnd, noteContentET.text!!)
 

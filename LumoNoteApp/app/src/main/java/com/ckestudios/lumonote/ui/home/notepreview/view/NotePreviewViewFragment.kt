@@ -225,7 +225,7 @@ class NotePreviewViewFragment : Fragment() {
                 Log.d("NoteFrag", "$noteData")
 
                 noteAppSharedViewModel.setIsNewNote(false)
-                noteAppSharedViewModel.saveNote(noteData)
+                noteAppSharedViewModel.saveNote(noteData, false)
 
                 noteAppSharedViewModel.setCurrentPreviewNoteID(-1)
             }

@@ -87,7 +87,7 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
         // reset value
         setNoteWasDeleted(false)
     }
-    fun saveNote(note: Note) {
+    fun saveNote(note: Note, shouldUseAsync: Boolean) {
 
         if (isNewNote.value == true) {
 
@@ -96,14 +96,16 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
             // Call database helper object and invoke note insertion method w/ new note
             noteRepository.insertItem(note)
 
-            setNoteWasCreated(true)
-        } else {
+            if (shouldUseAsync) setNoteWasCreatedAsync(true)
+            else setNoteWasCreated(true)
 
+        } else {
 
             // Call database helper object and invoke note update method w/ updated note
             noteRepository.updateItem(note)
 
-            setNoteWasUpdated(true)
+            if (shouldUseAsync) setNoteWasUpdatedAsync(true)
+            else setNoteWasUpdated(true)
         }
     }
 
@@ -127,14 +129,32 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
         _isNewNote.value = isNew
     }
 
+    fun setIsNewNoteAsync(isNew: Boolean) {
+        // Use liveData.postValue(value) instead of liveData.value = value.
+        // It's called asynchronous.
+        _isNewNote.postValue(isNew)
+    }
+
+
     private fun setNoteWasCreated(flag: Boolean) {
         _noteWasCreated.value = flag
         _noteWasUpdated.value = !flag
     }
+    private fun setNoteWasCreatedAsync(flag: Boolean) {
+        _noteWasCreated.postValue(flag)
+        _noteWasUpdated.postValue(!flag)
+    }
+
+
     private fun setNoteWasUpdated(flag: Boolean) {
-        _noteWasUpdated.value =  flag
+        _noteWasUpdated.value = flag
         _noteWasCreated.value = !flag
     }
+    private fun setNoteWasUpdatedAsync(flag: Boolean) {
+        _noteWasUpdated.postValue(flag)
+        _noteWasCreated.postValue(!flag)
+    }
+
 
     private fun setNoteWasDeleted(flag: Boolean){
         _noteWasDeleted.value = flag
