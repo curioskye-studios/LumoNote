@@ -235,6 +235,8 @@ class NoteViewActivity : AppCompatActivity() {
                 runningManualSave = true
 
                 collectNoteData()
+
+                finish()
             }
 
 
