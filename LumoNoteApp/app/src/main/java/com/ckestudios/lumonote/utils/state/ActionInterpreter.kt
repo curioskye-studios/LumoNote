@@ -103,7 +103,7 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
             ActionPerformed.REMOVE ->
                 removeSpanType(spanType, action.actionStart, action.actionEnd, editTextView)
         }
-        
+
 
         if (editTextView.selectionStart != editTextView.selectionEnd) {
 

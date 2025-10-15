@@ -57,6 +57,7 @@
         <ImageView
             android:id="@+id/replaceButtonIV"
             android:layout_width="wrap_content"
+            android:visibility="gone"
 
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -92,8 +93,24 @@
 
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:padding="13.5dp"
+            android:layout_marginEnd="8dp"
+
+            android:src="@drawable/baseline_save_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/saveCloseButtonIV"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            app:tint="@color/light_grey_1" />
+
+        <ImageView
+            android:id="@+id/saveCloseButtonIV"
+            android:layout_width="wrap_content"
+
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
             android:padding="9.5dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="8dp"
 
             android:src="@drawable/baseline_check_24"
             app:layout_constraintBottom_toBottomOf="parent"

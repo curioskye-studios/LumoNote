@@ -23,7 +23,8 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
     private var beforeTextState: String = ""
     private var afterText: String = ""
 
-    private var timer: Timer? = null
+    private var saveChangesOnPauseTimer: Timer? = null
+    private var uiRefreshTimer: Timer? = null
 
     init {
 
@@ -32,9 +33,10 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
             beforeText = editTextView.text.toString()
         }
 
-        startTimerTask()
+        startSaveChangesTimer()
 
-        val uiRefreshTimer = timer(initialDelay = 500, period = 500) {
+        // run every 0.05 secs
+        uiRefreshTimer = timer(initialDelay = 50, period = 50) {
 
             // refresh selection and UI indicators on main thread
             Handler(Looper.getMainLooper()).post {
@@ -66,7 +68,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
         if (makingInternalEdits) return
 
         // reset batch timer on keystroke
-        startTimerTask()
+        startSaveChangesTimer()
 
         Log.d("TextWatcher", "On: (start=$start, before=$before, count=$count)")
 
@@ -94,14 +96,14 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
     }
 
     // Starts 1s timer for batching keystrokes
-    private fun startTimerTask() {
+    private fun startSaveChangesTimer() {
 
-        stopTimerTask()
+        stopSaveChangesTimer()
 
-        timer = timer(initialDelay = 700, period = 700) {
+        saveChangesOnPauseTimer = timer(initialDelay = 700, period = 700) {
 
             // commit when user pauses typing
-            stopTimerTask()
+            stopSaveChangesTimer()
             commitChange()
 
             // reset snapshot
@@ -109,10 +111,10 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
         }
     }
 
-    private fun stopTimerTask() {
+    private fun stopSaveChangesTimer() {
 
-        timer?.cancel()
-        timer = null
+        saveChangesOnPauseTimer?.cancel()
+        saveChangesOnPauseTimer = null
     }
 
 

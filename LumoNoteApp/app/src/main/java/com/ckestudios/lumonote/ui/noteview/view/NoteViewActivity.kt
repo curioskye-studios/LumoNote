@@ -238,6 +238,32 @@ class NoteViewActivity : AppCompatActivity() {
 
                 collectNoteData()
 
+
+                val title =  noteViewBinding.noteTitleET.text.toString()
+                val content =  noteViewBinding.noteEditContentET.text.toString()
+                val pinned: Boolean =  (noteViewBinding.pinButtonIV.tag as Boolean)
+
+                if (existingNoteClicked) {
+
+                    if (!(retrievedNote.noteTitle == title && retrievedNote.noteContent == content &&
+                        retrievedNote.notePinned == pinned)) {
+                        generalUIHelper.displayFeedbackToast(this@NoteViewActivity,
+                            "Changes Saved", false)
+                    } else
+                        generalUIHelper.displayFeedbackToast(this@NoteViewActivity,
+                        "Up to date", false)
+                }
+            }
+
+            saveCloseButtonIV.setOnClickListener {
+
+                generalButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
+                    saveButtonIV)
+
+                runningManualSave = true
+
+                collectNoteData()
+
                 finish()
             }
 
