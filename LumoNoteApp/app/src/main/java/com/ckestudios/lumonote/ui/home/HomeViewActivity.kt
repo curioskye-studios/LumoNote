@@ -84,46 +84,46 @@ class HomeViewActivity : AppCompatActivity() {
         homeViewModel.notePreviewActive.observe(this) { active ->
 
             generalButtonIVHelper.updateButtonIVHighlight(homeViewBinding.notesViewIV, active,
-                this, null)
+                this, R.color.light_grey_3, R.drawable.selected_background)
 
-            if (active) {
-
-                generalButtonIVHelper.changeButtonBackground(this,
-                    homeViewBinding.notesViewIV, R.color.light_grey_3_selected2)
-            } else {
-
-                generalButtonIVHelper.removeButtonBackground(homeViewBinding.notesViewIV)
-            }
+//            if (active) {
+//
+//                generalButtonIVHelper.changeBtnBackgroundColor(this,
+//                    homeViewBinding.notesViewIV, R.color.light_grey_3_selected2)
+//            } else {
+//
+//                generalButtonIVHelper.removeButtonBackground(homeViewBinding.notesViewIV)
+//            }
         }
 
         homeViewModel.calendarActive.observe(this) { active ->
 
             generalButtonIVHelper.updateButtonIVHighlight(homeViewBinding.calendarViewIV, active,
-                this, null)
+                this, R.color.light_grey_3, R.drawable.selected_background)
 
-            if (active) {
-
-                generalButtonIVHelper.changeButtonBackground(this,
-                    homeViewBinding.calendarViewIV, R.color.light_grey_3_selected2)
-            } else {
-
-                generalButtonIVHelper.removeButtonBackground(homeViewBinding.calendarViewIV)
-            }
+//            if (active) {
+//
+//                generalButtonIVHelper.changeBtnBackgroundColor(this,
+//                    homeViewBinding.calendarViewIV, R.color.light_grey_3_selected2)
+//            } else {
+//
+//                generalButtonIVHelper.removeButtonBackground(homeViewBinding.calendarViewIV)
+//            }
         }
 
         homeViewModel.settingsActive.observe(this) { active ->
 
             generalButtonIVHelper.updateButtonIVHighlight(homeViewBinding.settingsViewIV, active,
-                this, null)
+                this, R.color.light_grey_3, R.drawable.selected_background)
 
-            if (active) {
-
-                generalButtonIVHelper.changeButtonBackground(this,
-                    homeViewBinding.settingsViewIV, R.color.light_grey_3_selected2)
-            } else {
-
-                generalButtonIVHelper.removeButtonBackground(homeViewBinding.settingsViewIV)
-            }
+//            if (active) {
+//
+//                generalButtonIVHelper.changeBtnBackgroundColor(this,
+//                    homeViewBinding.settingsViewIV, R.color.light_grey_3_selected2)
+//            } else {
+//
+//                generalButtonIVHelper.removeButtonBackground(homeViewBinding.settingsViewIV)
+//            }
         }
     }
 

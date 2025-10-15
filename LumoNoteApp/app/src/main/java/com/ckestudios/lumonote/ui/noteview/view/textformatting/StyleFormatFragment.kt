@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.databinding.FragmentStyleFormatBinding
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletResource
@@ -207,25 +208,29 @@ class StyleFormatFragment: Fragment() {
             isBold.observe(viewLifecycleOwner) { isTrue ->
 
                 generalButtonIVHelper.updateButtonIVHighlight(
-                    styleFormatViewBinding.boldButtonIV, isTrue, requireContext(), null)
+                    styleFormatViewBinding.boldButtonIV, isTrue, requireContext(), null,
+                    R.drawable.selected_background)
             }
 
             isItalics.observe(viewLifecycleOwner) { isTrue ->
 
                 generalButtonIVHelper.updateButtonIVHighlight(
-                    styleFormatViewBinding.italicsButtonIV, isTrue, requireContext(), null)
+                    styleFormatViewBinding.italicsButtonIV, isTrue, requireContext(), null,
+                    R.drawable.selected_background)
             }
 
             isUnderlined.observe(viewLifecycleOwner) { isTrue ->
 
                 generalButtonIVHelper.updateButtonIVHighlight(
-                    styleFormatViewBinding.underlineButtonIV, isTrue, requireContext(), null)
+                    styleFormatViewBinding.underlineButtonIV, isTrue, requireContext(), null,
+                    R.drawable.selected_background)
             }
 
             isBulleted.observe(viewLifecycleOwner){ isTrue ->
 
                 generalButtonIVHelper.updateButtonIVHighlight(
-                    styleFormatViewBinding.bulletButtonIV, isTrue, requireContext(), null)
+                    styleFormatViewBinding.bulletButtonIV, isTrue, requireContext(), null,
+                    R.drawable.selected_background)
             }
         }
 

@@ -147,7 +147,8 @@ class EditInputFragment : Fragment() {
 
                 pickImageLauncher.launch("image/*")
 
-                generalButtonIVHelper.highlightButtonIV(imageButtonIV, requireContext())
+                generalButtonIVHelper.highlightButtonIV(imageButtonIV, requireContext(),
+                    R.drawable.selected_background)
             }
 
 
@@ -240,7 +241,8 @@ class EditInputFragment : Fragment() {
                 if (editInputViewBinding.imageButtonIV.isEnabled) {
 
                     generalButtonIVHelper.updateButtonIVHighlight(
-                        editInputViewBinding.imageButtonIV, isTrue, requireContext(), null)
+                        editInputViewBinding.imageButtonIV, isTrue, requireContext(), null,
+                        R.drawable.selected_background)
                 }
             }
 
@@ -249,7 +251,8 @@ class EditInputFragment : Fragment() {
                 if (editInputViewBinding.checkListButtonIV.isEnabled) {
 
                     generalButtonIVHelper.updateButtonIVHighlight(
-                        editInputViewBinding.checkListButtonIV, isTrue, requireContext(), null)
+                        editInputViewBinding.checkListButtonIV, isTrue, requireContext(), null,
+                        R.drawable.selected_background)
                 }
             }
 
@@ -258,7 +261,8 @@ class EditInputFragment : Fragment() {
                 if (editInputViewBinding.textFormatButtonIV.isEnabled) {
 
                     generalButtonIVHelper.updateButtonIVHighlight(
-                        editInputViewBinding.textFormatButtonIV, isTrue, requireContext(), null)
+                        editInputViewBinding.textFormatButtonIV, isTrue, requireContext(), null,
+                        R.drawable.selected_background)
                 }
             }
 
@@ -268,7 +272,7 @@ class EditInputFragment : Fragment() {
 
                     generalButtonIVHelper.updateButtonIVHighlight(
                         editInputViewBinding.undoButtonIV, isTrue, requireContext(),
-                            R.color.light_grey_3)
+                            R.color.light_grey_3, R.drawable.selected_background)
                 }
             }
 
@@ -278,7 +282,7 @@ class EditInputFragment : Fragment() {
 
                     generalButtonIVHelper.updateButtonIVHighlight(
                         editInputViewBinding.redoButtonIV, isTrue, requireContext(),
-                            R.color.light_grey_3)
+                            R.color.light_grey_3, R.drawable.selected_background)
                 }
             }
 

@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.database.NoteRepository
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.databinding.ActivityNoteViewBinding
@@ -178,7 +179,8 @@ class NoteViewActivity : AppCompatActivity() {
 
             noteViewBinding.pinButtonIV.tag = retrievedNote.notePinned
 
-            generalButtonIVHelper.updatePinHighlight(noteViewBinding.pinButtonIV, this)
+            generalButtonIVHelper.updatePinHighlight(noteViewBinding.pinButtonIV, this,
+                R.drawable.selected_background)
         }
 
         else {
@@ -267,7 +269,7 @@ class NoteViewActivity : AppCompatActivity() {
             currentNotePinned.observe(this@NoteViewActivity){ currentlyPinned ->
 
                 generalButtonIVHelper.updatePinHighlight(noteViewBinding.pinButtonIV,
-                    this@NoteViewActivity)
+                    this@NoteViewActivity, R.drawable.selected_background)
 
                 val pinStateFeedback =
                     if (currentlyPinned) { "Note Pinned" }

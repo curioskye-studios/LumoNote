@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.models.TextSize
 import com.ckestudios.lumonote.databinding.FragmentSizeFormatBinding
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
@@ -124,19 +125,20 @@ class SizeFormatFragment: Fragment() {
             isNormalSized.observe(viewLifecycleOwner) {
 
                 generalButtonIVHelper.updateButtonIVHighlight(
-                    sizeFormatViewBinding.normalTextButtonIV, it, requireContext(), null)
+                    sizeFormatViewBinding.normalTextButtonIV, it, requireContext(), null,
+                    R.drawable.selected_background)
             }
 
             isHeader1Sized.observe(viewLifecycleOwner) {
 
                 generalButtonIVHelper.updateButtonIVHighlight(sizeFormatViewBinding.h1ButtonIV,
-                    it, requireContext(), null)
+                    it, requireContext(), null, R.drawable.selected_background)
             }
 
             isHeader2Sized.observe(viewLifecycleOwner) {
 
                 generalButtonIVHelper.updateButtonIVHighlight(sizeFormatViewBinding.h2ButtonIV,
-                    it, requireContext(), null)
+                    it, requireContext(), null, R.drawable.selected_background)
             }
         }
 

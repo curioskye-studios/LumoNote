@@ -59,7 +59,8 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
         holder.titlePreview.text = note.noteTitle
         holder.contentPreview.text = note.noteContent
         holder.pinPreview.tag = note.notePinned
-        generalButtonIVHelper.updatePinHighlight(holder.pinPreview, holder.pinPreview.context)
+        generalButtonIVHelper.updatePinHighlight(holder.pinPreview, holder.pinPreview.context,
+            R.drawable.selected_background)
 
         //Log.d("NoteFrag", "pinnedPreview: ${holder.pinPreview.tag}")
 
@@ -82,7 +83,8 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
 
             whenCurrentNotePinClicked(!pinnedFlag, currentNoteID)
 
-            generalButtonIVHelper.updatePinHighlight(holder.pinPreview, holder.pinPreview.context)
+            generalButtonIVHelper.updatePinHighlight(holder.pinPreview, holder.pinPreview.context,
+                R.drawable.selected_background)
         }
     }
 
