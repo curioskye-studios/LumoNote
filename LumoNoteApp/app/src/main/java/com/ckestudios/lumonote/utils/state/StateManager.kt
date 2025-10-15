@@ -69,7 +69,7 @@ class StateManager(private val editTextView: EditText) {
 
         val topAction = undoStack.getTopActionOfStack()
 
-        Log.d("TextWatcher", "undo: $topAction")
+        Log.d("SpanWatcher", "undo: $topAction")
 
         if (topAction == null) return
 
@@ -80,7 +80,7 @@ class StateManager(private val editTextView: EditText) {
 
             val secondAction = undoStack.getTopActionOfStack()
 
-            Log.d("TextWatcher", "undo2nd: $secondAction")
+            Log.d("SpanWatcher", "undo2nd: $secondAction")
 
             if (secondAction == null) return
 
@@ -92,7 +92,7 @@ class StateManager(private val editTextView: EditText) {
 
         val topAction = redoStack.getTopActionOfStack()
 
-        Log.d("TextWatcher", "redo: $topAction")
+        Log.d("SpanWatcher", "redo: $topAction")
 
         if (topAction == null) return
 
@@ -103,7 +103,7 @@ class StateManager(private val editTextView: EditText) {
 
             val secondAction = redoStack.getTopActionOfStack()
 
-            Log.d("TextWatcher", "redo2nd: $secondAction")
+            Log.d("SpanWatcher", "redo2nd: $secondAction")
 
             if (secondAction == null) return
 
@@ -128,7 +128,8 @@ class StateManager(private val editTextView: EditText) {
             ActionType.TEXT -> actionInterpreter.processTextAction(actionToUndo!!,
                 editTextView, true)
 
-            ActionType.SPAN -> {} //actionInterpreter.performSpanAction()
+            ActionType.SPAN -> actionInterpreter.processSpanAction(actionToUndo!!,
+                editTextView, true)
         }
     }
 
@@ -148,7 +149,8 @@ class StateManager(private val editTextView: EditText) {
             ActionType.TEXT -> actionInterpreter.processTextAction(actionToRedo!!,
                 editTextView, false)
 
-            ActionType.SPAN -> {} //actionInterpreter.performSpanAction()
+            ActionType.SPAN -> actionInterpreter.processSpanAction(actionToRedo!!,
+                editTextView, false)
         }
     }
 

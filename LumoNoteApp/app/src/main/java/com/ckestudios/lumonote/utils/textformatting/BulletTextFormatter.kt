@@ -8,9 +8,11 @@ import com.ckestudios.lumonote.data.models.BulletType
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
+import com.ckestudios.lumonote.utils.state.StateManager
 
-class BulletTextFormatter(override val editTextView: EditText)
-    : RichTextFormatter<CustomBulletSpan> {
+class BulletTextFormatter(
+    override val editTextView: EditText,
+    private val stateManager: StateManager) : RichTextFormatter<CustomBulletSpan> {
 
     override lateinit var etvSpannableContent: Editable
 
@@ -18,7 +20,7 @@ class BulletTextFormatter(override val editTextView: EditText)
     private var customBullet: String? = null
 
     private val textFormatHelper = TextFormatHelper()
-    private val spanStateManager = SpanStateWatcher(editTextView)
+    private val spanStateManager = SpanStateWatcher(editTextView, stateManager)
 
     override fun updateSpannableContent() {
 

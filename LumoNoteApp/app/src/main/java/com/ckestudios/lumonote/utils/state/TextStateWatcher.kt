@@ -12,10 +12,8 @@ import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import java.util.Timer
 import kotlin.concurrent.timer
 
-class TextStateWatcher(
-    private val editTextView: CustomSelectionET,
-    private val stateManager: StateManager
-) : TextWatcher {
+class TextStateWatcher(private val editTextView: CustomSelectionET,
+                       private val stateManager: StateManager) : TextWatcher {
 
     private var loggingChanges = false
     private var makingInternalEdits = false
@@ -35,6 +33,17 @@ class TextStateWatcher(
         }
 
         startTimerTask()
+
+        val uiRefreshTimer = timer(initialDelay = 500, period = 500) {
+
+            // refresh selection and UI indicators on main thread
+            Handler(Looper.getMainLooper()).post {
+
+                // triggers re-evaluation of redo and undo display
+                editTextView.triggerSelectionChanged()
+            }
+        }
+
     }
 
     override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {
@@ -213,13 +222,6 @@ class TextStateWatcher(
         beforeText = newText
 
         loggingChanges = false
-
-        // refresh selection and UI indicators on main thread
-        Handler(Looper.getMainLooper()).post {
-
-            // triggers re-evaluation of redo and undo display
-            editTextView.triggerSelectionChanged()
-        }
     }
 
 

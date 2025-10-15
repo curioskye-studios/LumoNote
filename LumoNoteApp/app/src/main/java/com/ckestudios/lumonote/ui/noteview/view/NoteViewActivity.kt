@@ -112,7 +112,7 @@ class NoteViewActivity : AppCompatActivity() {
         stopAutoSave()
 
         // run every 5s
-        autoSaveTimer = timer(initialDelay = 500, period = 5000) {
+        autoSaveTimer = timer(initialDelay = 500, period = 15000) {
 
             runningAutoSave = true
 

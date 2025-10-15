@@ -106,8 +106,8 @@ class EditInputFragment : Fragment() {
         noteContentET.addTextChangedListener(noteContentTextWatcher)
         editContentSharedViewModel.setNoteContentTextWatcher(noteContentTextWatcher)
 
-        simpleChecklistFormatter = SimpleChecklistFormatter(noteContentET)
-        simpleImageFormatter = SimpleImageFormatter(noteContentET)
+        simpleChecklistFormatter = SimpleChecklistFormatter(noteContentET, noteContentStateManager)
+        simpleImageFormatter = SimpleImageFormatter(noteContentET, noteContentStateManager)
 
         setOnClickListeners()
 

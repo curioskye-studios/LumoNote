@@ -8,15 +8,17 @@ import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
+import com.ckestudios.lumonote.utils.state.StateManager
 
-class UnderlineTextFormatter(override val editTextView: EditText)
+class UnderlineTextFormatter(
+    override val editTextView: EditText, private val stateManager: StateManager)
     : RichTextFormatter<UnderlineTextFormatter.CustomUnderlineSpan> {
 
     class CustomUnderlineSpan : UnderlineSpan()
 
     override lateinit var etvSpannableContent: Editable
     private val textFormatHelper = TextFormatHelper()
-    private val spanStateWatcher = SpanStateWatcher(editTextView)
+    private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
 
 
     override fun updateSpannableContent() {

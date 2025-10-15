@@ -11,8 +11,10 @@ import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.ui.noteview.other.ImageLineTextWatcher
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
+import com.ckestudios.lumonote.utils.state.StateManager
 
-class SimpleImageFormatter(private val editTextView: EditText) {
+class SimpleImageFormatter(private val editTextView: EditText,
+                           private val stateManager: StateManager) {
 
     // Special invisible character (used by Android to represent embedded objects like images)
     private val objectCharacter = '\uFFFC'
@@ -20,7 +22,7 @@ class SimpleImageFormatter(private val editTextView: EditText) {
     private var etvSpannableContent: Editable = editTextView.text
 
     private val textFormatHelper = TextFormatHelper()
-    private val spanStateWatcher = SpanStateWatcher(editTextView)
+    private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
 
     init {
 

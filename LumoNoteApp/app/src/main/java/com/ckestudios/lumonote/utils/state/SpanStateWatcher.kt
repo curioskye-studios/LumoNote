@@ -1,7 +1,11 @@
 package com.ckestudios.lumonote.utils.state
 
 import android.text.style.StyleSpan
+import android.util.Log
 import android.widget.EditText
+import com.ckestudios.lumonote.data.models.Action
+import com.ckestudios.lumonote.data.models.ActionPerformed
+import com.ckestudios.lumonote.data.models.ActionType
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.ChecklistSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
@@ -10,7 +14,8 @@ import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.textformatting.TextFormatHelper
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
-class SpanStateWatcher(private val editTextView: EditText) {
+class SpanStateWatcher(private val editTextView: EditText,
+                       private val stateManager: StateManager) {
 
     private var currentBoldSpans = ArrayList<StyleSpan>()
     private var currentItalicsSpans = ArrayList<StyleSpan>()
@@ -25,8 +30,6 @@ class SpanStateWatcher(private val editTextView: EditText) {
     private val textFormatHelper = TextFormatHelper()
     private val generalUIHelper = GeneralUIHelper()
     private val actionHelper = ActionHelper()
-
-    private val stateManager = StateManager(editTextView)
 
 
     fun addSpan(span: Any, spanType: SpanType) {
@@ -51,14 +54,18 @@ class SpanStateWatcher(private val editTextView: EditText) {
         val spanStart = editTextView.text.getSpanStart(span)
         val spanEnd = editTextView.text.getSpanEnd(span)
 
-        generalUIHelper.displayFeedbackToast(editTextView.context,
-            "${spanType.spanName} added at $spanStart-$spanEnd", true)
+        val action = Action(
+            ActionPerformed.ADD,
+            ActionType.SPAN,
+            false,
+            spanStart,
+            spanEnd,
+            spanType
+        )
 
-//        val action = Action(
-//            ActionType.SPAN, ActionPerformed.ADD, mapOf("apple" to 3,
-//            "banana" to 5))
-//
-//        addToUndo(action)
+        stateManager.addToUndo(action)
+
+        Log.d("SpanWatcher", "${spanType.spanName} added to $spanStart-$spanEnd")
     }
 
     fun <T> removeSpan(targetSpan: T, spanType: SpanType) {
@@ -91,13 +98,24 @@ class SpanStateWatcher(private val editTextView: EditText) {
                 val spanStart = editTextView.text.getSpanStart(span)
                 val spanEnd = editTextView.text.getSpanEnd(span)
 
-                generalUIHelper.displayFeedbackToast(editTextView.context,
-                    "${spanType.spanName} removed from $spanStart-$spanEnd",
-                    true)
+
+                val action = Action(
+                    ActionPerformed.REMOVE,
+                    ActionType.SPAN,
+                    false,
+                    spanStart,
+                    spanEnd,
+                    spanType
+                )
+
+                stateManager.addToUndo(action)
 
                 spansToRemove.add(span)
+
+                Log.d("SpanWatcher", "${spanType.spanName} removed from $spanStart-$spanEnd")
             }
         }
+
 
         spanList.removeAll(spansToRemove.toSet())
     }

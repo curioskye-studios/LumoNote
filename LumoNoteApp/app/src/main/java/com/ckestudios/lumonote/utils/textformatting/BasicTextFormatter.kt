@@ -8,13 +8,15 @@ import android.text.style.StyleSpan
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
+import com.ckestudios.lumonote.utils.state.StateManager
 
-class BasicTextFormatter(override val editTextView: EditText) : RichTextFormatter<StyleSpan> {
+class BasicTextFormatter(override val editTextView: EditText,
+                         private val stateManager: StateManager) : RichTextFormatter<StyleSpan> {
 
     override lateinit var etvSpannableContent: Editable
     private var spanType: SpanType? = null
     private val textFormatHelper = TextFormatHelper()
-    private val spanStateWatcher = SpanStateWatcher(editTextView)
+    private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
 
     override fun updateSpannableContent() {
 

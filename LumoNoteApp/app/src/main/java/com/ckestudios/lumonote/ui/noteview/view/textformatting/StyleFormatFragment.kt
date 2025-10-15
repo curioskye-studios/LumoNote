@@ -16,6 +16,7 @@ import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.state.StateManager
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.BulletTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.TextFormatHelper
@@ -72,9 +73,12 @@ class StyleFormatFragment: Fragment() {
         noteContentET =
             editContentSharedViewModel.noteContentEditTextView.value as CustomSelectionET
 
-        basicTextFormatter = BasicTextFormatter(noteContentET)
-        underlineTextFormatter = UnderlineTextFormatter(noteContentET)
-        bulletTextFormatter = BulletTextFormatter(noteContentET)
+        val stateManager =
+            editContentSharedViewModel.noteContentStateManager.value as StateManager
+
+        basicTextFormatter = BasicTextFormatter(noteContentET, stateManager)
+        underlineTextFormatter = UnderlineTextFormatter(noteContentET, stateManager)
+        bulletTextFormatter = BulletTextFormatter(noteContentET, stateManager)
 
 
         setOnClickListeners()
