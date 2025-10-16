@@ -128,6 +128,7 @@ class NoteViewActivity : AppCompatActivity() {
         autoSaveTimer = null
     }
 
+
     private fun notifyIfEditing() {
 
         // For removing text formatter when text content not being edited
@@ -258,7 +259,7 @@ class NoteViewActivity : AppCompatActivity() {
             saveCloseButtonIV.setOnClickListener {
 
                 generalButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
-                    saveButtonIV)
+                    saveCloseButtonIV)
 
                 runningManualSave = true
 
