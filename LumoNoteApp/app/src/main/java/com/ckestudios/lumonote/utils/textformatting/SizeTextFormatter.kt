@@ -6,13 +6,16 @@ import android.text.style.RelativeSizeSpan
 import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.TextSize
+import com.ckestudios.lumonote.utils.state.StateManager
 
-class SizeTextFormatter(override val editTextView: EditText)
+class SizeTextFormatter(override val editTextView: EditText,
+                        private val stateManager: StateManager)
     : RichTextFormatter<RelativeSizeSpan> {
 
     override lateinit var etvSpannableContent: Editable
     private var sizeType: TextSize? = null
-    private val textFormatHelper = TextFormatHelper()
+
+    private val textFormatterHelper = TextFormatterHelper()
 
 
     override fun updateSpannableContent() {
@@ -34,17 +37,11 @@ class SizeTextFormatter(override val editTextView: EditText)
         val relativeSizeSpans =
             getSelectionSpans(selectStart, selectEnd)
 
-        if (relativeSizeSpans.isEmpty()) {
+        val shouldApplyCheck = relativeSizeSpans.isEmpty()
 
-            assessProcessMethod(selectStart, selectEnd, relativeSizeSpans,
-                true)
-        } else {
+        assessProcessMethod(relativeSizeSpans, shouldApplyCheck)
 
-           assessProcessMethod(selectStart, selectEnd, relativeSizeSpans,
-               false)
-        }
-
-        textFormatHelper.fixLineHeight(editTextView)
+        textFormatterHelper.fixLineHeight(editTextView)
     }
 
     override fun getSelectionSpans(selectStart: Int, selectEnd: Int)
@@ -67,11 +64,10 @@ class SizeTextFormatter(override val editTextView: EditText)
     }
 
 
-    private fun assessProcessMethod(selectStart: Int, selectEnd: Int,
-            spansList: Array<RelativeSizeSpan>, shouldApply: Boolean) {
+    private fun assessProcessMethod(spansList: Array<RelativeSizeSpan>, shouldApply: Boolean) {
 
         val paragraphIndices =
-            textFormatHelper.getSelectionParagraphIndices(editTextView)
+            textFormatterHelper.getSelectionParagraphIndices(editTextView)
 
         if (paragraphIndices.size == 2) {
 
@@ -154,6 +150,46 @@ class SizeTextFormatter(override val editTextView: EditText)
         updateSpannableContent()
 
         return getSelectionSpans(selectStart, selectEnd).isNotEmpty()
+    }
+
+    fun isSelectionFullySpanned(textSize: TextSize, selectStart: Int, selectEnd: Int): Boolean {
+
+        updateSpannableContent()
+
+        val spanList = getDesiredSizeSpans(textSize)
+
+        if (spanList.isNullOrEmpty()) return false
+
+        val sizeSpansAtSelection = spanList.filter {
+
+            val start = editTextView.text.getSpanStart(it)
+            val end = editTextView.text.getSpanEnd(it)
+
+            // include spans intersecting action range
+            (selectStart <= end && selectEnd >= start)
+        }.toTypedArray()
+
+//        Log.d("SpanWatcher", sizeSpansAtSelection.size.toString())
+
+        return sizeSpansAtSelection.isNotEmpty()
+    }
+
+
+    private fun getDesiredSizeSpans(textSize: TextSize)
+            : Array<RelativeSizeSpan>? {
+
+        val allSpans =
+            etvSpannableContent.getSpans(0, editTextView.text.length,
+                RelativeSizeSpan::class.java)
+
+        return when (textSize) {
+
+            TextSize.H1 -> allSpans.filter { it.sizeChange == 1.4f }.toTypedArray()
+
+            TextSize.H2 -> allSpans.filter { it.sizeChange == 1.2f }.toTypedArray()
+
+            else -> null
+        }
     }
 
 }

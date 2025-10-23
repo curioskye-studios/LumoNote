@@ -3,7 +3,7 @@ package com.ckestudios.lumonote.ui.noteview.other
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
-import com.ckestudios.lumonote.utils.textformatting.TextFormatHelper
+import com.ckestudios.lumonote.utils.textformatting.TextFormatterHelper
 
 
 /**
@@ -13,7 +13,7 @@ import com.ckestudios.lumonote.utils.textformatting.TextFormatHelper
  */
 class ImageLineTextWatcher(private val editTextView: EditText) : TextWatcher {
 
-    private val textFormatHelper = TextFormatHelper()
+    private val textFormatterHelper = TextFormatterHelper()
 
     // Internal flag to prevent recursive edits
     private var internalEdit = false
@@ -42,7 +42,7 @@ class ImageLineTextWatcher(private val editTextView: EditText) : TextWatcher {
         val cursor = editTextView.selectionStart
         if (cursor < 0) return
 
-        val (lineStart, lineEnd) = textFormatHelper.getCurrentLineIndices(editTextView)
+        val (lineStart, lineEnd) = textFormatterHelper.getCurrentLineIndices(editTextView)
 
         val imageSpans =
             etvContentSpannable.getSpans(lineStart, lineEnd, CustomImageSpan::class.java)
@@ -67,7 +67,7 @@ class ImageLineTextWatcher(private val editTextView: EditText) : TextWatcher {
             // Jump to next line
             editTextView.setSelection((lineEnd).coerceAtMost(etvContentSpannable.length))
 
-            textFormatHelper.fixLineHeight(editTextView)
+            textFormatterHelper.fixLineHeight(editTextView)
         }
     }
 

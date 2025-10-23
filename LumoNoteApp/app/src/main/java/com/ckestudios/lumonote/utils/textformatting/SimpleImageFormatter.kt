@@ -10,6 +10,7 @@ import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.ui.noteview.other.ImageLineTextWatcher
+import com.ckestudios.lumonote.utils.state.ActionHelper
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 import com.ckestudios.lumonote.utils.state.StateManager
 
@@ -21,8 +22,9 @@ class SimpleImageFormatter(private val editTextView: EditText,
 
     private var etvSpannableContent: Editable = editTextView.text
 
-    private val textFormatHelper = TextFormatHelper()
+    private val textFormatterHelper = TextFormatterHelper()
     private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
+    private val actionHelper = ActionHelper()
 
     init {
 
@@ -41,7 +43,7 @@ class SimpleImageFormatter(private val editTextView: EditText,
 
         updateSpannableContent()
 
-        val (lineStart, lineEnd) = textFormatHelper.getCurrentLineIndices(editTextView)
+        val (lineStart, lineEnd) = textFormatterHelper.getCurrentLineIndices(editTextView)
 
         // Remove existing image in this line
         removeImageInRange(lineStart, lineEnd)
@@ -49,7 +51,7 @@ class SimpleImageFormatter(private val editTextView: EditText,
         // Insert the new image
         insertImage(imageUri)
 
-        textFormatHelper.fixLineHeight(editTextView)
+        textFormatterHelper.fixLineHeight(editTextView)
     }
 
 
@@ -90,8 +92,16 @@ class SimpleImageFormatter(private val editTextView: EditText,
         val insertedImageSpan =
             etvSpannableContent.getSpans(cursorPos+1, cursorPos+2, CustomImageSpan::class.java)
 
-        if (insertedImageSpan.isNotEmpty())
-            spanStateWatcher.addSpan(insertedImageSpan[0], SpanType.IMAGE_SPAN)
+        // add image bitmap to cache too
+        val identifier = actionHelper.getMultipartIdentifier()
+        stateManager.addImageToCache(adjustedBitmap, cursorPos+1, cursorPos+2, identifier)
+
+        if (insertedImageSpan.isNotEmpty()) {
+
+            spanStateWatcher.addStyleSpan(insertedImageSpan[0], SpanType.IMAGE_SPAN, true,
+                identifier)
+        }
+
     }
 
 
@@ -102,12 +112,11 @@ class SimpleImageFormatter(private val editTextView: EditText,
 
         for (span in imageSpans) {
 
-            spanStateWatcher.removeSpan(span, SpanType.IMAGE_SPAN)
+            spanStateWatcher.removeStyleSpan(span, SpanType.IMAGE_SPAN, false,
+                null)
 
             etvSpannableContent.removeSpan(span)
         }
-
-
     }
 
 

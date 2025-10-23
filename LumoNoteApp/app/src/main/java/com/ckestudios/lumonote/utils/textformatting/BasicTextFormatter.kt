@@ -7,6 +7,7 @@ import android.text.Spanned
 import android.text.style.StyleSpan
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
+import com.ckestudios.lumonote.utils.state.ActionHelper
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 import com.ckestudios.lumonote.utils.state.StateManager
 
@@ -15,8 +16,12 @@ class BasicTextFormatter(override val editTextView: EditText,
 
     override lateinit var etvSpannableContent: Editable
     private var spanType: SpanType? = null
-    private val textFormatHelper = TextFormatHelper()
+
+    private val textFormatterHelper = TextFormatterHelper()
+    private val actionHelper = ActionHelper()
+
     private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
+    private var multipartIdentifier: String? = null
 
     override fun updateSpannableContent() {
 
@@ -48,7 +53,7 @@ class BasicTextFormatter(override val editTextView: EditText,
 
         normalizeFormatting()
 
-        textFormatHelper.fixLineHeight(editTextView) // Keep line spacing consistent
+        textFormatterHelper.fixLineHeight(editTextView) // Keep line spacing consistent
     }
 
 
@@ -101,7 +106,8 @@ class BasicTextFormatter(override val editTextView: EditText,
             )
         }
 
-        spanStateWatcher.addSpan(setSpan!!, spanType!!)
+        val doingNormalization = multipartIdentifier != null
+        spanStateWatcher.addStyleSpan(setSpan!!, spanType!!, doingNormalization, multipartIdentifier)
     }
 
     override fun removeFormatting(selectStart: Int, selectEnd: Int, spansList: Array<StyleSpan>){
@@ -129,7 +135,8 @@ class BasicTextFormatter(override val editTextView: EditText,
 
             // eg. span: 1-9, selection 3-6, runs both
 
-            spanStateWatcher.removeSpan(span, spanType!!)
+            val doingNormalization = multipartIdentifier != null
+            spanStateWatcher.removeStyleSpan(span, spanType!!, doingNormalization, multipartIdentifier)
 
             etvSpannableContent.removeSpan(span)
 
@@ -147,12 +154,16 @@ class BasicTextFormatter(override val editTextView: EditText,
 
         if (newDesiredSpans != null) {
 
-            val sortedSpans = textFormatHelper.sortSpans(newDesiredSpans,
+            val sortedSpans = textFormatterHelper.sortSpans(newDesiredSpans,
                 etvSpannableContent)
 
+            multipartIdentifier = actionHelper.getMultipartIdentifier()
+
             // Combine adjacent or overlapping spans
-            textFormatHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
-                spanStateWatcher, spanType!!, ::applyFormatting)
+            textFormatterHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
+                spanStateWatcher, multipartIdentifier, spanType!!, ::applyFormatting)
+
+            multipartIdentifier = null
         }
     }
 

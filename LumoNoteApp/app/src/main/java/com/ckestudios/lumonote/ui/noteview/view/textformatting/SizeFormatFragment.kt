@@ -14,6 +14,7 @@ import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.state.StateManager
 import com.ckestudios.lumonote.utils.textformatting.SizeTextFormatter
 
 
@@ -63,9 +64,14 @@ class SizeFormatFragment: Fragment() {
         noteContentET =
             editContentSharedViewModel.noteContentEditTextView.value as CustomSelectionET
 
-        sizeTextFormatter = SizeTextFormatter(noteContentET)
+        val stateManager =
+            editContentSharedViewModel.noteContentStateManager.value as StateManager
+
+        sizeTextFormatter = SizeTextFormatter(noteContentET, stateManager)
 
         setOnClickListeners()
+
+        observeInputSharedVMValues()
 
         observeEditContentVMValues()
     }
@@ -118,6 +124,37 @@ class SizeFormatFragment: Fragment() {
     }
 
 
+    private fun observeInputSharedVMValues() {
+
+        inputSharedViewModel.apply {
+
+            currentLineHasImage.observe(viewLifecycleOwner) { hasImage ->
+
+                if (hasImage) {
+
+                    generalButtonIVHelper.disableButtonIV(sizeFormatViewBinding.normalTextButtonIV,
+                        requireContext())
+                    generalButtonIVHelper.disableButtonIV(sizeFormatViewBinding.h1ButtonIV,
+                        requireContext())
+                    generalButtonIVHelper.disableButtonIV(sizeFormatViewBinding.h2ButtonIV,
+                        requireContext())
+                } else {
+
+                    generalButtonIVHelper.enableButtonIV(sizeFormatViewBinding.normalTextButtonIV,
+                        requireContext(), null)
+                    generalButtonIVHelper.enableButtonIV(sizeFormatViewBinding.h1ButtonIV,
+                        requireContext(), null)
+                    generalButtonIVHelper.enableButtonIV(sizeFormatViewBinding.h2ButtonIV,
+                        requireContext(), null)
+
+                    updateSizeButtons()
+                }
+            }
+        }
+
+    }
+
+
     private fun observeEditContentVMValues() {
 
         editContentSharedViewModel.apply {
@@ -144,6 +181,17 @@ class SizeFormatFragment: Fragment() {
 
     }
 
+    private fun updateSizeButtons() {
+
+        val isH1Sized = sizeTextFormatter.isSelectionFullySpanned(TextSize.H1,
+            noteContentET.selectionStart, noteContentET.selectionEnd)
+        val isH2Sized = sizeTextFormatter.isSelectionFullySpanned(TextSize.H2,
+            noteContentET.selectionStart, noteContentET.selectionEnd)
+
+        if (isH1Sized && !isH2Sized) updateHeaderActive(TextSize.H1)
+        else if (isH2Sized && !isH1Sized) updateHeaderActive(TextSize.H2)
+        else updateHeaderActive(TextSize.NORMAL)
+    }
 
     private fun updateHeaderActive(sizeType: TextSize) {
 

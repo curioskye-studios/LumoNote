@@ -9,7 +9,7 @@ import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 
-class TextFormatHelper {
+class TextFormatterHelper {
 
     fun getSelectionParagraphIndices(editTextView: EditText) : MutableList<Int>{
 
@@ -112,8 +112,8 @@ class TextFormatHelper {
 
 
     fun fixOverlappingSpans(sortedSpans: Array<Any>, etvSpannableContent: Editable,
-                            spanStateWatcher: SpanStateWatcher, spanType: SpanType,
-                            applyFormattingFunction: (Int, Int) -> Unit) {
+                            spanStateWatcher: SpanStateWatcher, multipartIdentifier: String?,
+                            spanType: SpanType, applyFormattingFunction: (Int, Int) -> Unit) {
 
         for (spanIndex in sortedSpans.indices) {
 
@@ -138,12 +138,16 @@ class TextFormatHelper {
                 if (prevSpanEnd >= currentSpanStart && (prevSpanStart != -1 ||
                             prevSpanEnd != -1)) {
 
-                    Log.d("basicTextFormatter", "Previous spanIndex overlaps.")
+                    Log.d("SpanWatcher", "Previous spanIndex overlaps.")
 
                     applyFormattingFunction(prevSpanStart, currentSpanEnd)
 
-                    spanStateWatcher.removeSpan(sortedSpans[previousSpanIndex], spanType)
-                    spanStateWatcher.removeSpan(sortedSpans[spanIndex], spanType)
+                    val isNormalization = multipartIdentifier != null
+
+                    spanStateWatcher.removeStyleSpan(sortedSpans[previousSpanIndex], spanType,
+                        isNormalization, multipartIdentifier)
+                    spanStateWatcher.removeStyleSpan(sortedSpans[spanIndex], spanType,
+                        isNormalization, multipartIdentifier)
 
                     etvSpannableContent.removeSpan(sortedSpans[previousSpanIndex])
                     etvSpannableContent.removeSpan(sortedSpans[spanIndex])
@@ -160,18 +164,28 @@ class TextFormatHelper {
                 if (nextSpanStart <= currentSpanEnd && (nextSpanStart != -1 ||
                             nextSpanEnd != -1)) {
 
-                    Log.d("basicTextFormatter", "Next spanIndex overlaps.")
+                    Log.d("SpanWatcher", "Next spanIndex overlaps.")
 
                     applyFormattingFunction(currentSpanStart, nextSpanEnd)
+
+                    val isNormalization = multipartIdentifier != null
+
+                    spanStateWatcher.removeStyleSpan(sortedSpans[spanIndex], spanType,
+                        isNormalization, multipartIdentifier)
+                    spanStateWatcher.removeStyleSpan(sortedSpans[nextSpanIndex], spanType,
+                        isNormalization, multipartIdentifier)
 
                     etvSpannableContent.removeSpan(sortedSpans[spanIndex])
                     etvSpannableContent.removeSpan(sortedSpans[nextSpanIndex])
                 }
             }
 
-            // remove empty spans
-            removeIfEmptySpan(currentSpanEnd, currentSpanStart, sortedSpans[spanIndex],
-                etvSpannableContent)
+            if (currentSpanStart != -1 && currentSpanEnd != -1) {
+
+                // remove empty spans
+                removeIfEmptySpan(currentSpanEnd, currentSpanStart, sortedSpans[spanIndex],
+                    etvSpannableContent)
+            }
         }
     }
 
@@ -179,6 +193,9 @@ class TextFormatHelper {
                                   currentSpan: Any, etvSpannableContent: Editable) {
 
         if (currentSpanEnd == currentSpanStart) {
+
+            Log.d("SpanWatcher",
+                "removed empty span from $currentSpanStart to $currentSpanEnd")
 
             etvSpannableContent.removeSpan(currentSpan)
         }

@@ -1,5 +1,6 @@
 package com.ckestudios.lumonote.utils.state
 
+import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
 import android.util.Log
 import android.widget.EditText
@@ -11,7 +12,7 @@ import com.ckestudios.lumonote.ui.noteview.other.ChecklistSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
-import com.ckestudios.lumonote.utils.textformatting.TextFormatHelper
+import com.ckestudios.lumonote.utils.textformatting.TextFormatterHelper
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 class SpanStateWatcher(private val editTextView: EditText,
@@ -27,12 +28,16 @@ class SpanStateWatcher(private val editTextView: EditText,
 
     private var currChecklistSpans = ArrayList<ChecklistSpan>()
 
-    private val textFormatHelper = TextFormatHelper()
+    private var currH1SizeSpans = ArrayList<RelativeSizeSpan>()
+    private var currH2SizeSpans = ArrayList<RelativeSizeSpan>()
+
+    private val textFormatterHelper = TextFormatterHelper()
     private val generalUIHelper = GeneralUIHelper()
     private val actionHelper = ActionHelper()
 
 
-    fun addSpan(span: Any, spanType: SpanType) {
+    fun addStyleSpan(span: Any, spanType: SpanType, isNormalization: Boolean,
+                     multipartIdentifier: String?) {
 
         when (spanType) {
 
@@ -47,8 +52,6 @@ class SpanStateWatcher(private val editTextView: EditText,
             SpanType.IMAGE_SPAN -> currentImageSpans.add(span as CustomImageSpan)
 
             SpanType.CHECKLIST_SPAN -> currChecklistSpans.add(span as ChecklistSpan)
-
-            else -> {}
         }
 
         val spanStart = editTextView.text.getSpanStart(span)
@@ -57,7 +60,8 @@ class SpanStateWatcher(private val editTextView: EditText,
         val action = Action(
             ActionPerformed.ADD,
             ActionType.SPAN,
-            false,
+            isNormalization,
+            multipartIdentifier,
             spanStart,
             spanEnd,
             spanType
@@ -68,7 +72,8 @@ class SpanStateWatcher(private val editTextView: EditText,
         Log.d("SpanWatcher", "${spanType.spanName} added to $spanStart-$spanEnd")
     }
 
-    fun <T> removeSpan(targetSpan: T, spanType: SpanType) {
+    fun <T> removeStyleSpan(targetSpan: T, spanType: SpanType, isNormalization: Boolean,
+                            multipartIdentifier: String?) {
 
         val spanList =
             when (spanType) {
@@ -82,11 +87,9 @@ class SpanStateWatcher(private val editTextView: EditText,
                 SpanType.IMAGE_SPAN -> currentImageSpans
 
                 SpanType.CHECKLIST_SPAN -> currChecklistSpans
-
-                else -> null
             }
 
-        if (spanList.isNullOrEmpty()) return
+        if (spanList.isEmpty()) return
 
 
         val spansToRemove = mutableListOf<Any>() // Avoid ConcurrentModificationException
@@ -98,11 +101,11 @@ class SpanStateWatcher(private val editTextView: EditText,
                 val spanStart = editTextView.text.getSpanStart(span)
                 val spanEnd = editTextView.text.getSpanEnd(span)
 
-
                 val action = Action(
                     ActionPerformed.REMOVE,
                     ActionType.SPAN,
-                    false,
+                    isNormalization,
+                    multipartIdentifier,
                     spanStart,
                     spanEnd,
                     spanType
@@ -116,8 +119,10 @@ class SpanStateWatcher(private val editTextView: EditText,
             }
         }
 
-
         spanList.removeAll(spansToRemove.toSet())
     }
+
+
+
 
 }

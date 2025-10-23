@@ -1,6 +1,8 @@
 package com.ckestudios.lumonote.utils.state
 
+import android.graphics.Bitmap
 import android.graphics.Typeface
+import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.StyleSpan
 import android.widget.EditText
@@ -8,7 +10,10 @@ import com.ckestudios.lumonote.data.models.Action
 import com.ckestudios.lumonote.data.models.ActionPerformed
 import com.ckestudios.lumonote.data.models.BulletType
 import com.ckestudios.lumonote.data.models.SpanType
+import com.ckestudios.lumonote.ui.noteview.other.ChecklistSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
+import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
+import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
@@ -49,20 +54,14 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
                 action.actionEnd)
         }
 
-
-        if (editTextView.selectionStart != editTextView.selectionEnd) {
-
-            editTextView.setSelection(action.actionStart, action.actionEnd)
-        } else {
-
-            editTextView.setSelection(action.actionEnd)
-        }
+        editTextView.setSelection(action.actionEnd)
 
         textStateWatcher.setMakingInternalEdits(false)
     }
 
 
-    fun processSpanAction(action: Action, editTextView: EditText, shouldUndoAction: Boolean){
+
+    fun processStyleSpanAction(action: Action, editTextView: EditText, shouldUndoAction: Boolean){
 
         // Details e.g.: spantype: spanType.SPAN
 
@@ -70,57 +69,47 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
 
             when (action.actionPerformed) {
 
-                ActionPerformed.ADD -> performSpanAction(ActionPerformed.REMOVE, action,
+                ActionPerformed.ADD -> performStyleSpanAction(ActionPerformed.REMOVE, action,
                     editTextView)
 
-                ActionPerformed.REMOVE -> performSpanAction(ActionPerformed.ADD, action,
+                ActionPerformed.REMOVE -> performStyleSpanAction(ActionPerformed.ADD, action,
                     editTextView)
             }
         } else {
 
-            performSpanAction(action.actionPerformed, action, editTextView)
+            performStyleSpanAction(action.actionPerformed, action, editTextView)
         }
-
     }
 
-    private fun performSpanAction(actionPerformed: ActionPerformed, action: Action,
-                                  editTextView: EditText) {
+    private fun performStyleSpanAction(actionPerformed: ActionPerformed, action: Action,
+                                       editTextView: EditText) {
 
         val spanType = action.actionInfo as SpanType
 
-        //undo normalization too
 
         textStateWatcher.setMakingInternalEdits(true)
-
 
         when (actionPerformed) {
 
             ActionPerformed.ADD -> {
 
-                addSpanType(spanType, action.actionStart, action.actionEnd, editTextView)
+                addStyleSpan(spanType, action.actionStart, action.actionEnd, editTextView)
             }
 
             ActionPerformed.REMOVE ->
-                removeSpanType(spanType, action.actionStart, action.actionEnd, editTextView)
+                removeStyleSpan(spanType, action.actionStart, action.actionEnd, editTextView)
         }
 
 
-        if (editTextView.selectionStart != editTextView.selectionEnd) {
-
-            editTextView.setSelection(action.actionStart, action.actionEnd)
-        } else {
-
-            editTextView.setSelection(action.actionEnd)
-        }
+        editTextView.setSelection(action.actionEnd)
 
         textStateWatcher.setMakingInternalEdits(false)
     }
 
-    private fun addSpanType(spanType: SpanType, spanStart: Int, spanEnd: Int,
-                            editTextView: EditText){
+    private fun addStyleSpan(spanType: SpanType, spanStart: Int, spanEnd: Int,
+                             editTextView: EditText){
 
-
-        val setSpan = when (spanType) {
+        val setSpan: Any? = when (spanType) {
 
             SpanType.BOLD_SPAN -> StyleSpan(Typeface.BOLD)
 
@@ -134,8 +123,6 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
             SpanType.IMAGE_SPAN -> null
 
             SpanType.CHECKLIST_SPAN -> null
-
-            else -> null
         }
 
         if (setSpan != null) {
@@ -149,11 +136,11 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
         }
     }
 
+    private fun removeStyleSpan(spanType: SpanType, targetSpanStart: Int, targetSpanEnd: Int,
+                                editTextView: EditText){
 
-    private fun removeSpanType(spanType: SpanType, targetSpanStart: Int, targetSpanEnd: Int,
-                               editTextView: EditText){
+        val spanList = getDesiredStyleSpans(spanType, editTextView)
 
-        val spanList = getDesiredSpans(spanType, editTextView)
 
         if (spanList != null) {
 
@@ -171,7 +158,73 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
 
     }
 
-    private fun getDesiredSpans(spanType: SpanType, editTextView: EditText): Array<out Any>? {
+
+
+    fun processImageSpanAction(action: Action, editTextView: EditText, shouldUndoAction: Boolean,
+                               imageBitmap: Bitmap) {
+
+        if (shouldUndoAction) {
+
+            when (action.actionPerformed) {
+
+                ActionPerformed.ADD -> performImageSpanAction(ActionPerformed.REMOVE, action,
+                    editTextView, imageBitmap)
+
+                ActionPerformed.REMOVE -> performImageSpanAction(ActionPerformed.ADD, action,
+                    editTextView, imageBitmap)
+            }
+        } else {
+
+            performImageSpanAction(action.actionPerformed, action, editTextView, imageBitmap)
+        }
+    }
+
+    private fun performImageSpanAction(actionPerformed: ActionPerformed, action: Action,
+                                       editTextView: EditText, imageBitmap: Bitmap) {
+
+        val spanType = action.actionInfo as SpanType
+
+
+        textStateWatcher.setMakingInternalEdits(true)
+
+        when (actionPerformed) {
+
+            ActionPerformed.ADD ->
+                addImageSpan(action.actionStart, action.actionEnd, editTextView, imageBitmap)
+
+            ActionPerformed.REMOVE ->
+                removeStyleSpan(spanType, action.actionStart, action.actionEnd, editTextView)
+        }
+
+        editTextView.setSelection(action.actionEnd)
+
+        textStateWatcher.setMakingInternalEdits(false)
+    }
+
+    private fun addImageSpan(spanStart: Int, spanEnd: Int, editTextView: EditText,
+                             imageBitmap: Bitmap){
+
+        val imageSpan = CustomImageSpan(imageBitmap)
+        val objectCharacter = '\uFFFC'
+
+        val imageText = SpannableStringBuilder("$objectCharacter ")
+
+        // Apply the CustomImageSpan to the object character
+        imageText.setSpan(
+            imageSpan,
+            0,
+            1,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        editTextView.text.replace(spanStart, spanEnd, imageText)
+
+        (editTextView as CustomSelectionET).triggerSelectionChanged()
+    }
+
+
+
+    private fun getDesiredStyleSpans(spanType: SpanType, editTextView: EditText): Array<out Any>? {
 
         val spanClass = when(spanType) {
 
@@ -181,11 +234,9 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
 
             SpanType.BULLET_SPAN -> CustomBulletSpan::class.java
 
-            SpanType.IMAGE_SPAN -> null
+            SpanType.IMAGE_SPAN -> CustomImageSpan::class.java
 
-            SpanType.CHECKLIST_SPAN -> null
-
-            else -> null
+            SpanType.CHECKLIST_SPAN -> ChecklistSpan::class.java
         }
 
 
@@ -204,15 +255,7 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
                 styleSpans.filter { it.style == Typeface.ITALIC }.toTypedArray()
             }
 
-            SpanType.UNDERLINE_SPAN -> allSpans
-
-            SpanType.BULLET_SPAN -> allSpans
-
-            SpanType.IMAGE_SPAN -> null
-
-            SpanType.CHECKLIST_SPAN -> null
-
-            else -> null
+            else -> allSpans
         }
     }
 

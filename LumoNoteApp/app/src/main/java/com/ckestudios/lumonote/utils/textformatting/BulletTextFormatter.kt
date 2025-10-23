@@ -19,7 +19,7 @@ class BulletTextFormatter(
     private var bulletType: BulletType? = null
     private var customBullet: String? = null
 
-    private val textFormatHelper = TextFormatHelper()
+    private val textFormatterHelper = TextFormatterHelper()
     private val spanStateManager = SpanStateWatcher(editTextView, stateManager)
 
     override fun updateSpannableContent() {
@@ -64,7 +64,7 @@ class BulletTextFormatter(
             assessProcessMethod(selectStart, selectEnd)
         }
 
-        textFormatHelper.fixLineHeight(editTextView)
+        textFormatterHelper.fixLineHeight(editTextView)
 
         normalizeFormatting()
     }
@@ -89,7 +89,7 @@ class BulletTextFormatter(
     private fun assessProcessMethod(selectStart: Int, selectEnd: Int) {
 
         val paragraphIndices =
-            textFormatHelper.getSelectionParagraphIndices(editTextView)
+            textFormatterHelper.getSelectionParagraphIndices(editTextView)
 
         for (index in 0 until paragraphIndices.size - 1) {
 
@@ -166,7 +166,8 @@ class BulletTextFormatter(
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
 
-            spanStateManager.addSpan(bulletSpan, SpanType.BULLET_SPAN)
+            spanStateManager.addStyleSpan(bulletSpan, SpanType.BULLET_SPAN, false,
+                null)
         }
 
     }
@@ -177,7 +178,8 @@ class BulletTextFormatter(
 
         for (span in spansList) {
 
-            spanStateManager.removeSpan(span, SpanType.BULLET_SPAN)
+            spanStateManager.removeStyleSpan(span, SpanType.BULLET_SPAN, false,
+                null)
 
             etvSpannableContent.removeSpan(span)
         }

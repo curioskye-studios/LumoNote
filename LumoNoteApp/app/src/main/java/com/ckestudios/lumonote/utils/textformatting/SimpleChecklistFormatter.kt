@@ -13,7 +13,7 @@ class SimpleChecklistFormatter(private val editTextView: EditText,
 
     private lateinit var etvSpannableContent: Editable
     private var shouldRemoveChecklist = false
-    private val textFormatHelper = TextFormatHelper()
+    private val textFormatterHelper = TextFormatterHelper()
     private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
 
     private fun updateSpannableContent() {
@@ -30,7 +30,7 @@ class SimpleChecklistFormatter(private val editTextView: EditText,
 
         updateSpannableContent()
 
-        val paragraphIndices = textFormatHelper.getSelectionParagraphIndices(editTextView)
+        val paragraphIndices = textFormatterHelper.getSelectionParagraphIndices(editTextView)
 
         for (i in 0 until paragraphIndices.size - 1) {
 
@@ -74,7 +74,8 @@ class SimpleChecklistFormatter(private val editTextView: EditText,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
 
-                spanStateWatcher.addSpan(span, SpanType.CHECKLIST_SPAN)
+                spanStateWatcher.addStyleSpan(span, SpanType.CHECKLIST_SPAN, false,
+                    null)
             }
             line.startsWith("☑") -> {
 
@@ -109,7 +110,8 @@ class SimpleChecklistFormatter(private val editTextView: EditText,
 
         spans.forEach {
 
-            spanStateWatcher.removeSpan(it, SpanType.CHECKLIST_SPAN)
+            spanStateWatcher.removeStyleSpan(it, SpanType.CHECKLIST_SPAN, false,
+                null)
 
             etvSpannableContent.removeSpan(it)
         }
@@ -122,7 +124,7 @@ class SimpleChecklistFormatter(private val editTextView: EditText,
 
         updateSpannableContent()
 
-        val (lineStart, lineEnd) = textFormatHelper.getCurrentLineIndices(editTextView)
+        val (lineStart, lineEnd) = textFormatterHelper.getCurrentLineIndices(editTextView)
 
         val line =  etvSpannableContent.substring(lineStart, lineEnd).trimStart()
 
@@ -139,7 +141,7 @@ class SimpleChecklistFormatter(private val editTextView: EditText,
 
         updateSpannableContent()
 
-        val (lineStart, lineEnd) = textFormatHelper.getCurrentLineIndices(editTextView)
+        val (lineStart, lineEnd) = textFormatterHelper.getCurrentLineIndices(editTextView)
 
         val line =  etvSpannableContent.substring(lineStart, lineEnd).trimStart()
 

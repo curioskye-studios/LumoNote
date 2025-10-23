@@ -46,6 +46,7 @@ class NoteViewActivity : AppCompatActivity() {
     private var autoSaveTimer: Timer? = null
     private var runningAutoSave = false
     private var runningManualSave = false
+    private var closeNote = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -116,6 +117,8 @@ class NoteViewActivity : AppCompatActivity() {
 
             runningAutoSave = true
 
+            updateRetrievedNote()
+
             collectNoteData()
 
             runningAutoSave = false
@@ -153,11 +156,15 @@ class NoteViewActivity : AppCompatActivity() {
                 return null
             }
 
-            // Get existing note
-            retrievedNote = noteAppSharedViewModel.getNote(noteID)
+            updateRetrievedNote()
         }
 
         return existingNoteClicked
+    }
+
+    private fun updateRetrievedNote() {
+
+        if (existingNoteClicked) retrievedNote = noteAppSharedViewModel.getNote(noteID)
     }
 
 
@@ -237,6 +244,8 @@ class NoteViewActivity : AppCompatActivity() {
 
                 runningManualSave = true
 
+                updateRetrievedNote()
+
                 collectNoteData()
 
 
@@ -250,9 +259,10 @@ class NoteViewActivity : AppCompatActivity() {
                         retrievedNote.notePinned == pinned)) {
                         generalUIHelper.displayFeedbackToast(this@NoteViewActivity,
                             "Changes Saved", false)
-                    } else
+                    } else {
                         generalUIHelper.displayFeedbackToast(this@NoteViewActivity,
-                        "Up to date", false)
+                            "Up to date", false)
+                    }
                 }
             }
 
@@ -262,6 +272,7 @@ class NoteViewActivity : AppCompatActivity() {
                     saveCloseButtonIV)
 
                 runningManualSave = true
+                closeNote = true
 
                 collectNoteData()
 
@@ -275,6 +286,7 @@ class NoteViewActivity : AppCompatActivity() {
                     override fun handleOnBackPressed() {
 
                         runningManualSave = true
+                        closeNote = true
 
                         collectNoteData()
 
@@ -322,6 +334,7 @@ class NoteViewActivity : AppCompatActivity() {
                     runAutoSave()
                 } else {
                     stopAutoSave()
+                    collectNoteData()
                 }
             }
 
@@ -390,7 +403,7 @@ class NoteViewActivity : AppCompatActivity() {
 
         noteAppSharedViewModel.noteWasCreated.observe(this){ isTrue ->
 
-            if (isTrue && runningManualSave) {
+            if (isTrue && runningManualSave && closeNote) {
 
                 generalUIHelper.closeActivityWithFeedback("Note Created", this,
                     this, true)
@@ -399,7 +412,7 @@ class NoteViewActivity : AppCompatActivity() {
 
         noteAppSharedViewModel.noteWasUpdated.observe(this){ isTrue ->
 
-            if (isTrue && runningManualSave) {
+            if (isTrue && runningManualSave && closeNote) {
 
                 generalUIHelper.closeActivityWithFeedback("Note Updated", this,
                     this, true)

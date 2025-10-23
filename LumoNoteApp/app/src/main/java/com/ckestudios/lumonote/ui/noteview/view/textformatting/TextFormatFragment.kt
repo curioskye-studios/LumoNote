@@ -15,7 +15,7 @@ import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.state.StateManager
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.BulletTextFormatter
-import com.ckestudios.lumonote.utils.textformatting.TextFormatHelper
+import com.ckestudios.lumonote.utils.textformatting.TextFormatterHelper
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 
@@ -43,7 +43,7 @@ class TextFormatFragment: Fragment() {
     private lateinit var underlineTextFormatter: UnderlineTextFormatter
     private lateinit var bulletTextFormatter: BulletTextFormatter
 
-    private val textFormatHelper = TextFormatHelper()
+    private val textFormatterHelper = TextFormatterHelper()
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -113,12 +113,12 @@ class TextFormatFragment: Fragment() {
 
             inputSharedViewModel.setCurrentLineHasText(
 
-                textFormatHelper.checkIfCurrentLineHasText(noteContentET)
+                textFormatterHelper.checkIfCurrentLineHasText(noteContentET)
             )
 
             inputSharedViewModel.setCurrentLineHasImage(
 
-                textFormatHelper.checkIfCurrentLineHasImage(noteContentET)
+                textFormatterHelper.checkIfCurrentLineHasImage(noteContentET)
             )
         }
     }

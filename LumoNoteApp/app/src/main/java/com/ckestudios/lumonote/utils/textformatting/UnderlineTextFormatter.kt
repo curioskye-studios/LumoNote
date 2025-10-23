@@ -7,6 +7,7 @@ import android.text.style.UnderlineSpan
 import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
+import com.ckestudios.lumonote.utils.state.ActionHelper
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 import com.ckestudios.lumonote.utils.state.StateManager
 
@@ -17,8 +18,12 @@ class UnderlineTextFormatter(
     class CustomUnderlineSpan : UnderlineSpan()
 
     override lateinit var etvSpannableContent: Editable
-    private val textFormatHelper = TextFormatHelper()
+
+    private val textFormatterHelper = TextFormatterHelper()
+    private val actionHelper = ActionHelper()
+
     private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
+    private var multipartIdentifier: String? = null
 
 
     override fun updateSpannableContent() {
@@ -77,7 +82,9 @@ class UnderlineTextFormatter(
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
-        spanStateWatcher.addSpan(span, SpanType.UNDERLINE_SPAN)
+        val doingNormalization = multipartIdentifier != null
+        spanStateWatcher.addStyleSpan(span, SpanType.UNDERLINE_SPAN, doingNormalization,
+            multipartIdentifier)
     }
 
     override fun removeFormatting(selectStart: Int, selectEnd: Int,
@@ -106,7 +113,9 @@ class UnderlineTextFormatter(
 
             // eg. span: 1-9, selection 3-6, runs both
 
-            spanStateWatcher.removeSpan(span, SpanType.UNDERLINE_SPAN)
+            val doingNormalization = multipartIdentifier != null
+            spanStateWatcher.removeStyleSpan(span, SpanType.UNDERLINE_SPAN, doingNormalization,
+                multipartIdentifier)
 
             etvSpannableContent.removeSpan(span)
         }
@@ -121,12 +130,16 @@ class UnderlineTextFormatter(
 
         if (newUnderlineSpans != null) {
 
-            val sortedSpans = textFormatHelper.sortSpans(newUnderlineSpans,
+            val sortedSpans = textFormatterHelper.sortSpans(newUnderlineSpans,
                 etvSpannableContent)
 
+            multipartIdentifier = actionHelper.getMultipartIdentifier()
+
             // Combine adjacent or overlapping spans
-            textFormatHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
-                spanStateWatcher, SpanType.UNDERLINE_SPAN, ::applyFormatting)
+            textFormatterHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
+                spanStateWatcher, multipartIdentifier, SpanType.UNDERLINE_SPAN, ::applyFormatting)
+
+            multipartIdentifier = null
         }
     }
 

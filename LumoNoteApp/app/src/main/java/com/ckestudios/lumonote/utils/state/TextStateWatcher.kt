@@ -26,6 +26,8 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
     private var saveChangesOnPauseTimer: Timer? = null
     private var uiRefreshTimer: Timer? = null
 
+    private val actionHelper = ActionHelper()
+
     init {
 
         if (editTextView.text.toString().isNotEmpty()) {
@@ -125,6 +127,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
         val oldText = beforeText
         val newText = afterText
 
+        Log.d("TextWatcher", "newText: $newText")
 
         // nothing changed
         if (oldText == newText || beforeTextIsOriginalText()) {
@@ -162,10 +165,12 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
 
             // ADD → user inserted text
             oldSegment.isEmpty() && newSegment.isNotEmpty() -> {
+
                 val action = Action(
                     ActionPerformed.ADD,
                     ActionType.TEXT,
                     false,
+                    null,
                     changeStart,
                     changeStart + newSegment.length,
                     newSegment
@@ -182,6 +187,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
                     ActionPerformed.REMOVE,
                     ActionType.TEXT,
                     false,
+                    null,
                     changeStart,
                     changeStart + oldSegment.length,
                     oldSegment
@@ -194,10 +200,13 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
             // REPLACE → user replaced text segment
             oldSegment.isNotEmpty() && newSegment.isNotEmpty() -> {
 
+                val multipartIdentifier = actionHelper.getMultipartIdentifier()
+
                 val removeAction = Action(
                     ActionPerformed.REMOVE,
                     ActionType.TEXT,
                     true,
+                    multipartIdentifier,
                     changeStart,
                     changeStart + oldSegment.length,
                     oldSegment
@@ -207,6 +216,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
                     ActionPerformed.ADD,
                     ActionType.TEXT,
                     true,
+                    multipartIdentifier,
                     changeStart,
                     changeStart + newSegment.length,
                     newSegment

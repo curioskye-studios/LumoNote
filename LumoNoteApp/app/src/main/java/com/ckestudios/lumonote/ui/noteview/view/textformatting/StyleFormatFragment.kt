@@ -19,7 +19,7 @@ import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.state.StateManager
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.BulletTextFormatter
-import com.ckestudios.lumonote.utils.textformatting.TextFormatHelper
+import com.ckestudios.lumonote.utils.textformatting.TextFormatterHelper
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 
@@ -40,7 +40,7 @@ class StyleFormatFragment: Fragment() {
     private lateinit var underlineTextFormatter: UnderlineTextFormatter
     private lateinit var bulletTextFormatter: BulletTextFormatter
 
-    private val textFormatHelper = TextFormatHelper()
+    private val textFormatterHelper = TextFormatterHelper()
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -158,7 +158,7 @@ class StyleFormatFragment: Fragment() {
             generalButtonIVHelper.playSelectionIndication(requireContext(),
                 styleFormatViewBinding.clearFormatsButtonIV)
 
-            textFormatHelper.clearBasicFormatting(noteContentET.selectionStart,
+            textFormatterHelper.clearBasicFormatting(noteContentET.selectionStart,
                 noteContentET.selectionEnd, noteContentET.text!!)
 
             editContentSharedViewModel.setIsBold(false)
@@ -190,6 +190,7 @@ class StyleFormatFragment: Fragment() {
                     updateUnderlineActive()
                     updateBasicFormatActive(SpanType.BOLD_SPAN)
                     updateBasicFormatActive(SpanType.ITALICS_SPAN)
+                    updateBulletedActive()
                 }
             }
 
