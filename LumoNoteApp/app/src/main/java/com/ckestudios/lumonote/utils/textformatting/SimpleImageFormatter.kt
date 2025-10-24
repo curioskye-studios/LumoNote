@@ -30,7 +30,7 @@ class SimpleImageFormatter(private val editTextView: EditText,
 
         updateSpannableContent()
 
-        editTextView.addTextChangedListener(ImageLineTextWatcher(editTextView))
+        editTextView.addTextChangedListener(ImageLineTextWatcher(editTextView, stateManager))
     }
 
 

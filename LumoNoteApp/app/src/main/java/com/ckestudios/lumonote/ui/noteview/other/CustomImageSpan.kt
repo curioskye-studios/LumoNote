@@ -52,4 +52,9 @@ class CustomImageSpan(
         canvas.drawBitmap(bitmap, 0f, 0f, paint)
         canvas.restore()
     }
+
+    fun getBitmap(): Bitmap {
+
+        return bitmap
+    }
 }

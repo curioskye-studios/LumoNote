@@ -3,6 +3,7 @@ package com.ckestudios.lumonote.ui.noteview.other
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
+import com.ckestudios.lumonote.utils.state.StateManager
 import com.ckestudios.lumonote.utils.textformatting.TextFormatterHelper
 
 
@@ -11,7 +12,8 @@ import com.ckestudios.lumonote.utils.textformatting.TextFormatterHelper
  * - No typing directly on an image line (except ENTER to create a new line below).
  * - Keeps only one image per line.
  */
-class ImageLineTextWatcher(private val editTextView: EditText) : TextWatcher {
+class ImageLineTextWatcher(private val editTextView: EditText,
+                           private val stateManager: StateManager) : TextWatcher {
 
     private val textFormatterHelper = TextFormatterHelper()
 
@@ -44,8 +46,8 @@ class ImageLineTextWatcher(private val editTextView: EditText) : TextWatcher {
 
         val (lineStart, lineEnd) = textFormatterHelper.getCurrentLineIndices(editTextView)
 
-        val imageSpans =
-            etvContentSpannable.getSpans(lineStart, lineEnd, CustomImageSpan::class.java)
+        var imageSpans =
+            checkLineForImages(etvContentSpannable, lineStart, lineEnd)
 
         if (imageSpans.isNotEmpty()) {
 
@@ -53,6 +55,9 @@ class ImageLineTextWatcher(private val editTextView: EditText) : TextWatcher {
 //                if (cursor > 0 && cursor <= etvContentSpannable.length)
 //                    etvContentSpannable.subSequence(cursor - 1, cursor)
 //                else ""
+
+            // only one image allowed per line
+            val imageBitmap = imageSpans[0].getBitmap()
 
             internalEdit = true
 
@@ -62,6 +67,10 @@ class ImageLineTextWatcher(private val editTextView: EditText) : TextWatcher {
                 editTextView.setSelection(lineEnd.coerceAtMost(etvContentSpannable.length))
             }
 
+            imageSpans = checkLineForImages(etvContentSpannable, lineStart, lineEnd)
+
+
+
             internalEdit = false
 
             // Jump to next line
@@ -69,6 +78,12 @@ class ImageLineTextWatcher(private val editTextView: EditText) : TextWatcher {
 
             textFormatterHelper.fixLineHeight(editTextView)
         }
+    }
+
+    private fun checkLineForImages(etvContentSpannable: Editable, lineStart: Int,
+                                   lineEnd: Int) : Array<CustomImageSpan> {
+
+        return etvContentSpannable.getSpans(lineStart, lineEnd, CustomImageSpan::class.java)
     }
 
 }

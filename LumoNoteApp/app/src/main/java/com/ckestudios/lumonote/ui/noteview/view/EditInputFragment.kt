@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.databinding.FragmentEditInputBinding
+import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditInputViewModel
@@ -304,7 +305,7 @@ class EditInputFragment : Fragment() {
         val hasImage = inputSharedViewModel.currentLineHasImage.value!!
         val hasText = inputSharedViewModel.currentLineHasText.value!!
 
-        if (!hasImage && !hasText && isEditing) {
+        if (!hasImage && !hasText && isEditing && imageCountLessThanOne()) {
 
             generalButtonIVHelper.enableButtonIV(editInputViewBinding.imageButtonIV,
                 requireContext(), null)
@@ -403,6 +404,14 @@ class EditInputFragment : Fragment() {
             generalButtonIVHelper.disableButtonIV(editInputViewBinding.redoButtonIV,
                 requireContext())
         }
+    }
+
+    private fun imageCountLessThanOne(): Boolean {
+
+        val imageSpans =
+            noteContentET.text?.getSpans(0, noteContentET.length(), CustomImageSpan::class.java)
+
+        return imageSpans.isNullOrEmpty()
     }
 
 }

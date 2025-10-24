@@ -9,6 +9,7 @@ import com.ckestudios.lumonote.data.models.Action
 import com.ckestudios.lumonote.data.models.ActionPerformed
 import com.ckestudios.lumonote.data.models.ActionType
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
+import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
 import java.util.Timer
 import kotlin.concurrent.timer
 
@@ -27,6 +28,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
     private var uiRefreshTimer: Timer? = null
 
     private val actionHelper = ActionHelper()
+    private val generalTextHelper = GeneralTextHelper()
 
     init {
 
@@ -82,10 +84,15 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
         if (loggingChanges || newText == null || makingInternalEdits) return
 
         // update after text snapshot
-        afterText = newText.toString()
+        afterText = buildString {
+            for (element in newText) {
+                append(element) // preserves invisible chars like \uFFFC
+            }
+        }
 
-        Log.d("TextWatcher", "After: $newText")
+        Log.d("TextWatcher", "After: $afterText")
     }
+
 
     fun setMakingInternalEdits(isTrue: Boolean) {
 
@@ -119,7 +126,6 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
         saveChangesOnPauseTimer = null
     }
 
-
     private fun commitChange() {
 
         loggingChanges = true
@@ -127,7 +133,14 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
         val oldText = beforeText
         val newText = afterText
 
+        Log.d("TextWatcher", "oldText: $oldText")
         Log.d("TextWatcher", "newText: $newText")
+
+        val objectChar = '\uFFFC'
+        val count1 = oldText.filter { it == objectChar}.length
+        val count2 = newText.filter { it == objectChar}.length
+        Log.d("TextWatcher", "oldText count: $count1")
+        Log.d("TextWatcher", "newText count: $count2")
 
         // nothing changed
         if (oldText == newText || beforeTextIsOriginalText()) {
@@ -158,10 +171,30 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
                 newText.substring(changeStart, newEndExcludingMatch.coerceAtMost(newText.length))
             else ""
 
-        Log.d("TextWatcher", "Diff → start=$changeStart, oldSeg='$oldSegment', newSeg='$newSegment'")
+        Log.d("TextWatcher", "Diff → start=$changeStart, oldSeg='$oldSegment', " +
+                "newSeg='$newSegment'")
 
 
         when {
+
+            // ADD → user inserted image char after first one logged
+            oldSegment.isEmpty() && newSegment.isEmpty() && count2 > count1 -> {
+
+                val newImageCharPos = newText.lastIndexOf(objectChar)
+
+                val action = Action(
+                    ActionPerformed.ADD,
+                    ActionType.TEXT,
+                    false,
+                    null,
+                    newImageCharPos,
+                    newImageCharPos+1,
+                    objectChar.toString()
+                )
+
+                stateManager.addToUndo(action)
+                Log.d("TextWatcher", "ADD IMAGE: '$objectChar' at $newImageCharPos")
+            }
 
             // ADD → user inserted text
             oldSegment.isEmpty() && newSegment.isNotEmpty() -> {
@@ -261,11 +294,10 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
 
         // Length of the shorter text, prevent going out of bounds
         val maxToCompare = minOf(firstText.length, secondText.length)
+        var matchingCharsCount = 0
 
         val firstSpan = firstText.length - 1
         val secondSpan = secondText.length - 1
-
-        var matchingCharsCount = 0
 
         while (
             matchingCharsCount < maxToCompare &&
@@ -274,7 +306,13 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
             matchingCharsCount++
         }
 
+        // handle case where extra chars exist but all matched so far
+        if (matchingCharsCount == maxToCompare && firstText.length != secondText.length) {
+            return matchingCharsCount - 1
+        }
+
         return matchingCharsCount
     }
+
 
 }

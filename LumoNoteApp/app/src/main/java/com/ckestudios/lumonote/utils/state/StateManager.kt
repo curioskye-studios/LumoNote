@@ -24,6 +24,7 @@ class StateManager(private val editTextView: EditText) {
     private var actionToRedo: Action? = null
 
     private var imageCache = mutableMapOf<String, Triple<Bitmap, Int, Int>>()
+    private var customBulletCache = mutableListOf<Triple<String, Int, Int>>()
 
 
     fun addImageToCache(image: Bitmap, start: Int, end: Int, identifier: String) {
@@ -38,6 +39,24 @@ class StateManager(private val editTextView: EditText) {
         if (imageIdentifier in imageCache.keys){
 
             imageCache.remove(imageIdentifier)
+        }
+    }
+
+    fun addBulletToCache(customBullet: String, start: Int, end: Int) {
+
+        customBulletCache.add(Triple(customBullet, start, end))
+
+        Log.d("SpanWatcher", customBulletCache.toString())
+    }
+
+    fun removeBulletFromCache(start: Int, end: Int) {
+
+        for (bullet in customBulletCache) {
+
+            if (bullet.second == start && bullet.third == end){
+
+                customBulletCache.remove(bullet)
+            }
         }
     }
 
@@ -68,17 +87,17 @@ class StateManager(private val editTextView: EditText) {
 
     fun addToUndo(undoAction: Action) {
 
-        val undoTopAction = undoStack.getTopActionOfStack()
+        val spanUndoAction = undoStack.getTopActionOfStack()
 
         val inRedoStack = redoStack.getStackContents().contains(undoAction)
 
         if (!inRedoStack) { clearRedoStack() }
 
 
-        if (imageWasJustAdded(undoTopAction, undoAction)) {
+        if (imageWasJustAdded(spanUndoAction, undoAction)) {
 
             undoAction.actionIsMultipart = true
-            undoAction.actionMultipartIdentifier = undoTopAction!!.actionMultipartIdentifier
+            undoAction.actionMultipartIdentifier = spanUndoAction!!.actionMultipartIdentifier
 
             // reverse the order of the actions since image span registered first
             undoStack.popActionFromStack()
@@ -86,9 +105,9 @@ class StateManager(private val editTextView: EditText) {
 
         undoStack.pushActionToStack(undoAction)
 
-        if (undoTopAction != null && imageWasJustAdded(undoTopAction, undoAction)) {
+        if (spanUndoAction != null && imageWasJustAdded(spanUndoAction, undoAction)) {
 
-            undoStack.pushActionToStack(undoTopAction)
+            undoStack.pushActionToStack(spanUndoAction)
         }
 
         Log.d("SpanWatcher", "undoAdd: $undoAction")
@@ -104,7 +123,9 @@ class StateManager(private val editTextView: EditText) {
             val imagePlaceHolder = "￼"
 
             spanUndoAction.actionInfo == SpanType.IMAGE_SPAN &&
-                    textUndoAction.actionInfo == imagePlaceHolder
+                    textUndoAction.actionInfo == imagePlaceHolder &&
+                    spanUndoAction.actionStart == textUndoAction.actionStart &&
+                    spanUndoAction.actionEnd == textUndoAction.actionEnd
         }
 
         else { false }
@@ -129,16 +150,23 @@ class StateManager(private val editTextView: EditText) {
         performUndo(topAction)
 
 
-        val multipartIdentifier = topAction.actionMultipartIdentifier ?: return
+        val firstMultipartIdentifier = topAction.actionMultipartIdentifier ?: return
+        var currentMultipartIdentifier: String
 
-        while (topAction!!.actionIsMultipart &&
-                topAction!!.actionMultipartIdentifier == multipartIdentifier) {
+        while (topAction!!.actionIsMultipart) {
 
             topAction = undoStack.getTopActionOfStack()
 
             Log.d("SpanWatcher", "undoNextPart: $topAction")
 
             if (topAction == null) return
+
+            currentMultipartIdentifier = topAction.actionMultipartIdentifier ?: return
+
+//            Log.d("SpanWatcher", "firstMultipartIdentifier: $firstMultipartIdentifier")
+//            Log.d("SpanWatcher", "currentMultipartIdentifier: $currentMultipartIdentifier")
+
+            if (currentMultipartIdentifier != firstMultipartIdentifier) return
 
             performUndo(topAction)
         }
@@ -155,10 +183,10 @@ class StateManager(private val editTextView: EditText) {
         performRedo(topAction)
 
 
-        val multipartIdentifier = topAction.actionMultipartIdentifier ?: return
+        val firstMultipartIdentifier = topAction.actionMultipartIdentifier ?: return
+        var currentMultipartIdentifier: String
 
-        while (topAction!!.actionIsMultipart &&
-            topAction!!.actionMultipartIdentifier == multipartIdentifier) {
+        while (topAction!!.actionIsMultipart) {
 
             topAction = redoStack.getTopActionOfStack()
 
@@ -166,7 +194,19 @@ class StateManager(private val editTextView: EditText) {
 
             if (topAction == null) return
 
+            Log.d("SpanWatcher", "Point 1")
+            Log.d("SpanWatcher", "currenttopAction: $topAction")
+
+            currentMultipartIdentifier = topAction.actionMultipartIdentifier ?: return
+
+            Log.d("SpanWatcher", "firstMultipartIdentifier: $firstMultipartIdentifier")
+            Log.d("SpanWatcher", "currentMultipartIdentifier: $currentMultipartIdentifier")
+
+            if (currentMultipartIdentifier != firstMultipartIdentifier) return
+
             performRedo(topAction)
+
+            Log.d("SpanWatcher", "Point 2")
         }
     }
 
@@ -234,6 +274,10 @@ class StateManager(private val editTextView: EditText) {
                              imageCache[actionToRedo!!.actionMultipartIdentifier!!]
 
                          if (imageData != null) {
+                             Log.d("SpanWatcher",
+                                 "Redo Image ID: ${actionToRedo!!.actionMultipartIdentifier}, " +
+                                         "Cache keys: ${imageCache.keys}")
+
                              actionInterpreter.processImageSpanAction(actionToRedo!!,
                                  editTextView, false, imageData.first)
                          }

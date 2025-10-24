@@ -6,6 +6,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class GeneralTextHelper {
+
     fun formatDate(date: LocalDate) : String {
 
         val formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy")
@@ -48,7 +49,9 @@ class GeneralTextHelper {
         return "${weekDayString.take(3)}, $fixedCurrentDate"
     }
 
+    fun convertChars(text: String, targetText:String, replaceText: String): String {
 
-
+        return text.replace(targetText, replaceText)
+    }
 
 }
