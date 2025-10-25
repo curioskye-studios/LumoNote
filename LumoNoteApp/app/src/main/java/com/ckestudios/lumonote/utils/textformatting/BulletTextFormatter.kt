@@ -19,6 +19,7 @@ class BulletTextFormatter(
 
     private var bulletType: BulletType? = null
     private var customBullet: String? = null
+    private lateinit var identifier: String
 
     private val spanStateManager = SpanStateWatcher(editTextView, stateManager)
 
@@ -167,15 +168,16 @@ class BulletTextFormatter(
             )
 
             if (bulletType == BulletType.DEFAULT) {
-                spanStateManager.addStyleSpan(bulletSpan, SpanType.BULLET_SPAN, false,
+
+                spanStateManager.addBasicSpan(bulletSpan, SpanType.BULLET_SPAN, false,
                     null)
-                return
+            } else {
+
+                identifier = ActionHelper.getMultipartIdentifier()
+
+                stateManager.addBulletToCache(customBullet!!, identifier)
+                spanStateManager.addCustomBulletSpan(bulletSpan, identifier)
             }
-
-            val identifier = ActionHelper.getMultipartIdentifier()
-            spanStateManager.addStyleSpan(bulletSpan, SpanType.BULLET_SPAN, false,
-                identifier)
-
 
         }
 
@@ -187,8 +189,15 @@ class BulletTextFormatter(
 
         for (span in spansList) {
 
-            spanStateManager.removeStyleSpan(span, SpanType.BULLET_SPAN, false,
-                null)
+            if (span.getBulletType() == BulletType.DEFAULT) {
+
+                spanStateManager.removeStyleSpan(span, SpanType.BULLET_SPAN, false,
+                    null)
+            } else {
+
+                spanStateManager.removeCustomBulletSpan(span, identifier)
+            }
+
 
             etvSpannableContent.removeSpan(span)
         }

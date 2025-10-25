@@ -223,6 +223,62 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
     }
 
 
+    fun processCustomBulletAction(action: Action, editTextView: EditText, shouldUndoAction: Boolean,
+                                  customBullet: String) {
+
+
+        if (shouldUndoAction) {
+
+            when (action.actionPerformed) {
+
+                ActionPerformed.ADD -> performCustomBulletAction(ActionPerformed.REMOVE, action,
+                        editTextView, customBullet)
+
+                ActionPerformed.REMOVE -> performCustomBulletAction(ActionPerformed.ADD, action,
+                        editTextView, customBullet)
+            }
+        } else {
+
+            performCustomBulletAction(action.actionPerformed, action, editTextView, customBullet)
+        }
+    }
+
+    private fun performCustomBulletAction(actionPerformed: ActionPerformed, action: Action,
+                                       editTextView: EditText, customBullet: String) {
+
+        val spanType = action.actionInfo as SpanType
+
+
+        textStateWatcher.setMakingInternalEdits(true)
+
+        when (actionPerformed) {
+
+            ActionPerformed.ADD -> {
+                addCustomBullet(action.actionStart, action.actionEnd, editTextView, customBullet)
+            }
+
+            ActionPerformed.REMOVE -> {
+                removeStyleSpan(spanType, action.actionStart, action.actionEnd, editTextView)
+            }
+        }
+
+        editTextView.setSelection(action.actionEnd)
+
+        textStateWatcher.setMakingInternalEdits(false)
+    }
+
+    private fun addCustomBullet(spanStart: Int, spanEnd: Int, editTextView: EditText,
+                                customBullet: String){
+
+        editTextView.text.setSpan(
+            CustomBulletSpan(30, 6f, BulletType.CUSTOM, customBullet),
+            spanStart,
+            spanEnd,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+    }
+
+
 
     private fun getDesiredStyleSpans(spanType: SpanType, editTextView: EditText): Array<out Any>? {
 

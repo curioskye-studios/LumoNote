@@ -96,7 +96,7 @@ class SimpleImageFormatter(private val editTextView: EditText,
 
         if (insertedImageSpan.isNotEmpty()) {
 
-            spanStateWatcher.addStyleSpan(insertedImageSpan[0], SpanType.IMAGE_SPAN, true,
+            spanStateWatcher.addBasicSpan(insertedImageSpan[0], SpanType.IMAGE_SPAN, true,
                 identifier)
         }
 

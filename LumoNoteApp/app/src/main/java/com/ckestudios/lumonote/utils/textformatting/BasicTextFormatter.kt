@@ -104,7 +104,7 @@ class BasicTextFormatter(override val editTextView: EditText,
         }
 
         val doingNormalization = multipartIdentifier != null
-        spanStateWatcher.addStyleSpan(setSpan!!, spanType!!, doingNormalization, multipartIdentifier)
+        spanStateWatcher.addBasicSpan(setSpan!!, spanType!!, doingNormalization, multipartIdentifier)
     }
 
     override fun removeFormatting(selectStart: Int, selectEnd: Int, spansList: Array<StyleSpan>){

@@ -74,7 +74,7 @@ class SimpleChecklistFormatter(private val editTextView: EditText,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
 
-                spanStateWatcher.addStyleSpan(span, SpanType.CHECKLIST_SPAN, false,
+                spanStateWatcher.addBasicSpan(span, SpanType.CHECKLIST_SPAN, false,
                     null)
             }
             line.startsWith("☑") -> {

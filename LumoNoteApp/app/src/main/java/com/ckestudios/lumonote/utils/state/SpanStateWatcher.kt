@@ -30,7 +30,7 @@ class SpanStateWatcher(private val editTextView: EditText,
     private var currH2SizeSpans = ArrayList<RelativeSizeSpan>()
 
 
-    fun addStyleSpan(span: Any, spanType: SpanType, isNormalization: Boolean,
+    fun addBasicSpan(span: Any, spanType: SpanType, isNormalization: Boolean,
                      multipartIdentifier: String?) {
 
         when (spanType) {
@@ -54,7 +54,7 @@ class SpanStateWatcher(private val editTextView: EditText,
         val action = Action(
             ActionPerformed.ADD,
             ActionType.SPAN,
-            isNormalization,
+            actionIsMultipart = isNormalization,
             multipartIdentifier,
             spanStart,
             spanEnd,
@@ -98,7 +98,7 @@ class SpanStateWatcher(private val editTextView: EditText,
                 val action = Action(
                     ActionPerformed.REMOVE,
                     ActionType.SPAN,
-                    isNormalization,
+                    actionIsMultipart = isNormalization,
                     multipartIdentifier,
                     spanStart,
                     spanEnd,
@@ -110,6 +110,65 @@ class SpanStateWatcher(private val editTextView: EditText,
                 spansToRemove.add(span)
 
                 Log.d("SpanWatcher", "${spanType.spanName} removed from $spanStart-$spanEnd")
+            }
+        }
+
+        spanList.removeAll(spansToRemove.toSet())
+    }
+
+    fun addCustomBulletSpan(span: CustomBulletSpan, multipartIdentifier: String?) {
+
+        currentBulletSpans.add(span)
+
+        val spanStart = editTextView.text.getSpanStart(span)
+        val spanEnd = editTextView.text.getSpanEnd(span)
+
+        val action = Action(
+            ActionPerformed.ADD,
+            ActionType.SPAN,
+            true,
+            multipartIdentifier,
+            spanStart,
+            spanEnd,
+            SpanType.BULLET_SPAN
+        )
+
+        stateManager.addToUndo(action)
+
+        Log.d("SpanWatcher", "custombullet added to $spanStart-$spanEnd")
+    }
+
+    fun removeCustomBulletSpan(targetSpan: CustomBulletSpan, multipartIdentifier: String?) {
+
+        val spanList = currentBulletSpans
+
+        if (spanList.isEmpty()) return
+
+
+        val spansToRemove = mutableListOf<Any>() // Avoid ConcurrentModificationException
+
+        for (span in spanList) {
+
+            if (span == targetSpan) {
+
+                val spanStart = editTextView.text.getSpanStart(span)
+                val spanEnd = editTextView.text.getSpanEnd(span)
+
+                val action = Action(
+                    ActionPerformed.REMOVE,
+                    ActionType.SPAN,
+                    true,
+                    multipartIdentifier,
+                    spanStart,
+                    spanEnd,
+                    SpanType.BULLET_SPAN
+                )
+
+                stateManager.addToUndo(action)
+
+                spansToRemove.add(span)
+
+                Log.d("SpanWatcher", "custombullet removed from $spanStart-$spanEnd")
             }
         }
 

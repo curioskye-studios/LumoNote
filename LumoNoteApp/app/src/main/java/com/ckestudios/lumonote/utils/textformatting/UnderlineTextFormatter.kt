@@ -80,7 +80,7 @@ class UnderlineTextFormatter(
         )
 
         val doingNormalization = multipartIdentifier != null
-        spanStateWatcher.addStyleSpan(span, SpanType.UNDERLINE_SPAN, doingNormalization,
+        spanStateWatcher.addBasicSpan(span, SpanType.UNDERLINE_SPAN, doingNormalization,
             multipartIdentifier)
     }
 

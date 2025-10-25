@@ -19,14 +19,14 @@ class StateManager(private val editTextView: EditText) {
     private var actionToRedo: Action? = null
 
     private var imageCache = mutableMapOf<String, Triple<Bitmap, Int, Int>>()
-    private var customBulletCache = mutableListOf<Triple<String, Int, Int>>()
+    private var customBulletCache = mutableMapOf<String, String>()
 
 
     fun addImageToCache(image: Bitmap, start: Int, end: Int, identifier: String) {
 
         imageCache[identifier] = Triple(image, start, end)
 
-        Log.d("SpanWatcher", imageCache.keys.toString())
+        Log.d("SpanWatcher", "imageCache: ${imageCache.keys}")
     }
 
     fun removeImageFromCache(imageIdentifier: String) {
@@ -37,21 +37,26 @@ class StateManager(private val editTextView: EditText) {
         }
     }
 
-    fun addBulletToCache(customBullet: String, start: Int, end: Int) {
+    fun addBulletToCache(customBullet: String, identifier: String) {
 
-        customBulletCache.add(Triple(customBullet, start, end))
+        customBulletCache[identifier] = customBullet
 
-        Log.d("SpanWatcher", customBulletCache.toString())
+        Log.d("SpanWatcher", "customBulletCache: ${customBulletCache.keys}")
     }
 
-    fun removeBulletFromCache(start: Int, end: Int) {
+    fun removeBulletFromCache(bulletIdentifier: String) {
 
-        for (bullet in customBulletCache) {
+        if (bulletIdentifier in customBulletCache.keys){
 
-            if (bullet.second == start && bullet.third == end){
+            customBulletCache.remove(bulletIdentifier)
+        }
+    }
 
-                customBulletCache.remove(bullet)
-            }
+    fun cacheCleanUp(cache: MutableMap<*, *>) {
+         for (pair in cache) {
+
+             //if pair.key not in redo or undo actions multipart, remove
+             //cache.remove(key)
         }
     }
 
@@ -82,17 +87,20 @@ class StateManager(private val editTextView: EditText) {
 
     fun addToUndo(undoAction: Action) {
 
-        val spanUndoAction = undoStack.getTopActionOfStack()
+        cacheCleanUp(imageCache)
+        cacheCleanUp(customBulletCache)
+
+        val lastUndoAction = undoStack.getTopActionOfStack()
 
         val inRedoStack = redoStack.getStackContents().contains(undoAction)
 
         if (!inRedoStack) { clearRedoStack() }
 
 
-        if (imageWasJustAdded(spanUndoAction, undoAction)) {
+        if (ActionHelper.imageWasJustAdded(lastUndoAction, undoAction)) {
 
             undoAction.actionIsMultipart = true
-            undoAction.actionMultipartIdentifier = spanUndoAction!!.actionMultipartIdentifier
+            undoAction.actionMultipartIdentifier = lastUndoAction!!.actionMultipartIdentifier
 
             // reverse the order of the actions since image span registered first
             undoStack.popActionFromStack()
@@ -100,33 +108,20 @@ class StateManager(private val editTextView: EditText) {
 
         undoStack.pushActionToStack(undoAction)
 
-        if (spanUndoAction != null && imageWasJustAdded(spanUndoAction, undoAction)) {
+        if (lastUndoAction != null && ActionHelper.imageWasJustAdded(lastUndoAction, undoAction)) {
 
-            undoStack.pushActionToStack(spanUndoAction)
+            undoStack.pushActionToStack(lastUndoAction)
         }
 
         Log.d("SpanWatcher", "undoAdd: $undoAction")
         Log.d("SpanWatcher", "undoStack: ${undoStack.getStackContents()}")
     }
 
-    private fun imageWasJustAdded(spanUndoAction: Action?, textUndoAction: Action) : Boolean {
-
-        return if (spanUndoAction == null) { false }
-
-        else if (spanUndoAction.actionInfo is SpanType && textUndoAction.actionInfo is String) {
-
-            val imagePlaceHolder = "￼"
-
-            spanUndoAction.actionInfo == SpanType.IMAGE_SPAN &&
-                    textUndoAction.actionInfo == imagePlaceHolder &&
-                    spanUndoAction.actionStart == textUndoAction.actionStart &&
-                    spanUndoAction.actionEnd == textUndoAction.actionEnd
-        }
-
-        else { false }
-    }
 
     private fun addToRedo(redoAction: Action) {
+
+        cacheCleanUp(imageCache)
+        cacheCleanUp(customBulletCache)
 
         redoStack.pushActionToStack(redoAction)
     }
@@ -224,9 +219,8 @@ class StateManager(private val editTextView: EditText) {
 
             ActionType.SPAN -> {
 
-                when (actionToUndo!!.actionInfo) {
-
-                    SpanType.IMAGE_SPAN -> {
+                when {
+                    actionToUndo!!.actionInfo == SpanType.IMAGE_SPAN -> {
 
                         val imageData =
                             imageCache[actionToUndo!!.actionMultipartIdentifier!!]
@@ -234,6 +228,18 @@ class StateManager(private val editTextView: EditText) {
                         if (imageData != null) {
                             actionInterpreter.processImageSpanAction(actionToUndo!!, editTextView,
                                 true, imageData.first)
+                        }
+                    }
+
+                    actionToUndo!!.actionInfo == SpanType.BULLET_SPAN &&
+                            actionToUndo!!.actionIsMultipart -> {
+
+                        val customBullet =
+                            customBulletCache[actionToUndo!!.actionMultipartIdentifier!!]
+
+                        if (customBullet != null) {
+                            actionInterpreter.processCustomBulletAction(actionToUndo!!, editTextView,
+                                true, customBullet)
                         }
                     }
 
@@ -261,20 +267,31 @@ class StateManager(private val editTextView: EditText) {
                 editTextView, false)
 
             ActionType.SPAN -> {
-                 when (actionToRedo!!.actionInfo) {
-
-                     SpanType.IMAGE_SPAN -> {
+                 when {
+                     actionToRedo!!.actionInfo == SpanType.IMAGE_SPAN -> {
 
                          val imageData =
                              imageCache[actionToRedo!!.actionMultipartIdentifier!!]
 
                          if (imageData != null) {
-                             Log.d("SpanWatcher",
-                                 "Redo Image ID: ${actionToRedo!!.actionMultipartIdentifier}, " +
-                                         "Cache keys: ${imageCache.keys}")
+//                             Log.d("SpanWatcher",
+//                                 "Redo Image ID: ${actionToRedo!!.actionMultipartIdentifier}, " +
+//                                         "Cache keys: ${imageCache.keys}")
 
                              actionInterpreter.processImageSpanAction(actionToRedo!!,
                                  editTextView, false, imageData.first)
+                         }
+                     }
+
+                     actionToRedo!!.actionInfo == SpanType.BULLET_SPAN &&
+                             actionToRedo!!.actionIsMultipart -> {
+
+                         val customBullet =
+                             customBulletCache[actionToRedo!!.actionMultipartIdentifier!!]
+
+                         if (customBullet != null) {
+                             actionInterpreter.processCustomBulletAction(actionToRedo!!,
+                                 editTextView, false, customBullet)
                          }
                      }
 
