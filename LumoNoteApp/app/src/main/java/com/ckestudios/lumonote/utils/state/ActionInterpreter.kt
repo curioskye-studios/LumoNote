@@ -54,7 +54,7 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
                 action.actionEnd)
         }
 
-        editTextView.setSelection(action.actionEnd)
+        editTextView.setSelection(action.actionEnd.coerceAtMost(editTextView.text.length))
 
         textStateWatcher.setMakingInternalEdits(false)
     }

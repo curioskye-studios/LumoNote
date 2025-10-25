@@ -103,6 +103,15 @@ class NoteViewActivity : AppCompatActivity() {
     }
 
 
+    private fun updateModifiedDate(){
+
+        // Format: YYYY-MM-DD
+        val currentDate = LocalDate.parse(LocalDate.now().toString())
+        val convertedDate = GeneralTextHelper.formatDate(currentDate)
+        noteViewBinding.modifiedDateTV.text = convertedDate
+    }
+
+
     private fun runAutoSave(){
 
         stopAutoSave()
@@ -360,6 +369,8 @@ class NoteViewActivity : AppCompatActivity() {
 
             if (retrievedNote.noteTitle == title && retrievedNote.noteContent == content &&
                 retrievedNote.notePinned == pinned) return
+
+            updateModifiedDate()
 
             if (runningAutoSave) noteAppSharedViewModel.setIsNewNoteAsync(false)
             else noteAppSharedViewModel.setIsNewNote(false)
