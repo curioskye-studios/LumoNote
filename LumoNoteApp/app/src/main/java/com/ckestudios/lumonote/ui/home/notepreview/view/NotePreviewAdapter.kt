@@ -19,7 +19,6 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
     : RecyclerView.Adapter<NotePreviewAdapter.NotePreviewViewHolder>() {
 
     private val notesList = mutableListOf<Note>()
-    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
 
     // cache of highlighted/selected item, updated by notepreviewfragment
     private val areNotesPinned = mutableListOf<Boolean>()
@@ -59,7 +58,7 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
         holder.titlePreview.text = note.noteTitle
         holder.contentPreview.text = note.noteContent
         holder.pinPreview.tag = note.notePinned
-        generalButtonIVHelper.updatePinHighlight(holder.pinPreview, holder.pinPreview.context,
+        GeneralButtonIVHelper.updatePinHighlight(holder.pinPreview, holder.pinPreview.context,
             R.drawable.selected_background)
 
         //Log.d("NoteFrag", "pinnedPreview: ${holder.pinPreview.tag}")
@@ -83,7 +82,7 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
 
             whenCurrentNotePinClicked(!pinnedFlag, currentNoteID)
 
-            generalButtonIVHelper.updatePinHighlight(holder.pinPreview, holder.pinPreview.context,
+            GeneralButtonIVHelper.updatePinHighlight(holder.pinPreview, holder.pinPreview.context,
                 R.drawable.selected_background)
         }
     }

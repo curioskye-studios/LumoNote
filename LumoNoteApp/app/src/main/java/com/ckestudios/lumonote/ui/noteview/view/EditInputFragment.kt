@@ -17,7 +17,6 @@ import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditInputViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.state.ActionInterpreter
 import com.ckestudios.lumonote.utils.state.StateManager
 import com.ckestudios.lumonote.utils.state.TextStateWatcher
@@ -42,9 +41,6 @@ class EditInputFragment : Fragment() {
     private lateinit var editInputViewModel: EditInputViewModel
     private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
-
-    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
-    private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
 
     private lateinit var noteContentET: CustomSelectionET
     private lateinit var noteContentStateManager: StateManager
@@ -143,12 +139,12 @@ class EditInputFragment : Fragment() {
 
             imageButtonIV.setOnClickListener {
 
-                generalButtonIVHelper.playSelectionIndication(requireContext(),
+                GeneralButtonIVHelper.playSelectionIndication(requireContext(),
                     imageButtonIV)
 
                 pickImageLauncher.launch("image/*")
 
-                generalButtonIVHelper.highlightButtonIV(imageButtonIV, requireContext(),
+                GeneralButtonIVHelper.highlightButtonIV(imageButtonIV, requireContext(),
                     R.drawable.selected_background)
             }
 
@@ -189,14 +185,14 @@ class EditInputFragment : Fragment() {
 
                 if (isTrue) {
 
-                    generalButtonIVHelper.enableButtonIV(editInputViewBinding.textFormatButtonIV,
+                    GeneralButtonIVHelper.enableButtonIV(editInputViewBinding.textFormatButtonIV,
                         requireContext(), null)
 
                     // since automatically opens textformatter when editing
                     editInputViewModel.setTextFormatBtnActive(true)
                 } else {
 
-                    generalButtonIVHelper.disableButtonIV(editInputViewBinding.textFormatButtonIV,
+                    GeneralButtonIVHelper.disableButtonIV(editInputViewBinding.textFormatButtonIV,
                         requireContext())
                 }
 
@@ -241,7 +237,7 @@ class EditInputFragment : Fragment() {
 
                 if (editInputViewBinding.imageButtonIV.isEnabled) {
 
-                    generalButtonIVHelper.updateButtonIVHighlight(
+                    GeneralButtonIVHelper.updateButtonIVHighlight(
                         editInputViewBinding.imageButtonIV, isTrue, requireContext(), null,
                         R.drawable.selected_background)
                 }
@@ -251,7 +247,7 @@ class EditInputFragment : Fragment() {
 
                 if (editInputViewBinding.checkListButtonIV.isEnabled) {
 
-                    generalButtonIVHelper.updateButtonIVHighlight(
+                    GeneralButtonIVHelper.updateButtonIVHighlight(
                         editInputViewBinding.checkListButtonIV, isTrue, requireContext(), null,
                         R.drawable.selected_background)
                 }
@@ -261,7 +257,7 @@ class EditInputFragment : Fragment() {
 
                 if (editInputViewBinding.textFormatButtonIV.isEnabled) {
 
-                    generalButtonIVHelper.updateButtonIVHighlight(
+                    GeneralButtonIVHelper.updateButtonIVHighlight(
                         editInputViewBinding.textFormatButtonIV, isTrue, requireContext(), null,
                         R.drawable.selected_background)
                 }
@@ -271,7 +267,7 @@ class EditInputFragment : Fragment() {
 
                 if (editInputViewBinding.undoButtonIV.isEnabled) {
 
-                    generalButtonIVHelper.updateButtonIVHighlight(
+                    GeneralButtonIVHelper.updateButtonIVHighlight(
                         editInputViewBinding.undoButtonIV, isTrue, requireContext(),
                             R.color.light_grey_3, R.drawable.selected_background)
                 }
@@ -281,7 +277,7 @@ class EditInputFragment : Fragment() {
 
                 if (editInputViewBinding.redoButtonIV.isEnabled) {
 
-                    generalButtonIVHelper.updateButtonIVHighlight(
+                    GeneralButtonIVHelper.updateButtonIVHighlight(
                         editInputViewBinding.redoButtonIV, isTrue, requireContext(),
                             R.color.light_grey_3, R.drawable.selected_background)
                 }
@@ -307,11 +303,11 @@ class EditInputFragment : Fragment() {
 
         if (!hasImage && !hasText && isEditing && imageCountLessThanOne()) {
 
-            generalButtonIVHelper.enableButtonIV(editInputViewBinding.imageButtonIV,
+            GeneralButtonIVHelper.enableButtonIV(editInputViewBinding.imageButtonIV,
                 requireContext(), null)
         } else {
 
-            generalButtonIVHelper.disableButtonIV(editInputViewBinding.imageButtonIV,
+            GeneralButtonIVHelper.disableButtonIV(editInputViewBinding.imageButtonIV,
                 requireContext())
         }
     }
@@ -324,11 +320,11 @@ class EditInputFragment : Fragment() {
 
         if (selectionIsEmpty && !hasImage && isEditing) {
 
-            generalButtonIVHelper.enableButtonIV(editInputViewBinding.checkListButtonIV,
+            GeneralButtonIVHelper.enableButtonIV(editInputViewBinding.checkListButtonIV,
                 requireContext(), null)
         } else {
 
-            generalButtonIVHelper.disableButtonIV(editInputViewBinding.checkListButtonIV,
+            GeneralButtonIVHelper.disableButtonIV(editInputViewBinding.checkListButtonIV,
                 requireContext())
         }
 
@@ -347,12 +343,12 @@ class EditInputFragment : Fragment() {
 
             when (checkedState) {
                 ("☐") -> {
-                    generalButtonIVHelper.changeButtonIVImage(
+                    GeneralButtonIVHelper.changeButtonIVImage(
                         editInputViewBinding.checkListButtonIV,
                         R.drawable.check_box_outline_blank_24px)
                 }
                 ("☑") -> {
-                    generalButtonIVHelper.changeButtonIVImage(
+                    GeneralButtonIVHelper.changeButtonIVImage(
                         editInputViewBinding.checkListButtonIV,
                         R.drawable.check_box_24px)
                 }
@@ -361,7 +357,7 @@ class EditInputFragment : Fragment() {
         }
         else {
 
-            generalButtonIVHelper.changeButtonIVImage(editInputViewBinding.checkListButtonIV,
+            GeneralButtonIVHelper.changeButtonIVImage(editInputViewBinding.checkListButtonIV,
                 R.drawable.check_box_24px)
         }
 
@@ -376,13 +372,13 @@ class EditInputFragment : Fragment() {
 
         if (isEditing && !undoEmpty) {
 
-            generalButtonIVHelper.enableButtonIV(editInputViewBinding.undoButtonIV,
+            GeneralButtonIVHelper.enableButtonIV(editInputViewBinding.undoButtonIV,
                 requireContext(), R.color.light_grey_3)
 
             editInputViewModel.setUndoBtnActive(!noteContentStateManager.checkIfUndoEmpty())
         } else {
 
-            generalButtonIVHelper.disableButtonIV(editInputViewBinding.undoButtonIV,
+            GeneralButtonIVHelper.disableButtonIV(editInputViewBinding.undoButtonIV,
                 requireContext())
         }
     }
@@ -395,13 +391,13 @@ class EditInputFragment : Fragment() {
 
         if (isEditing && !redoEmpty) {
 
-            generalButtonIVHelper.enableButtonIV(editInputViewBinding.redoButtonIV,
+            GeneralButtonIVHelper.enableButtonIV(editInputViewBinding.redoButtonIV,
                 requireContext(), R.color.light_grey_3)
 2
             editInputViewModel.setRedoBtnActive(!noteContentStateManager.checkIfRedoEmpty())
         } else {
 
-            generalButtonIVHelper.disableButtonIV(editInputViewBinding.redoButtonIV,
+            GeneralButtonIVHelper.disableButtonIV(editInputViewBinding.redoButtonIV,
                 requireContext())
         }
     }

@@ -7,9 +7,7 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.ckestudios.lumonote.R
 
-class GeneralButtonIVHelper {
-
-    private val generalUIHelper = GeneralUIHelper()
+object GeneralButtonIVHelper {
 
     fun changeButtonIVResBackground(context: Context, buttonIV: ImageView, color: Int) {
 
@@ -33,7 +31,7 @@ class GeneralButtonIVHelper {
     fun changeBtnBackgroundRes(context: Context, buttonIV: ImageView, drawable: Int,
                                customColor: Int) {
 
-        buttonIV.background = generalUIHelper.getResourceDrawable(context, drawable,
+        buttonIV.background = GeneralUIHelper.getResourceDrawable(context, drawable,
             customColor)
     }
 

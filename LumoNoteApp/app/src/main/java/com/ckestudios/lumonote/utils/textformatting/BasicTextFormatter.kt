@@ -17,9 +17,6 @@ class BasicTextFormatter(override val editTextView: EditText,
     override lateinit var etvSpannableContent: Editable
     private var spanType: SpanType? = null
 
-    private val textFormatterHelper = TextFormatterHelper()
-    private val actionHelper = ActionHelper()
-
     private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
     private var multipartIdentifier: String? = null
 
@@ -53,7 +50,7 @@ class BasicTextFormatter(override val editTextView: EditText,
 
         normalizeFormatting()
 
-        textFormatterHelper.fixLineHeight(editTextView) // Keep line spacing consistent
+        TextFormatterHelper.fixLineHeight(editTextView) // Keep line spacing consistent
     }
 
 
@@ -154,13 +151,13 @@ class BasicTextFormatter(override val editTextView: EditText,
 
         if (newDesiredSpans != null) {
 
-            val sortedSpans = textFormatterHelper.sortSpans(newDesiredSpans,
+            val sortedSpans = TextFormatterHelper.sortSpans(newDesiredSpans,
                 etvSpannableContent)
 
-            multipartIdentifier = actionHelper.getMultipartIdentifier()
+            multipartIdentifier = ActionHelper.getMultipartIdentifier()
 
             // Combine adjacent or overlapping spans
-            textFormatterHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
+            TextFormatterHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
                 spanStateWatcher, multipartIdentifier, spanType!!, ::applyFormatting)
 
             multipartIdentifier = null

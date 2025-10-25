@@ -9,7 +9,7 @@ import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 
-class TextFormatterHelper {
+object TextFormatterHelper {
 
     fun getSelectionParagraphIndices(editTextView: EditText) : MutableList<Int>{
 

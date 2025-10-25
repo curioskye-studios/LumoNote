@@ -22,9 +22,7 @@ class SimpleImageFormatter(private val editTextView: EditText,
 
     private var etvSpannableContent: Editable = editTextView.text
 
-    private val textFormatterHelper = TextFormatterHelper()
     private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
-    private val actionHelper = ActionHelper()
 
     init {
 
@@ -43,7 +41,7 @@ class SimpleImageFormatter(private val editTextView: EditText,
 
         updateSpannableContent()
 
-        val (lineStart, lineEnd) = textFormatterHelper.getCurrentLineIndices(editTextView)
+        val (lineStart, lineEnd) = TextFormatterHelper.getCurrentLineIndices(editTextView)
 
         // Remove existing image in this line
         removeImageInRange(lineStart, lineEnd)
@@ -51,7 +49,7 @@ class SimpleImageFormatter(private val editTextView: EditText,
         // Insert the new image
         insertImage(imageUri)
 
-        textFormatterHelper.fixLineHeight(editTextView)
+        TextFormatterHelper.fixLineHeight(editTextView)
     }
 
 
@@ -93,7 +91,7 @@ class SimpleImageFormatter(private val editTextView: EditText,
             etvSpannableContent.getSpans(cursorPos+1, cursorPos+2, CustomImageSpan::class.java)
 
         // add image bitmap to cache too
-        val identifier = actionHelper.getMultipartIdentifier()
+        val identifier = ActionHelper.getMultipartIdentifier()
         stateManager.addImageToCache(adjustedBitmap, cursorPos+1, cursorPos+2, identifier)
 
         if (insertedImageSpan.isNotEmpty()) {

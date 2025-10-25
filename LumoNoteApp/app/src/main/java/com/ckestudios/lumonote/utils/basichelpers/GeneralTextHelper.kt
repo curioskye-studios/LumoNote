@@ -5,7 +5,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class GeneralTextHelper {
+object GeneralTextHelper {
 
     fun formatDate(date: LocalDate) : String {
 

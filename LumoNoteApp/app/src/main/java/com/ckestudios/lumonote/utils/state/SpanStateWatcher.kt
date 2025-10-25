@@ -11,8 +11,6 @@ import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.ChecklistSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
-import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
-import com.ckestudios.lumonote.utils.textformatting.TextFormatterHelper
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 class SpanStateWatcher(private val editTextView: EditText,
@@ -30,10 +28,6 @@ class SpanStateWatcher(private val editTextView: EditText,
 
     private var currH1SizeSpans = ArrayList<RelativeSizeSpan>()
     private var currH2SizeSpans = ArrayList<RelativeSizeSpan>()
-
-    private val textFormatterHelper = TextFormatterHelper()
-    private val generalUIHelper = GeneralUIHelper()
-    private val actionHelper = ActionHelper()
 
 
     fun addStyleSpan(span: Any, spanType: SpanType, isNormalization: Boolean,

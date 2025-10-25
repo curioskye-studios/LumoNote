@@ -7,7 +7,7 @@ import java.time.ZoneId
 import java.util.Date
 import kotlin.random.Random
 
-class BasicUtilityHelper {
+object BasicUtilityHelper {
 
     fun clearETViewFocusOnHideKeyboard(editTextView: CustomSelectionET, rootView: View){
 

@@ -10,7 +10,6 @@ import com.ckestudios.lumonote.databinding.FragmentTextFormatBinding
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
-import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.state.StateManager
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
@@ -35,16 +34,10 @@ class TextFormatFragment: Fragment() {
     private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
 
-    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
-    private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
-
     private lateinit var noteContentET: CustomSelectionET
     private lateinit var basicTextFormatter: BasicTextFormatter
     private lateinit var underlineTextFormatter: UnderlineTextFormatter
     private lateinit var bulletTextFormatter: BulletTextFormatter
-
-    private val textFormatterHelper = TextFormatterHelper()
-
 
     // Called when the Fragment is created (before the UI exists)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -113,12 +106,12 @@ class TextFormatFragment: Fragment() {
 
             inputSharedViewModel.setCurrentLineHasText(
 
-                textFormatterHelper.checkIfCurrentLineHasText(noteContentET)
+                TextFormatterHelper.checkIfCurrentLineHasText(noteContentET)
             )
 
             inputSharedViewModel.setCurrentLineHasImage(
 
-                textFormatterHelper.checkIfCurrentLineHasImage(noteContentET)
+                TextFormatterHelper.checkIfCurrentLineHasImage(noteContentET)
             )
         }
     }
@@ -136,7 +129,7 @@ class TextFormatFragment: Fragment() {
 
             shouldOpenFormatter.observe(viewLifecycleOwner){ shouldOpen ->
 
-                generalUIHelper.changeViewVisibility(
+                GeneralUIHelper.changeViewVisibility(
                     textFormatViewBinding.formatTextSectionRL, shouldOpen)
             }
         }

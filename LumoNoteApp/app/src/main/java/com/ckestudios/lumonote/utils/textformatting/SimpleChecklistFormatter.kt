@@ -13,7 +13,7 @@ class SimpleChecklistFormatter(private val editTextView: EditText,
 
     private lateinit var etvSpannableContent: Editable
     private var shouldRemoveChecklist = false
-    private val textFormatterHelper = TextFormatterHelper()
+
     private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
 
     private fun updateSpannableContent() {
@@ -30,7 +30,7 @@ class SimpleChecklistFormatter(private val editTextView: EditText,
 
         updateSpannableContent()
 
-        val paragraphIndices = textFormatterHelper.getSelectionParagraphIndices(editTextView)
+        val paragraphIndices = TextFormatterHelper.getSelectionParagraphIndices(editTextView)
 
         for (i in 0 until paragraphIndices.size - 1) {
 
@@ -124,7 +124,7 @@ class SimpleChecklistFormatter(private val editTextView: EditText,
 
         updateSpannableContent()
 
-        val (lineStart, lineEnd) = textFormatterHelper.getCurrentLineIndices(editTextView)
+        val (lineStart, lineEnd) = TextFormatterHelper.getCurrentLineIndices(editTextView)
 
         val line =  etvSpannableContent.substring(lineStart, lineEnd).trimStart()
 
@@ -141,7 +141,7 @@ class SimpleChecklistFormatter(private val editTextView: EditText,
 
         updateSpannableContent()
 
-        val (lineStart, lineEnd) = textFormatterHelper.getCurrentLineIndices(editTextView)
+        val (lineStart, lineEnd) = TextFormatterHelper.getCurrentLineIndices(editTextView)
 
         val line =  etvSpannableContent.substring(lineStart, lineEnd).trimStart()
 

@@ -6,8 +6,6 @@ import android.widget.EditText
 import com.ckestudios.lumonote.data.models.Action
 import com.ckestudios.lumonote.data.models.ActionType
 import com.ckestudios.lumonote.data.models.SpanType
-import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
-import com.ckestudios.lumonote.utils.textformatting.TextFormatterHelper
 
 class StateManager(private val editTextView: EditText) {
 
@@ -15,10 +13,7 @@ class StateManager(private val editTextView: EditText) {
     private val redoStack = ActionStateStack()
     private var isNewAction = false
 
-    private val textFormatterHelper = TextFormatterHelper()
-    private val generalUIHelper = GeneralUIHelper()
     private lateinit var actionInterpreter: ActionInterpreter
-    private val actionHelper = ActionHelper()
 
     private var actionToUndo: Action? = null
     private var actionToRedo: Action? = null

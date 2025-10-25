@@ -7,6 +7,7 @@ import android.widget.EditText
 import com.ckestudios.lumonote.data.models.BulletType
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
+import com.ckestudios.lumonote.utils.state.ActionHelper
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 import com.ckestudios.lumonote.utils.state.StateManager
 
@@ -19,7 +20,6 @@ class BulletTextFormatter(
     private var bulletType: BulletType? = null
     private var customBullet: String? = null
 
-    private val textFormatterHelper = TextFormatterHelper()
     private val spanStateManager = SpanStateWatcher(editTextView, stateManager)
 
     override fun updateSpannableContent() {
@@ -64,7 +64,7 @@ class BulletTextFormatter(
             assessProcessMethod(selectStart, selectEnd)
         }
 
-        textFormatterHelper.fixLineHeight(editTextView)
+        TextFormatterHelper.fixLineHeight(editTextView)
 
         normalizeFormatting()
     }
@@ -89,7 +89,7 @@ class BulletTextFormatter(
     private fun assessProcessMethod(selectStart: Int, selectEnd: Int) {
 
         val paragraphIndices =
-            textFormatterHelper.getSelectionParagraphIndices(editTextView)
+            TextFormatterHelper.getSelectionParagraphIndices(editTextView)
 
         for (index in 0 until paragraphIndices.size - 1) {
 
@@ -166,8 +166,17 @@ class BulletTextFormatter(
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
 
+            if (bulletType == BulletType.DEFAULT) {
+                spanStateManager.addStyleSpan(bulletSpan, SpanType.BULLET_SPAN, false,
+                    null)
+                return
+            }
+
+            val identifier = ActionHelper.getMultipartIdentifier()
             spanStateManager.addStyleSpan(bulletSpan, SpanType.BULLET_SPAN, false,
-                null)
+                identifier)
+
+
         }
 
     }

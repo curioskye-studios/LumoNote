@@ -13,7 +13,6 @@ import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.state.StateManager
 import com.ckestudios.lumonote.utils.textformatting.SizeTextFormatter
 
@@ -26,9 +25,6 @@ class SizeFormatFragment: Fragment() {
 
     private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
-
-    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
-    private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
 
     private lateinit var noteContentET: CustomSelectionET
     private lateinit var sizeTextFormatter: SizeTextFormatter
@@ -132,19 +128,19 @@ class SizeFormatFragment: Fragment() {
 
                 if (hasImage) {
 
-                    generalButtonIVHelper.disableButtonIV(sizeFormatViewBinding.normalTextButtonIV,
+                    GeneralButtonIVHelper.disableButtonIV(sizeFormatViewBinding.normalTextButtonIV,
                         requireContext())
-                    generalButtonIVHelper.disableButtonIV(sizeFormatViewBinding.h1ButtonIV,
+                    GeneralButtonIVHelper.disableButtonIV(sizeFormatViewBinding.h1ButtonIV,
                         requireContext())
-                    generalButtonIVHelper.disableButtonIV(sizeFormatViewBinding.h2ButtonIV,
+                    GeneralButtonIVHelper.disableButtonIV(sizeFormatViewBinding.h2ButtonIV,
                         requireContext())
                 } else {
 
-                    generalButtonIVHelper.enableButtonIV(sizeFormatViewBinding.normalTextButtonIV,
+                    GeneralButtonIVHelper.enableButtonIV(sizeFormatViewBinding.normalTextButtonIV,
                         requireContext(), null)
-                    generalButtonIVHelper.enableButtonIV(sizeFormatViewBinding.h1ButtonIV,
+                    GeneralButtonIVHelper.enableButtonIV(sizeFormatViewBinding.h1ButtonIV,
                         requireContext(), null)
-                    generalButtonIVHelper.enableButtonIV(sizeFormatViewBinding.h2ButtonIV,
+                    GeneralButtonIVHelper.enableButtonIV(sizeFormatViewBinding.h2ButtonIV,
                         requireContext(), null)
 
                     updateSizeButtons()
@@ -161,20 +157,20 @@ class SizeFormatFragment: Fragment() {
 
             isNormalSized.observe(viewLifecycleOwner) {
 
-                generalButtonIVHelper.updateButtonIVHighlight(
+                GeneralButtonIVHelper.updateButtonIVHighlight(
                     sizeFormatViewBinding.normalTextButtonIV, it, requireContext(), null,
                     R.drawable.selected_background)
             }
 
             isHeader1Sized.observe(viewLifecycleOwner) {
 
-                generalButtonIVHelper.updateButtonIVHighlight(sizeFormatViewBinding.h1ButtonIV,
+                GeneralButtonIVHelper.updateButtonIVHighlight(sizeFormatViewBinding.h1ButtonIV,
                     it, requireContext(), null, R.drawable.selected_background)
             }
 
             isHeader2Sized.observe(viewLifecycleOwner) {
 
-                generalButtonIVHelper.updateButtonIVHighlight(sizeFormatViewBinding.h2ButtonIV,
+                GeneralButtonIVHelper.updateButtonIVHighlight(sizeFormatViewBinding.h2ButtonIV,
                     it, requireContext(), null, R.drawable.selected_background)
             }
         }

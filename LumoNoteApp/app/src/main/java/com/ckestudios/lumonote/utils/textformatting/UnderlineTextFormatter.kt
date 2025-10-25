@@ -19,9 +19,6 @@ class UnderlineTextFormatter(
 
     override lateinit var etvSpannableContent: Editable
 
-    private val textFormatterHelper = TextFormatterHelper()
-    private val actionHelper = ActionHelper()
-
     private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
     private var multipartIdentifier: String? = null
 
@@ -130,13 +127,13 @@ class UnderlineTextFormatter(
 
         if (newUnderlineSpans != null) {
 
-            val sortedSpans = textFormatterHelper.sortSpans(newUnderlineSpans,
+            val sortedSpans = TextFormatterHelper.sortSpans(newUnderlineSpans,
                 etvSpannableContent)
 
-            multipartIdentifier = actionHelper.getMultipartIdentifier()
+            multipartIdentifier = ActionHelper.getMultipartIdentifier()
 
             // Combine adjacent or overlapping spans
-            textFormatterHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
+            TextFormatterHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
                 spanStateWatcher, multipartIdentifier, SpanType.UNDERLINE_SPAN, ::applyFormatting)
 
             multipartIdentifier = null

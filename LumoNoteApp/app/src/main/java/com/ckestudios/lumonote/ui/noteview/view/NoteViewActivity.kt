@@ -28,16 +28,11 @@ import kotlin.concurrent.timer
 class NoteViewActivity : AppCompatActivity() {
 
     private lateinit var noteViewBinding: ActivityNoteViewBinding
-    private val generalTextHelper: GeneralTextHelper = GeneralTextHelper()
-    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
 
     // Stores reference to id of current note being updated, stays -1 if not found
     private var noteID: Int = -1
     private var existingNoteClicked: Boolean = false
     private lateinit var retrievedNote: Note
-
-    private val basicUtilityHelper = BasicUtilityHelper()
-    private val generalUIHelper = GeneralUIHelper()
 
     private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
@@ -89,9 +84,9 @@ class NoteViewActivity : AppCompatActivity() {
 
         // Setup Functionality
 
-        basicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteTitleET,
+        BasicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteTitleET,
             noteViewBinding.root)
-        basicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteEditContentET,
+        BasicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteEditContentET,
             noteViewBinding.root)
 
         runAutoSave()
@@ -176,7 +171,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             // Parse the modified date as a date object
             val convertedDate = LocalDate.parse(retrievedNote.noteModifiedDate);
-            val retrievedNoteDate = generalTextHelper.formatDate(convertedDate)
+            val retrievedNoteDate = GeneralTextHelper.formatDate(convertedDate)
 
             Log.d("noteData", retrievedNote.notePinned.toString())
 
@@ -187,14 +182,14 @@ class NoteViewActivity : AppCompatActivity() {
 
             noteViewBinding.pinButtonIV.tag = retrievedNote.notePinned
 
-            generalButtonIVHelper.updatePinHighlight(noteViewBinding.pinButtonIV, this,
+            GeneralButtonIVHelper.updatePinHighlight(noteViewBinding.pinButtonIV, this,
                 R.drawable.selected_background)
         }
 
         else {
 
             // Display the modified date as current date
-            noteViewBinding.modifiedDateTV.text = generalTextHelper.formatDate(LocalDate.now())
+            noteViewBinding.modifiedDateTV.text = GeneralTextHelper.formatDate(LocalDate.now())
 
             // set isPinned to false
             noteViewBinding.pinButtonIV.tag = false
@@ -207,7 +202,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             backButtonIV.setOnClickListener {
 
-                generalButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
+                GeneralButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
                     backButtonIV)
 
                 runningManualSave = true
@@ -220,7 +215,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             deleteButtonIV.setOnClickListener {
 
-                generalButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
+                GeneralButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
                     deleteButtonIV)
 
                 noteAppSharedViewModel.deleteNote(noteID)
@@ -239,7 +234,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             saveButtonIV.setOnClickListener {
 
-                generalButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
+                GeneralButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
                     saveButtonIV)
 
                 runningManualSave = true
@@ -257,10 +252,10 @@ class NoteViewActivity : AppCompatActivity() {
 
                     if (!(retrievedNote.noteTitle == title && retrievedNote.noteContent == content &&
                         retrievedNote.notePinned == pinned)) {
-                        generalUIHelper.displayFeedbackToast(this@NoteViewActivity,
+                        GeneralUIHelper.displayFeedbackToast(this@NoteViewActivity,
                             "Changes Saved", false)
                     } else {
-                        generalUIHelper.displayFeedbackToast(this@NoteViewActivity,
+                        GeneralUIHelper.displayFeedbackToast(this@NoteViewActivity,
                             "Up to date", false)
                     }
                 }
@@ -268,7 +263,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             saveCloseButtonIV.setOnClickListener {
 
-                generalButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
+                GeneralButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
                     saveCloseButtonIV)
 
                 runningManualSave = true
@@ -307,7 +302,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             currentNotePinned.observe(this@NoteViewActivity){ currentlyPinned ->
 
-                generalButtonIVHelper.updatePinHighlight(noteViewBinding.pinButtonIV,
+                GeneralButtonIVHelper.updatePinHighlight(noteViewBinding.pinButtonIV,
                     this@NoteViewActivity, R.drawable.selected_background)
 
                 val pinStateFeedback =
@@ -315,7 +310,7 @@ class NoteViewActivity : AppCompatActivity() {
 
                     else { "Note Unpinned" }
 
-                generalUIHelper.displayFeedbackToast(this@NoteViewActivity,
+                GeneralUIHelper.displayFeedbackToast(this@NoteViewActivity,
                     pinStateFeedback, false)
             }
         }
@@ -379,7 +374,7 @@ class NoteViewActivity : AppCompatActivity() {
                 // switch to main thread
                 Handler(Looper.getMainLooper()).post {
 
-                    generalUIHelper.displayFeedbackToast(this, "Auto saved",
+                    GeneralUIHelper.displayFeedbackToast(this, "Auto saved",
                         false)
                 }
             }
@@ -405,7 +400,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             if (isTrue && runningManualSave && closeNote) {
 
-                generalUIHelper.closeActivityWithFeedback("Note Created", this,
+                GeneralUIHelper.closeActivityWithFeedback("Note Created", this,
                     this, true)
             }
         }
@@ -414,7 +409,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             if (isTrue && runningManualSave && closeNote) {
 
-                generalUIHelper.closeActivityWithFeedback("Note Updated", this,
+                GeneralUIHelper.closeActivityWithFeedback("Note Updated", this,
                     this, true)
             }
         }
@@ -423,7 +418,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             if (isTrue) {
 
-                generalUIHelper.closeActivityWithFeedback("Note Deleted", this,
+                GeneralUIHelper.closeActivityWithFeedback("Note Deleted", this,
                     this, true)
             }
         }

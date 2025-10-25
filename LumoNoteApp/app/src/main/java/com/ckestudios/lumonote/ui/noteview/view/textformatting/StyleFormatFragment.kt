@@ -15,7 +15,6 @@ import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.state.StateManager
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.BulletTextFormatter
@@ -32,15 +31,10 @@ class StyleFormatFragment: Fragment() {
     private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
 
-    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
-    private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
-
     private lateinit var noteContentET: CustomSelectionET
     private lateinit var basicTextFormatter: BasicTextFormatter
     private lateinit var underlineTextFormatter: UnderlineTextFormatter
     private lateinit var bulletTextFormatter: BulletTextFormatter
-
-    private val textFormatterHelper = TextFormatterHelper()
 
 
     // Called when the Fragment is created (before the UI exists)
@@ -155,10 +149,10 @@ class StyleFormatFragment: Fragment() {
 
         styleFormatViewBinding.clearFormatsButtonIV.setOnClickListener {
 
-            generalButtonIVHelper.playSelectionIndication(requireContext(),
+            GeneralButtonIVHelper.playSelectionIndication(requireContext(),
                 styleFormatViewBinding.clearFormatsButtonIV)
 
-            textFormatterHelper.clearBasicFormatting(noteContentET.selectionStart,
+            TextFormatterHelper.clearBasicFormatting(noteContentET.selectionStart,
                 noteContentET.selectionEnd, noteContentET.text!!)
 
             editContentSharedViewModel.setIsBold(false)
@@ -212,28 +206,28 @@ class StyleFormatFragment: Fragment() {
 
             isBold.observe(viewLifecycleOwner) { isTrue ->
 
-                generalButtonIVHelper.updateButtonIVHighlight(
+                GeneralButtonIVHelper.updateButtonIVHighlight(
                     styleFormatViewBinding.boldButtonIV, isTrue, requireContext(), null,
                     R.drawable.selected_background)
             }
 
             isItalics.observe(viewLifecycleOwner) { isTrue ->
 
-                generalButtonIVHelper.updateButtonIVHighlight(
+                GeneralButtonIVHelper.updateButtonIVHighlight(
                     styleFormatViewBinding.italicsButtonIV, isTrue, requireContext(), null,
                     R.drawable.selected_background)
             }
 
             isUnderlined.observe(viewLifecycleOwner) { isTrue ->
 
-                generalButtonIVHelper.updateButtonIVHighlight(
+                GeneralButtonIVHelper.updateButtonIVHighlight(
                     styleFormatViewBinding.underlineButtonIV, isTrue, requireContext(), null,
                     R.drawable.selected_background)
             }
 
             isBulleted.observe(viewLifecycleOwner){ isTrue ->
 
-                generalButtonIVHelper.updateButtonIVHighlight(
+                GeneralButtonIVHelper.updateButtonIVHighlight(
                     styleFormatViewBinding.bulletButtonIV, isTrue, requireContext(), null,
                     R.drawable.selected_background)
             }
@@ -248,11 +242,11 @@ class StyleFormatFragment: Fragment() {
 
         if (!hasImage && hasText) {
 
-            generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.bulletButtonIV,
+            GeneralButtonIVHelper.enableButtonIV(styleFormatViewBinding.bulletButtonIV,
                 requireContext(), null)
         } else {
 
-            generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.bulletButtonIV,
+            GeneralButtonIVHelper.disableButtonIV(styleFormatViewBinding.bulletButtonIV,
                 requireContext())
         }
     }
@@ -266,23 +260,23 @@ class StyleFormatFragment: Fragment() {
 
         if (selectionIsEmpty || hasImage) {
 
-            generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.clearFormatsButtonIV,
+            GeneralButtonIVHelper.disableButtonIV(styleFormatViewBinding.clearFormatsButtonIV,
                 requireContext())
-            generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.boldButtonIV,
+            GeneralButtonIVHelper.disableButtonIV(styleFormatViewBinding.boldButtonIV,
                 requireContext())
-            generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.italicsButtonIV,
+            GeneralButtonIVHelper.disableButtonIV(styleFormatViewBinding.italicsButtonIV,
                 requireContext())
-            generalButtonIVHelper.disableButtonIV(styleFormatViewBinding.underlineButtonIV,
+            GeneralButtonIVHelper.disableButtonIV(styleFormatViewBinding.underlineButtonIV,
                 requireContext())
         } else {
 
-            generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.clearFormatsButtonIV,
+            GeneralButtonIVHelper.enableButtonIV(styleFormatViewBinding.clearFormatsButtonIV,
                 requireContext(), null)
-            generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.boldButtonIV,
+            GeneralButtonIVHelper.enableButtonIV(styleFormatViewBinding.boldButtonIV,
                 requireContext(), null)
-            generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.italicsButtonIV,
+            GeneralButtonIVHelper.enableButtonIV(styleFormatViewBinding.italicsButtonIV,
                 requireContext(), null)
-            generalButtonIVHelper.enableButtonIV(styleFormatViewBinding.underlineButtonIV,
+            GeneralButtonIVHelper.enableButtonIV(styleFormatViewBinding.underlineButtonIV,
                 requireContext(), null)
 
             updateUnderlineActive()

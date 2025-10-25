@@ -11,7 +11,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 
-class GeneralUIHelper {
+object GeneralUIHelper {
 
     fun getResourceDrawable(context: Context, drawable: Int, customColor: Int): Drawable? {
 

@@ -15,8 +15,6 @@ import com.ckestudios.lumonote.utils.textformatting.TextFormatterHelper
 class ImageLineTextWatcher(private val editTextView: EditText,
                            private val stateManager: StateManager) : TextWatcher {
 
-    private val textFormatterHelper = TextFormatterHelper()
-
     // Internal flag to prevent recursive edits
     private var internalEdit = false
 
@@ -44,7 +42,7 @@ class ImageLineTextWatcher(private val editTextView: EditText,
         val cursor = editTextView.selectionStart
         if (cursor < 0) return
 
-        val (lineStart, lineEnd) = textFormatterHelper.getCurrentLineIndices(editTextView)
+        val (lineStart, lineEnd) = TextFormatterHelper.getCurrentLineIndices(editTextView)
 
         var imageSpans =
             checkLineForImages(etvContentSpannable, lineStart, lineEnd)
@@ -69,14 +67,16 @@ class ImageLineTextWatcher(private val editTextView: EditText,
 
             imageSpans = checkLineForImages(etvContentSpannable, lineStart, lineEnd)
 
-
+            // if image spans is empty, means the user just deleted the image.
+            // possibility for this be committed as an REMOVE action with bitmap
+            // for accurate tracking here
 
             internalEdit = false
 
             // Jump to next line
             editTextView.setSelection((lineEnd).coerceAtMost(etvContentSpannable.length))
 
-            textFormatterHelper.fixLineHeight(editTextView)
+            TextFormatterHelper.fixLineHeight(editTextView)
         }
     }
 

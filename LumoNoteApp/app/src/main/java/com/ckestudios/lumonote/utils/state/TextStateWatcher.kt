@@ -9,7 +9,6 @@ import com.ckestudios.lumonote.data.models.Action
 import com.ckestudios.lumonote.data.models.ActionPerformed
 import com.ckestudios.lumonote.data.models.ActionType
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
-import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
 import java.util.Timer
 import kotlin.concurrent.timer
 
@@ -26,9 +25,6 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
 
     private var saveChangesOnPauseTimer: Timer? = null
     private var uiRefreshTimer: Timer? = null
-
-    private val actionHelper = ActionHelper()
-    private val generalTextHelper = GeneralTextHelper()
 
     init {
 
@@ -233,7 +229,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
             // REPLACE → user replaced text segment
             oldSegment.isNotEmpty() && newSegment.isNotEmpty() -> {
 
-                val multipartIdentifier = actionHelper.getMultipartIdentifier()
+                val multipartIdentifier = ActionHelper.getMultipartIdentifier()
 
                 val removeAction = Action(
                     ActionPerformed.REMOVE,

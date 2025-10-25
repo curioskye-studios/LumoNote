@@ -15,8 +15,6 @@ class SizeTextFormatter(override val editTextView: EditText,
     override lateinit var etvSpannableContent: Editable
     private var sizeType: TextSize? = null
 
-    private val textFormatterHelper = TextFormatterHelper()
-
 
     override fun updateSpannableContent() {
 
@@ -41,7 +39,7 @@ class SizeTextFormatter(override val editTextView: EditText,
 
         assessProcessMethod(relativeSizeSpans, shouldApplyCheck)
 
-        textFormatterHelper.fixLineHeight(editTextView)
+        TextFormatterHelper.fixLineHeight(editTextView)
     }
 
     override fun getSelectionSpans(selectStart: Int, selectEnd: Int)
@@ -67,7 +65,7 @@ class SizeTextFormatter(override val editTextView: EditText,
     private fun assessProcessMethod(spansList: Array<RelativeSizeSpan>, shouldApply: Boolean) {
 
         val paragraphIndices =
-            textFormatterHelper.getSelectionParagraphIndices(editTextView)
+            TextFormatterHelper.getSelectionParagraphIndices(editTextView)
 
         if (paragraphIndices.size == 2) {
 

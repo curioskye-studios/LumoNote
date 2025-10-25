@@ -15,7 +15,6 @@ import com.ckestudios.lumonote.ui.noteview.view.NoteViewActivity
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
-import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import java.time.LocalDate
@@ -35,11 +34,6 @@ class CalendarViewFragment : Fragment() {
     private val calendarViewBinding get() = _calendarViewBinding!!
 
     private lateinit var calendarNotePreviewAdapter: CalendarNotePreviewAdapter
-
-    private val generalButtonIVHelper: GeneralButtonIVHelper = GeneralButtonIVHelper()
-    private val generalUIHelper: GeneralUIHelper = GeneralUIHelper()
-    private val generalTextHelper: GeneralTextHelper = GeneralTextHelper()
-    private val basicUtilityHelper: BasicUtilityHelper = BasicUtilityHelper()
 
     private lateinit var calendarViewModel: CalendarViewModel
     private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
@@ -75,7 +69,7 @@ class CalendarViewFragment : Fragment() {
 
         // Initialize calendar selected date
         val todayCurrentDate = Date()
-        val todayCurrentLocalDate = basicUtilityHelper.convertDateToLocalDate(Date())
+        val todayCurrentLocalDate = BasicUtilityHelper.convertDateToLocalDate(Date())
 
         calendarViewBinding.calendarDateSelectorKV.setInitialSelectedDate(todayCurrentDate)
         calendarViewModel.setSelectedDate(todayCurrentLocalDate)
@@ -145,7 +139,7 @@ class CalendarViewFragment : Fragment() {
         calendarViewBinding.calendarDateSelectorKV.setDateSelector { selectedDate ->
 
             val selectedDateAsLocalDate =
-                basicUtilityHelper.convertDateToLocalDate(selectedDate)
+                BasicUtilityHelper.convertDateToLocalDate(selectedDate)
 
             calendarViewModel.setSelectedDate(selectedDateAsLocalDate)
         }
@@ -176,7 +170,7 @@ class CalendarViewFragment : Fragment() {
                     calendarViewBinding.selectedDateTV.text = "Today"
                 } else {
 
-                    val dateWithWeekDay = generalTextHelper.formatDate(date)
+                    val dateWithWeekDay = GeneralTextHelper.formatDate(date)
 
                     val dateNoWeekday =  dateWithWeekDay.substring(5)
 
@@ -188,7 +182,7 @@ class CalendarViewFragment : Fragment() {
 
             dateHasNotes.observe(viewLifecycleOwner) { hasNotes ->
 
-                generalUIHelper.changeViewVisibility(calendarViewBinding.noNotesMessageTV,
+                GeneralUIHelper.changeViewVisibility(calendarViewBinding.noNotesMessageTV,
                         !hasNotes)
             }
 
