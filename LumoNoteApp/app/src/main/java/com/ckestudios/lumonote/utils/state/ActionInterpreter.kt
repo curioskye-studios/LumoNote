@@ -91,10 +91,8 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
 
         when (actionPerformed) {
 
-            ActionPerformed.ADD -> {
-
+            ActionPerformed.ADD ->
                 addStyleSpan(spanType, action.actionStart, action.actionEnd, editTextView)
-            }
 
             ActionPerformed.REMOVE ->
                 removeStyleSpan(spanType, action.actionStart, action.actionEnd, editTextView)
@@ -122,7 +120,7 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
 
             SpanType.IMAGE_SPAN -> null
 
-            SpanType.CHECKLIST_SPAN -> null
+            SpanType.CHECKLIST_SPAN -> ChecklistSpan(editTextView.context)
         }
 
         if (setSpan != null) {
@@ -141,15 +139,17 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
 
         val spanList = getDesiredStyleSpans(spanType, editTextView)
 
-
         if (spanList != null) {
 
             for (span in spanList) {
 
                 val spanStart = editTextView.text.getSpanStart(span)
+
                 val spanEnd = editTextView.text.getSpanEnd(span)
 
-                if (spanStart == targetSpanStart && spanEnd == targetSpanEnd) {
+
+                if ((spanStart == targetSpanStart && spanEnd == targetSpanEnd) ||
+                        (spanType == SpanType.CHECKLIST_SPAN && spanEnd == targetSpanEnd)) {
 
                     editTextView.text.removeSpan(span)
                 }

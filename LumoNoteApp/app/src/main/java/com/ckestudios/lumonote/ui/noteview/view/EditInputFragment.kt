@@ -17,6 +17,7 @@ import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditInputViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.state.ActionInterpreter
 import com.ckestudios.lumonote.utils.state.StateManager
 import com.ckestudios.lumonote.utils.state.TextStateWatcher
@@ -47,7 +48,6 @@ class EditInputFragment : Fragment() {
     private lateinit var noteContentTextWatcher: TextStateWatcher
     private lateinit var simpleChecklistFormatter: SimpleChecklistFormatter
     private lateinit var simpleImageFormatter: SimpleImageFormatter
-//    private lateinit var imageLineGuard: ImageLineGuard
 
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>
     private var pickImage: Uri? = null
@@ -134,6 +134,14 @@ class EditInputFragment : Fragment() {
                 simpleChecklistFormatter.processFormatting()
 
                 updateChecklistActive()
+
+                val checkedState =
+                    simpleChecklistFormatter.getCheckedState(noteContentET.selectionStart)
+
+                 if (checkedState == "☐") {
+                     GeneralUIHelper.displayFeedbackToast(
+                         requireContext(), "Tap again to tick as done", false)
+                 }
             }
 
 

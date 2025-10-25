@@ -91,13 +91,17 @@ class StateManager(private val editTextView: EditText) {
         cacheCleanUp(customBulletCache)
 
         val lastUndoAction = undoStack.getTopActionOfStack()
+        var checklistUndoSpan: Action? = null
 
         val inRedoStack = redoStack.getStackContents().contains(undoAction)
+        val imageAdded = ActionHelper.imageWasJustAdded(lastUndoAction, undoAction)
+        val checklistAdded =
+            ActionHelper.checklistWasJustAdded(undoAction, undoStack.getStackContents())
 
         if (!inRedoStack) { clearRedoStack() }
 
 
-        if (ActionHelper.imageWasJustAdded(lastUndoAction, undoAction)) {
+        if (imageAdded) {
 
             undoAction.actionIsMultipart = true
             undoAction.actionMultipartIdentifier = lastUndoAction!!.actionMultipartIdentifier
@@ -106,11 +110,37 @@ class StateManager(private val editTextView: EditText) {
             undoStack.popActionFromStack()
         }
 
+        if (checklistAdded) {
+
+            val undoContents = undoStack.getStackContents()
+            val checklistSpanPos =
+                undoContents.indexOfFirst { it.actionInfo == SpanType.CHECKLIST_SPAN }
+
+            if (checklistSpanPos != -1) {
+                undoContents[checklistSpanPos].actionIsMultipart = true
+                undoContents[checklistSpanPos].actionMultipartIdentifier =
+                    undoAction.actionMultipartIdentifier
+            }
+
+            // reverse the order of the actions since checklist span registered first
+            undoStack.popActionFromStack()
+            checklistUndoSpan = undoStack.getTopActionOfStack()
+            undoStack.popActionFromStack()
+
+            if (lastUndoAction != null) {
+                undoStack.pushActionToStack(lastUndoAction)
+            }
+        }
+
         undoStack.pushActionToStack(undoAction)
 
-        if (lastUndoAction != null && ActionHelper.imageWasJustAdded(lastUndoAction, undoAction)) {
+        if (lastUndoAction != null && imageAdded) {
 
             undoStack.pushActionToStack(lastUndoAction)
+        }
+        if (checklistUndoSpan != null) {
+
+            undoStack.pushActionToStack(checklistUndoSpan)
         }
 
         Log.d("SpanWatcher", "undoAdd: $undoAction")
@@ -184,19 +214,14 @@ class StateManager(private val editTextView: EditText) {
 
             if (topAction == null) return
 
-            Log.d("SpanWatcher", "Point 1")
-            Log.d("SpanWatcher", "currenttopAction: $topAction")
-
             currentMultipartIdentifier = topAction.actionMultipartIdentifier ?: return
 
-            Log.d("SpanWatcher", "firstMultipartIdentifier: $firstMultipartIdentifier")
-            Log.d("SpanWatcher", "currentMultipartIdentifier: $currentMultipartIdentifier")
+//            Log.d("SpanWatcher", "firstMultipartIdentifier: $firstMultipartIdentifier")
+//            Log.d("SpanWatcher", "currentMultipartIdentifier: $currentMultipartIdentifier")
 
             if (currentMultipartIdentifier != firstMultipartIdentifier) return
 
             performRedo(topAction)
-
-            Log.d("SpanWatcher", "Point 2")
         }
     }
 

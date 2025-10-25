@@ -24,16 +24,26 @@ object ActionHelper {
 
         return if (spanUndoAction == null) { false }
 
-        else if (spanUndoAction.actionInfo is SpanType && textUndoAction.actionInfo is String) {
+        else if (spanUndoAction.actionInfo == SpanType.IMAGE_SPAN && textUndoAction.actionInfo is String) {
 
             val imagePlaceHolder = "￼"
 
-            spanUndoAction.actionInfo == SpanType.IMAGE_SPAN &&
-                    textUndoAction.actionInfo == imagePlaceHolder &&
-                    spanUndoAction.actionStart == textUndoAction.actionStart &&
-                    spanUndoAction.actionEnd == textUndoAction.actionEnd
+            // return this check
+            textUndoAction.actionInfo == imagePlaceHolder &&
+            spanUndoAction.actionStart == textUndoAction.actionStart &&
+            spanUndoAction.actionEnd == textUndoAction.actionEnd
         }
 
         else { false }
     }
+
+    fun checklistWasJustAdded(textUndoAction: Action, actionList: ArrayList<Action>) : Boolean {
+
+        val allIdentifiers: List<String?> = actionList.map { it.actionMultipartIdentifier }
+
+        return allIdentifiers.count { it == textUndoAction.actionMultipartIdentifier } == 1 &&
+            actionList.any { it.actionInfo == SpanType.CHECKLIST_SPAN}
+    }
+
+
 }
