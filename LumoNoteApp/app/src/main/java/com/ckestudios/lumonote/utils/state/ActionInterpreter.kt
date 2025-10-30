@@ -115,13 +115,16 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
 
             SpanType.UNDERLINE_SPAN -> UnderlineTextFormatter.CustomUnderlineSpan()
 
-            SpanType.BULLET_SPAN ->
+            SpanType.BULLET_SPAN -> {
+                removeStyleSpan(spanType, spanStart, spanEnd, editTextView)
                 CustomBulletSpan(30, 6f, BulletType.DEFAULT, null)
+            }
 
             SpanType.IMAGE_SPAN -> null
 
             SpanType.CHECKLIST_SPAN -> ChecklistSpan(editTextView.context)
         }
+
 
         if (setSpan != null) {
 

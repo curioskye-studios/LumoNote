@@ -244,6 +244,7 @@ class StyleFormatFragment: Fragment() {
 
             GeneralButtonIVHelper.enableButtonIV(styleFormatViewBinding.bulletButtonIV,
                 requireContext(), null)
+            updateBulletedActive()
         } else {
 
             GeneralButtonIVHelper.disableButtonIV(styleFormatViewBinding.bulletButtonIV,
