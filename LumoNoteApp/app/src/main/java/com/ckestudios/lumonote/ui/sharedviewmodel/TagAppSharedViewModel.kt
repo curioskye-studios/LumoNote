@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.ckestudios.lumonote.data.database.TagRepository
+import com.ckestudios.lumonote.data.repository.TagRepository
 import com.ckestudios.lumonote.data.models.Tag
 import kotlinx.coroutines.launch
 

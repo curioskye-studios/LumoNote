@@ -1,11 +1,13 @@
-package com.ckestudios.lumonote.data.database
+package com.ckestudios.lumonote.data.repository
 
 import android.content.Context
+import com.ckestudios.lumonote.data.database.DatabaseHelper
 import com.ckestudios.lumonote.data.models.Item
 
-class NoteTagRepository (context: Context) : Repository {
+class TaggedRepository (context: Context) : Repository {
 
     private val dbConnection = DatabaseHelper(context)
+
     override fun getItems(): List<Item> {
         TODO("Not yet implemented")
     }

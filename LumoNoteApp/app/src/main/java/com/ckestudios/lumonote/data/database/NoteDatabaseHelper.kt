@@ -37,7 +37,7 @@ class NoteDatabaseHelper (
 
         val notesList = mutableListOf<Note>()
 
-        val query = "SELECT * FROM ${noteTableName}"
+        val query = "SELECT * FROM $noteTableName"
         val cursor = db.rawQuery(query, null)
 
         /*
@@ -46,7 +46,6 @@ class NoteDatabaseHelper (
          */
         while (cursor.moveToNext()) {
 
-            // Collect each note record from the database
             val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
             val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
             val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
@@ -69,8 +68,7 @@ class NoteDatabaseHelper (
 
         val notesList = mutableListOf<Note>()
 
-        // Query notes where created date matches the given date
-        val query = "SELECT * FROM ${noteTableName} WHERE ${noteCreatedColumn} = ?"
+        val query = "SELECT * FROM $noteTableName WHERE $noteCreatedColumn = ?"
         val cursor = db.rawQuery(query, arrayOf(date))
 
         while (cursor.moveToNext()) {
@@ -102,7 +100,7 @@ class NoteDatabaseHelper (
             put(notePinnedColumn, note.notePinned.toString())
         }
 
-        val whereClause = "${noteIDColumn} = ?"
+        val whereClause = "$noteIDColumn = ?"
         val whereArgs = arrayOf(note.noteID.toString())
 
         db.update(noteTableName, values, whereClause, whereArgs)
@@ -113,7 +111,7 @@ class NoteDatabaseHelper (
     // Get a specific note from the database using its id
     fun getNoteByID(noteID: Int, db: SQLiteDatabase): Note {
 
-        val query = "SELECT * FROM ${noteTableName} WHERE ${noteIDColumn} = $noteID"
+        val query = "SELECT * FROM $noteTableName WHERE $noteIDColumn = $noteID"
         val cursor = db.rawQuery(query, null)
 
         /*
@@ -133,10 +131,6 @@ class NoteDatabaseHelper (
         cursor.close()
         db.close()
 
-//        Log.d("getNoteModData", modified.toString())
-//
-//        Log.d("getNoteData", pinned.toString())
-
         return Note(id, title, content, created, modified, pinned.toBoolean())
     }
 
@@ -144,7 +138,7 @@ class NoteDatabaseHelper (
     // Remove a specific note from the database using its id
     fun deleteNote(noteID: Int, db: SQLiteDatabase) {
 
-        val whereClause = "${noteIDColumn} = ?"
+        val whereClause = "$noteIDColumn = ?"
         val whereArgs = arrayOf(noteID.toString())
 
         db.delete(noteTableName, whereClause, whereArgs)

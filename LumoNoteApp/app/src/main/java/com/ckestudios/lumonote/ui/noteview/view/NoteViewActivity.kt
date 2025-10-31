@@ -8,7 +8,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.ckestudios.lumonote.R
-import com.ckestudios.lumonote.data.database.NoteRepository
+import com.ckestudios.lumonote.data.repository.NoteRepository
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.databinding.ActivityNoteViewBinding
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel

@@ -1,4 +1,4 @@
-package com.ckestudios.lumonote.data.database
+package com.ckestudios.lumonote.data.repository
 
 import com.ckestudios.lumonote.data.models.Item
 

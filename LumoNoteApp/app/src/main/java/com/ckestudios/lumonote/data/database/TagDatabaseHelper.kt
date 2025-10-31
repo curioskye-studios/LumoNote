@@ -28,9 +28,9 @@ class TagDatabaseHelper(
     // Retrieve all tags in the database
     fun getAllTags(db: SQLiteDatabase): List<Tag> {
 
-        val tagsList = mutableListOf<Tag>() // Store tag objects, similar to java arraylist
+        val tagsList = mutableListOf<Tag>()
 
-        val query = "SELECT * FROM ${tagTableName}"
+        val query = "SELECT * FROM $tagTableName"
         val cursor = db.rawQuery(query, null)
 
         /*
@@ -39,13 +39,11 @@ class TagDatabaseHelper(
          */
         while (cursor.moveToNext()) {
 
-            // Collect each note record from the database, store data as a note object
             val id = cursor.getInt(cursor.getColumnIndexOrThrow(tagIDColumn))
             val name = cursor.getString(cursor.getColumnIndexOrThrow(tagNameColumn))
 
             val tag = Tag(id, name)
 
-            // Add collected note to note list
             tagsList.add(tag)
         }
 
@@ -64,7 +62,7 @@ class TagDatabaseHelper(
             put(tagNameColumn, tag.tagName)
         }
 
-        val whereClause = "${tagIDColumn} = ?"
+        val whereClause = "$tagIDColumn = ?"
         val whereArgs = arrayOf(tag.tagID.toString())
 
         db.update(tagTableName, values, whereClause, whereArgs)
@@ -75,7 +73,7 @@ class TagDatabaseHelper(
     // Get a specific tag from the database using its id
     fun getTagByID(tagID: Int, db: SQLiteDatabase): Tag {
 
-        val query = "SELECT * FROM ${tagTableName} WHERE ${tagIDColumn} = $tagID"
+        val query = "SELECT * FROM $tagTableName WHERE $tagIDColumn = $tagID"
         val cursor = db.rawQuery(query, null)
 
         /*
@@ -98,7 +96,7 @@ class TagDatabaseHelper(
     // Remove a specific tag from the database using its id
     fun deleteTag(tagID: Int, db: SQLiteDatabase) {
 
-        val whereClause = "${tagIDColumn} = ?"
+        val whereClause = "$tagIDColumn = ?"
         val whereArgs = arrayOf(tagID.toString())
 
         db.delete(tagTableName, whereClause, whereArgs)

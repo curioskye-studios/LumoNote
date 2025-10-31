@@ -1,6 +1,7 @@
-package com.ckestudios.lumonote.data.database
+package com.ckestudios.lumonote.data.repository
 
 import android.content.Context
+import com.ckestudios.lumonote.data.database.DatabaseHelper
 import com.ckestudios.lumonote.data.models.Item
 import com.ckestudios.lumonote.data.models.Tag
 
@@ -19,6 +20,7 @@ class TagRepository (private val context: Context) : Repository {
             dbConnection.insertTag(Tag(5, "Japanese"))
             dbConnection.insertTag(Tag(6, "Italian"))
         }
+
         catch (e: Exception) {}
     }
 

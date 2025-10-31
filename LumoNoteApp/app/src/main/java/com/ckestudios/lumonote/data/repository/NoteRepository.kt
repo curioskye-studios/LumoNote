@@ -1,6 +1,7 @@
-package com.ckestudios.lumonote.data.database
+package com.ckestudios.lumonote.data.repository
 
 import android.content.Context
+import com.ckestudios.lumonote.data.database.DatabaseHelper
 import com.ckestudios.lumonote.data.models.Item
 import com.ckestudios.lumonote.data.models.Note
 

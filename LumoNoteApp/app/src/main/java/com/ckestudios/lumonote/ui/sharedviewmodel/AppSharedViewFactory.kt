@@ -3,9 +3,9 @@ package com.ckestudios.lumonote.ui.sharedviewmodel
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.ckestudios.lumonote.data.database.NoteRepository
-import com.ckestudios.lumonote.data.database.Repository
-import com.ckestudios.lumonote.data.database.TagRepository
+import com.ckestudios.lumonote.data.repository.NoteRepository
+import com.ckestudios.lumonote.data.repository.Repository
+import com.ckestudios.lumonote.data.repository.TagRepository
 
 
 // A custom ViewModelFactory is needed because our ViewModel has a constructor parameter

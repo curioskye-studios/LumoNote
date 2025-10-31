@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ckestudios.lumonote.data.database.NoteRepository
+import com.ckestudios.lumonote.data.repository.NoteRepository
 import com.ckestudios.lumonote.databinding.FragmentCalendarViewBinding
 import com.ckestudios.lumonote.ui.home.calendar.viewmodel.CalendarViewModel
 import com.ckestudios.lumonote.ui.noteview.view.NoteViewActivity

@@ -12,8 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.ckestudios.lumonote.data.database.NoteRepository
-import com.ckestudios.lumonote.data.database.TagRepository
+import com.ckestudios.lumonote.data.repository.NoteRepository
+import com.ckestudios.lumonote.data.repository.TagRepository
 import com.ckestudios.lumonote.databinding.FragmentNotePreviewViewBinding
 import com.ckestudios.lumonote.ui.noteview.view.NoteViewActivity
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory

@@ -31,6 +31,10 @@ class DatabaseHelper (context: Context)
         private const val TAG_ID_COLUMN = "TagID"
         private const val TAG_NAME_COLUMN = "TagName"
 
+        private const val TAGGED_TABLE_NAME = "Tagged"
+        private const val TAGGED_TAGID_COLUMN = "TagID"
+        private const val TAGGED_NOTEID_COLUMN = "NoteID"
+
     }
 
     private val noteDatabaseHelper = NoteDatabaseHelper(
@@ -42,92 +46,134 @@ class DatabaseHelper (context: Context)
         TAG_TABLE_NAME, TAG_ID_COLUMN, TAG_NAME_COLUMN
     )
 
+    private val taggedDatabaseHelper = TaggedDatabaseHelper(
+        TAGGED_TABLE_NAME, TAGGED_TAGID_COLUMN, TAGGED_NOTEID_COLUMN
+    )
+
 
     override fun onCreate(db: SQLiteDatabase?) {
 
-        // Initializes table in database as well as each column (id, title, content)
         val createNoteTableQuery = "CREATE TABLE $NOTE_TABLE_NAME " +
-            "($NOTE_ID_COLUMN INTEGER PRIMARY KEY, $NOTE_TITLE_COLUMN TEXT, $NOTE_CONTENT_COLUMN TEXT," +
-            "$NOTE_CREATED_COLUMN, $NOTE_MODIFIED_COLUMN, $NOTE_PINNED_COLUMN)"
+            "(" +
+                "$NOTE_ID_COLUMN INTEGER PRIMARY KEY, " +
+                "$NOTE_TITLE_COLUMN TEXT, " +
+                "$NOTE_CONTENT_COLUMN TEXT, " +
+                "$NOTE_CREATED_COLUMN, " +
+                "$NOTE_MODIFIED_COLUMN, $NOTE_PINNED_COLUMN" +
+            ")"
 
-        // Initializes table in database as well as each column (id, name)
         val createTagTableQuery = "CREATE TABLE $TAG_TABLE_NAME " +
-            "($TAG_ID_COLUMN INTEGER PRIMARY KEY, $TAG_NAME_COLUMN TEXT UNIQUE)"
+            "(" +
+                "$TAG_ID_COLUMN INTEGER PRIMARY KEY, " +
+                "$TAG_NAME_COLUMN TEXT UNIQUE" +
+            ")"
+
+        val createTaggedTableQuery = "CREATE TABLE $TAGGED_TABLE_NAME " +
+            "(" +
+                "$TAGGED_TAGID_COLUMN INTEGER, " +
+                "$TAGGED_NOTEID_COLUMN INTEGER, " +
+                "PRIMARY KEY($TAGGED_TAGID_COLUMN, $TAGGED_NOTEID_COLUMN), " +
+                "FOREIGN KEY($TAGGED_TAGID_COLUMN) REFERENCES $TAG_TABLE_NAME($TAG_ID_COLUMN), " +
+                "FOREIGN KEY($TAGGED_NOTEID_COLUMN) REFERENCES $NOTE_TABLE_NAME($NOTE_ID_COLUMN)" +
+            ")"
+
 
         db?.execSQL(createNoteTableQuery)
         db?.execSQL(createTagTableQuery)
+        db?.execSQL(createTaggedTableQuery)
+    }
+
+    override fun onConfigure(db: SQLiteDatabase?) {
+
+        super.onConfigure(db)
+        db?.setForeignKeyConstraintsEnabled(true)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
 
         // Prevents duplicate tables of the same name being created
         val dropNoteTableQuery = "DROP TABLE IF EXISTS $NOTE_TABLE_NAME"
-        db?.execSQL(dropNoteTableQuery)
-
         val dropTagTableQuery = "DROP TABLE IF EXISTS $TAG_TABLE_NAME"
+        val dropTaggedTableQuery = "DROP TABLE IF EXISTS $TAGGED_TABLE_NAME"
+
+        db?.execSQL(dropNoteTableQuery)
         db?.execSQL(dropTagTableQuery)
+        db?.execSQL(dropTaggedTableQuery)
         onCreate(db)
     }
 
 
     // NOTE DATABASE FUNCTIONS
     fun insertNote(note: Note) {
-
         val db = writableDatabase // Database manipulator object
         noteDatabaseHelper.insertNote(note, db)
     }
     fun getAllNotes(): List<Note> {
-
-        val db = writableDatabase // Database manipulator object
+        val db = writableDatabase
         return noteDatabaseHelper.getAllNotes(db)
     }
     fun getNotesByDate(date: String): List<Note> {
-
         val db = readableDatabase
         return noteDatabaseHelper.getNotesByDate(date, db)
     }
     fun updateNote(note: Note){
-
-        val db = writableDatabase // Database manipulator object
+        val db = writableDatabase
         noteDatabaseHelper.updateNote(note, db)
     }
     fun getNoteByID(noteID: Int): Note {
-
-        val db = readableDatabase // Database accessor object
+        val db = readableDatabase
         return noteDatabaseHelper.getNoteByID(noteID, db)
     }
     fun deleteNote(noteID: Int) {
-
-        val db = writableDatabase // Database manipulator object
+        val db = writableDatabase
         noteDatabaseHelper.deleteNote(noteID, db)
     }
 
 
     // TAG DATABASE FUNCTIONS
     fun insertTag(tag: Tag) {
-
         val db = writableDatabase // Database manipulator object
         tagDatabaseHelper.insertTag(tag, db)
     }
     fun getAllTags(): List<Tag> {
-
-        val db = writableDatabase // Database manipulator object
+        val db = writableDatabase
         return tagDatabaseHelper.getAllTags(db)
     }
     fun updateTag(tag: Tag){
-
-        val db = writableDatabase // Database manipulator object
+        val db = writableDatabase
         tagDatabaseHelper.updateTag(tag, db)
     }
     fun getTagByID(tagID: Int): Tag {
-
-        val db = readableDatabase // Database accessor object
+        val db = readableDatabase
         return tagDatabaseHelper.getTagByID(tagID, db)
     }
     fun deleteTag(tagID: Int) {
-
-        val db = writableDatabase // Database manipulator object
+        val db = writableDatabase
         tagDatabaseHelper.deleteTag(tagID, db)
     }
+
+
+    // TAGGED DATABASE FUNCTIONS
+    fun insertTagged(tagID: Int, noteID: Int) {
+        val db = writableDatabase // Database manipulator object
+        taggedDatabaseHelper.insertTagged(tagID, noteID, db)
+    }
+    fun getTagsByNoteID(noteID: Int): List<Tag> {
+        val db = readableDatabase
+        val tagList = mutableListOf<Tag>()
+        val tagIDs = taggedDatabaseHelper.getTagsByNoteID(noteID, db)
+
+        //get corresponding tags by ID and add to list
+        for (tagID in tagIDs) {
+            tagList.add(getTagByID(tagID))
+        }
+
+        return tagList
+    }
+    fun deleteTagged(tagID: Int, noteID: Int) {
+        val db = writableDatabase
+        taggedDatabaseHelper.deleteTagged(tagID, noteID, db)
+    }
+
 
 }

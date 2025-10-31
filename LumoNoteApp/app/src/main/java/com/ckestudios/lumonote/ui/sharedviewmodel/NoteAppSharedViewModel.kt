@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.ckestudios.lumonote.data.database.NoteRepository
+import com.ckestudios.lumonote.data.repository.NoteRepository
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
 import kotlinx.coroutines.launch
