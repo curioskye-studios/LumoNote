@@ -2,35 +2,25 @@ package com.ckestudios.lumonote.data.repository
 
 import android.content.Context
 import com.ckestudios.lumonote.data.database.DatabaseHelper
-import com.ckestudios.lumonote.data.models.Item
+import com.ckestudios.lumonote.data.models.Tag
 
-class TaggedRepository (context: Context) : Repository {
+class TaggedRepository (context: Context){
 
     private val dbConnection = DatabaseHelper(context)
 
-    override fun getItems(): List<Item> {
-        TODO("Not yet implemented")
+    fun insertTagged(tagID: Int, noteID: Int) {
+
+        dbConnection.insertTagged(tagID, noteID)
     }
 
-    override fun getItemByID(itemID: Int): Item {
-        TODO("Not yet implemented")
+    fun getTagsByNoteID(noteID: Int): List<Tag> {
+
+        return dbConnection.getTagsByNoteID(noteID)
     }
 
-    override fun insertItem(item: Item) {
-        TODO("Not yet implemented")
-    }
+    fun deleteTagged(tagID: Int, noteID: Int) {
 
-    override fun updateItem(item: Item) {
-        TODO("Not yet implemented")
+        return dbConnection.deleteTagged(tagID, noteID)
     }
-
-    override fun deleteItem(itemID: Int) {
-        TODO("Not yet implemented")
-    }
-
-//    fun getNotesByTag(tag: Tag): List<Note> {
-//
-//        return dbConnection.getNotesByTag(tag)
-//    }
 
 }
