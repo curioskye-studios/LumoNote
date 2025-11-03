@@ -8,8 +8,6 @@ import com.ckestudios.lumonote.data.models.SpanType
 
 class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
 
-    private val actionPerformer = ActionPerformer()
-
     fun processTextAction(action: Action, editTextView: EditText, shouldUndoAction: Boolean){
 
         // Details e.g.: text - ""
@@ -84,11 +82,11 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
         when (actionPerformed) {
 
             ActionPerformed.ADD ->
-                actionPerformer.addStyleSpan(spanType, action.actionStart, action.actionEnd,
+                ActionPerformer.addStyleSpan(spanType, action.actionStart, action.actionEnd,
                     editTextView)
 
             ActionPerformed.REMOVE ->
-                actionPerformer.removeStyleSpan(spanType, action.actionStart, action.actionEnd,
+                ActionPerformer.removeStyleSpan(spanType, action.actionStart, action.actionEnd,
                     editTextView)
         }
 
@@ -131,11 +129,11 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
         when (actionPerformed) {
 
             ActionPerformed.ADD ->
-                actionPerformer.addImageSpan(action.actionStart, action.actionEnd, editTextView,
+                ActionPerformer.addImageSpan(action.actionStart, action.actionEnd, editTextView,
                     imageBitmap)
 
             ActionPerformed.REMOVE ->
-                actionPerformer.removeStyleSpan(spanType, action.actionStart, action.actionEnd,
+                ActionPerformer.removeStyleSpan(spanType, action.actionStart, action.actionEnd,
                     editTextView)
         }
 
@@ -177,12 +175,12 @@ class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
         when (actionPerformed) {
 
             ActionPerformed.ADD -> {
-                actionPerformer.addCustomBullet(action.actionStart, action.actionEnd, editTextView,
+                ActionPerformer.addCustomBullet(action.actionStart, action.actionEnd, editTextView,
                     customBullet)
             }
 
             ActionPerformed.REMOVE -> {
-                actionPerformer.removeStyleSpan(spanType, action.actionStart, action.actionEnd,
+                ActionPerformer.removeStyleSpan(spanType, action.actionStart, action.actionEnd,
                     editTextView)
             }
         }

@@ -9,6 +9,7 @@ class NoteDatabaseHelper (
     private val noteIDColumn: String,
     private val noteTitleColumn: String,
     private val noteContentColumn: String,
+    private val noteSpansColumn: String,
     private val noteCreatedColumn: String,
     private val noteModifiedColumn: String,
     private val notePinnedColumn: String
@@ -23,6 +24,7 @@ class NoteDatabaseHelper (
             // ID not needed since sqlite provides unique ids
             put(noteTitleColumn, note.noteTitle)
             put(noteContentColumn, note.noteContent)
+            put(noteSpansColumn, note.noteSpans)
             put(noteCreatedColumn, note.noteCreatedDate)
             put(noteModifiedColumn, note.noteModifiedDate)
             put(notePinnedColumn, note.notePinned.toString())
@@ -49,11 +51,12 @@ class NoteDatabaseHelper (
             val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
             val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
             val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
+            val spans = cursor.getString(cursor.getColumnIndexOrThrow(noteSpansColumn))
             val createdDate = cursor.getString(cursor.getColumnIndexOrThrow(noteCreatedColumn))
             val modifiedDate = cursor.getString(cursor.getColumnIndexOrThrow(noteModifiedColumn))
             val isPinned = cursor.getString(cursor.getColumnIndexOrThrow(notePinnedColumn))
 
-            val note = Note(id, title, content, createdDate, modifiedDate, isPinned.toBoolean())
+            val note = Note(id, title, content, spans, createdDate, modifiedDate, isPinned.toBoolean())
 
             notesList.add(note)
         }
@@ -72,14 +75,17 @@ class NoteDatabaseHelper (
         val cursor = db.rawQuery(query, arrayOf(date))
 
         while (cursor.moveToNext()) {
+
             val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
             val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
             val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
+            val spans = cursor.getString(cursor.getColumnIndexOrThrow(noteSpansColumn))
             val createdDate = cursor.getString(cursor.getColumnIndexOrThrow(noteCreatedColumn))
             val modifiedDate = cursor.getString(cursor.getColumnIndexOrThrow(noteModifiedColumn))
             val isPinned = cursor.getString(cursor.getColumnIndexOrThrow(notePinnedColumn))
 
-            val note = Note(id, title, content, createdDate, modifiedDate, isPinned.toBoolean())
+            val note = Note(id, title, content, spans, createdDate, modifiedDate, isPinned.toBoolean())
+
             notesList.add(note)
         }
 
@@ -94,8 +100,10 @@ class NoteDatabaseHelper (
     fun updateNote(note: Note, db: SQLiteDatabase){
 
         val values = ContentValues().apply {
+
             put(noteTitleColumn, note.noteTitle)
             put(noteContentColumn, note.noteContent)
+            put(noteSpansColumn, note.noteSpans)
             put(noteModifiedColumn, note.noteModifiedDate)
             put(notePinnedColumn, note.notePinned.toString())
         }
@@ -124,6 +132,7 @@ class NoteDatabaseHelper (
         val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
         val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
         val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
+        val spans = cursor.getString(cursor.getColumnIndexOrThrow(noteSpansColumn))
         val created = cursor.getString(cursor.getColumnIndexOrThrow(noteCreatedColumn))
         val modified = cursor.getString(cursor.getColumnIndexOrThrow(noteModifiedColumn))
         val pinned = cursor.getString(cursor.getColumnIndexOrThrow(notePinnedColumn))
@@ -131,7 +140,7 @@ class NoteDatabaseHelper (
         cursor.close()
         db.close()
 
-        return Note(id, title, content, created, modified, pinned.toBoolean())
+        return Note(id, title, content, spans, created, modified, pinned.toBoolean())
     }
 
 

@@ -7,6 +7,7 @@ data class Note (
 
     val noteTitle: String,
     val noteContent: String,
+    val noteSpans: String,
 
     val noteCreatedDate: String,
     val noteModifiedDate: String,

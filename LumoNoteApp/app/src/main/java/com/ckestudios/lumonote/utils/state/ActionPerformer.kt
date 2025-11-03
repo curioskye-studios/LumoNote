@@ -14,7 +14,7 @@ import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
-class ActionPerformer {
+object ActionPerformer {
 
     fun addStyleSpan(spanType: SpanType, spanStart: Int, spanEnd: Int,
                              editTextView: EditText){

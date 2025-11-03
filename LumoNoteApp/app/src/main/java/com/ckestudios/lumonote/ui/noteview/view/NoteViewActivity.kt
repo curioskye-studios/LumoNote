@@ -8,8 +8,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.ckestudios.lumonote.R
-import com.ckestudios.lumonote.data.repository.NoteRepository
 import com.ckestudios.lumonote.data.models.Note
+import com.ckestudios.lumonote.data.repository.NoteRepository
 import com.ckestudios.lumonote.databinding.ActivityNoteViewBinding
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
@@ -19,6 +19,7 @@ import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.state.SpanHelper
 import com.ckestudios.lumonote.utils.state.StateManager
 import java.time.LocalDate
 import java.util.Timer
@@ -108,7 +109,10 @@ class NoteViewActivity : AppCompatActivity() {
         // Format: YYYY-MM-DD
         val currentDate = LocalDate.parse(LocalDate.now().toString())
         val convertedDate = GeneralTextHelper.formatDate(currentDate)
-        noteViewBinding.modifiedDateTV.text = convertedDate
+
+        runOnUiThread {
+            noteViewBinding.modifiedDateTV.text = convertedDate
+        }
     }
 
 
@@ -188,6 +192,7 @@ class NoteViewActivity : AppCompatActivity() {
             noteViewBinding.modifiedDateTV.text = retrievedNoteDate
             noteViewBinding.noteTitleET.setText(retrievedNote.noteTitle)
             noteViewBinding.noteEditContentET.setText(retrievedNote.noteContent)
+            SpanHelper.reapplySpansETV(retrievedNote.noteSpans, noteViewBinding.noteEditContentET)
 
             noteViewBinding.pinButtonIV.tag = retrievedNote.notePinned
 
@@ -255,12 +260,13 @@ class NoteViewActivity : AppCompatActivity() {
 
                 val title =  noteViewBinding.noteTitleET.text.toString()
                 val content =  noteViewBinding.noteEditContentET.text.toString()
+                val spans = SpanHelper.extractSpans(noteViewBinding.noteEditContentET)
                 val pinned: Boolean =  (noteViewBinding.pinButtonIV.tag as Boolean)
 
                 if (existingNoteClicked) {
 
                     if (!(retrievedNote.noteTitle == title && retrievedNote.noteContent == content &&
-                        retrievedNote.notePinned == pinned)) {
+                        retrievedNote.notePinned == pinned && retrievedNote.noteSpans == spans)) {
                         GeneralUIHelper.displayFeedbackToast(this@NoteViewActivity,
                             "Changes Saved", false)
                     } else {
@@ -353,9 +359,11 @@ class NoteViewActivity : AppCompatActivity() {
         // Collect data from input fields, store in note object
         val title =  noteViewBinding.noteTitleET.text.toString()
         val content =  noteViewBinding.noteEditContentET.text.toString()
+        val spans = SpanHelper.extractSpans(noteViewBinding.noteEditContentET)
         val pinned: Boolean =  (noteViewBinding.pinButtonIV.tag as Boolean)
 
         Log.d("collectNoteData", pinned.toString())
+        Log.d("SaveSpans", "spans: $spans")
 
         // Format: YYYY-MM-DD
         val currentDate = LocalDate.now().toString()
@@ -368,14 +376,14 @@ class NoteViewActivity : AppCompatActivity() {
         if (existingNoteClicked) {
 
             if (retrievedNote.noteTitle == title && retrievedNote.noteContent == content &&
-                retrievedNote.notePinned == pinned) return
+                retrievedNote.notePinned == pinned && retrievedNote.noteSpans == spans) return
 
             updateModifiedDate()
 
             if (runningAutoSave) noteAppSharedViewModel.setIsNewNoteAsync(false)
             else noteAppSharedViewModel.setIsNewNote(false)
 
-            val updatedNote = Note(retrievedNote.noteID, title, content,
+            val updatedNote = Note(retrievedNote.noteID, title, content, spans,
                 retrievedNote.noteCreatedDate, modified, pinned)
 
             noteAppSharedViewModel.saveNote(updatedNote, runningAutoSave)
@@ -396,7 +404,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             noteAppSharedViewModel.setIsNewNote(true)
 
-            val newNote = Note(0, title, content, created, modified, pinned)
+            val newNote = Note(0, title, content, spans, created, modified, pinned)
 
             noteAppSharedViewModel.saveNote(newNote, false)
         }

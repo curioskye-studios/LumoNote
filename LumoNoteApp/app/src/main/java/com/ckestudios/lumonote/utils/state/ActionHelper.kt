@@ -2,7 +2,7 @@ package com.ckestudios.lumonote.utils.state
 
 import com.ckestudios.lumonote.data.models.Action
 import com.ckestudios.lumonote.data.models.SpanType
-import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
 
 object ActionHelper {
 
@@ -10,11 +10,11 @@ object ActionHelper {
 
     fun getMultipartIdentifier(): String {
 
-        var identifier = BasicUtilityHelper.generateRandomString(8)
+        var identifier = GeneralTextHelper.generateRandomString(8)
 
         while (identifier in generatedIdentifiers) {
 
-            identifier = BasicUtilityHelper.generateRandomString(8)
+            identifier = GeneralTextHelper.generateRandomString(8)
         }
 
         return identifier

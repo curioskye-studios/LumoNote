@@ -17,12 +17,13 @@ class DatabaseHelper (context: Context)
         // Stores constants used for database access
 
         private const val DATABASE_NAME = "LumoNote.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 2
 
         private const val NOTE_TABLE_NAME = "Notes"
         private const val NOTE_ID_COLUMN = "NoteID"
         private const val NOTE_TITLE_COLUMN = "NoteTitle"
         private const val NOTE_CONTENT_COLUMN = "NoteContent"
+        private const val NOTE_SPANS_COLUMN = "NoteSpans"
         private const val NOTE_CREATED_COLUMN = "NoteCreated"
         private const val NOTE_MODIFIED_COLUMN = "NoteModified"
         private const val NOTE_PINNED_COLUMN = "NotePinned"
@@ -38,7 +39,7 @@ class DatabaseHelper (context: Context)
     }
 
     private val noteDatabaseHelper = NoteDatabaseHelper(
-        NOTE_TABLE_NAME, NOTE_ID_COLUMN, NOTE_TITLE_COLUMN, NOTE_CONTENT_COLUMN,
+        NOTE_TABLE_NAME, NOTE_ID_COLUMN, NOTE_TITLE_COLUMN, NOTE_CONTENT_COLUMN, NOTE_SPANS_COLUMN,
         NOTE_CREATED_COLUMN, NOTE_MODIFIED_COLUMN, NOTE_PINNED_COLUMN
     )
 
@@ -58,8 +59,10 @@ class DatabaseHelper (context: Context)
                 "$NOTE_ID_COLUMN INTEGER PRIMARY KEY, " +
                 "$NOTE_TITLE_COLUMN TEXT, " +
                 "$NOTE_CONTENT_COLUMN TEXT, " +
-                "$NOTE_CREATED_COLUMN, " +
-                "$NOTE_MODIFIED_COLUMN, $NOTE_PINNED_COLUMN" +
+                "$NOTE_SPANS_COLUMN TEXT, " +
+                "$NOTE_CREATED_COLUMN TEXT, " +
+                "$NOTE_MODIFIED_COLUMN TEXT, " +
+                "$NOTE_PINNED_COLUMN TEXT" +
             ")"
 
         val createTagTableQuery = "CREATE TABLE $TAG_TABLE_NAME " +

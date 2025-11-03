@@ -4,6 +4,7 @@ import android.util.Log
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.random.Random
 
 object GeneralTextHelper {
 
@@ -52,6 +53,18 @@ object GeneralTextHelper {
     fun convertChars(text: String, targetText:String, replaceText: String): String {
 
         return text.replace(targetText, replaceText)
+    }
+
+    fun generateRandomString(length: Int): String {
+
+        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        val random = Random.Default
+
+        if (length <= 0) return ""
+
+        return (1..length)
+            .map { chars[random.nextInt(chars.length)] }
+            .joinToString("")
     }
 
 }
