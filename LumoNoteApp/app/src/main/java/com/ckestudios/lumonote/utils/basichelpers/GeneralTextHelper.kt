@@ -67,4 +67,17 @@ object GeneralTextHelper {
             .joinToString("")
     }
 
+    fun removeCharsFromString(targetString: String, charsToRemove: List<String>) : String {
+
+        var newString = targetString
+
+        for (char in charsToRemove) {
+            if (char in newString) {
+                newString = newString.replace(char, "")
+            }
+        }
+
+        return newString
+    }
+
 }

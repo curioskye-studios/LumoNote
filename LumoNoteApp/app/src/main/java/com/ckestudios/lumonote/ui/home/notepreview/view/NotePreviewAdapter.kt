@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.state.SpanHelper
+import com.ckestudios.lumonote.utils.state.SpanProcessor
 
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
@@ -58,7 +58,7 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
         // index in the list
         holder.titlePreview.text = note.noteTitle
         holder.contentPreview.text = note.noteContent
-        SpanHelper.reapplySpansTV(note.noteSpans, holder.contentPreview)
+        SpanProcessor.reapplySpansTV(note.noteSpans, holder.contentPreview)
         holder.pinPreview.tag = note.notePinned
         GeneralButtonIVHelper.updatePinHighlight(holder.pinPreview, holder.pinPreview.context,
             R.drawable.selected_background)

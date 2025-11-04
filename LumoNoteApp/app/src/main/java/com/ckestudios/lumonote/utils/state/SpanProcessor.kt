@@ -8,13 +8,16 @@ import android.text.style.StyleSpan
 import android.util.Log
 import android.widget.EditText
 import android.widget.TextView
+import com.ckestudios.lumonote.data.models.BulletType
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.ChecklistSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
+import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
-object SpanHelper {
+object SpanProcessor {
 
     fun extractSpans(editTextView: EditText) : String {
 
@@ -67,9 +70,13 @@ object SpanHelper {
                 "[span: ${SpanType.UNDERLINE_SPAN.spanName}, start: $spanStart, end: $spanEnd]"
 
             is CustomBulletSpan -> {
-//                "[span: ${SpanType.BULLET_SPAN.spanName}, bullet: ${span.getBulletType()}, " +
-//                        "start: $spanStart, end: $spanEnd]"
-                ""
+                val custom =
+                    if (span.getBulletType() == BulletType.CUSTOM) { span.getCustomBullet() }
+                    else null
+
+                "[span: ${SpanType.BULLET_SPAN.spanName}, start: $spanStart, end: $spanEnd, " +
+                        "bulletType: ${span.getBulletType()}, bullet: $custom]"
+
             }
 
             is ChecklistSpan ->
@@ -93,61 +100,75 @@ object SpanHelper {
         }
     }
 
-    fun reapplySpansETV(spanEntries: String, editTextView: EditText) {
+    fun reapplySpansETV(spanData: String, editTextView: EditText) {
 
-        if (spanEntries == "") return
+        if (spanData == "") return
+        editTextView.text.clearSpans() // remove any lingering spans
 
-        val spanEntriesList = convertEntriesStringToList(spanEntries)
+        val spanRecordList = convertSpanDataToList(spanData)
 
-        //use actionperformer
+        for (spanRecord in spanRecordList) {
 
-        for (entry in spanEntriesList) {
+            val spanRecordDict = getSpanRecordInfoPairs(spanRecord).toMap()
 
-            val entryInfoList = getSpanEntryInfoPairs(entry)
-
-            Log.d("SaveSpans", "entryInfoList: $entryInfoList")
-
-            var spanType: SpanType? = null
-            var spanStart: Int? = null
-            var spanEnd: Int? = null
-
-            for (entryInfo in entryInfoList){
-
-                when (entryInfo.first) {
-                    "span" ->
-                        when (entryInfo.second) {
-                            SpanType.BOLD_SPAN.spanName -> spanType = SpanType.BOLD_SPAN
-                            SpanType.ITALICS_SPAN.spanName -> spanType = SpanType.ITALICS_SPAN
-                            SpanType.UNDERLINE_SPAN.spanName -> spanType = SpanType.UNDERLINE_SPAN
-                            SpanType.CHECKLIST_SPAN.spanName -> spanType = SpanType.CHECKLIST_SPAN
-                        }
-                    "start" -> spanStart = (entryInfo.second as String).toInt()
-                    "end" -> spanEnd = (entryInfo.second as String).toInt()
+            val spanType =
+                when (spanRecordDict["span"]) {
+                    SpanType.BOLD_SPAN.spanName -> SpanType.BOLD_SPAN
+                    SpanType.ITALICS_SPAN.spanName -> SpanType.ITALICS_SPAN
+                    SpanType.UNDERLINE_SPAN.spanName -> SpanType.UNDERLINE_SPAN
+                    SpanType.CHECKLIST_SPAN.spanName -> SpanType.CHECKLIST_SPAN
+                    SpanType.BULLET_SPAN.spanName -> SpanType.BULLET_SPAN
+                    else -> null
                 }
 
-                Log.d("SaveSpans", "entryInfo: $spanType, $spanStart, $spanEnd")
-                if (spanType == null || spanStart == null || spanEnd == null) continue
+            val startValString = spanRecordDict["start"] as String
+            val endValString = spanRecordDict["end"] as String
 
-                ActionPerformer.addStyleSpan(spanType, spanStart, spanEnd, editTextView)
+            val spanStart = startValString.toIntOrNull() ?: -1
+            val spanEnd = endValString.toIntOrNull() ?: -1
 
-                spanType = null
-                spanStart = null
-                spanEnd = null
+
+            if (spanType == null || spanStart == -1 || spanEnd == -1) continue
+
+            if (spanRecordDict.containsKey("bulletType") && spanRecordDict.containsKey("bullet")) {
+
+                var customBullet: String? = null
+                val bulletType =
+                    when (spanRecordDict["bulletType"]) {
+                        BulletType.DEFAULT.bulletName -> BulletType.DEFAULT
+                        BulletType.CUSTOM.bulletName -> BulletType.CUSTOM
+                        else -> null
+                    }
+
+                if (bulletType == BulletType.CUSTOM) {
+                    customBullet = spanRecordDict["bullet"].toString()
+                    ActionPerformer.addCustomBullet(spanStart, spanEnd, editTextView, customBullet)
+                    continue
+                }
             }
+
+            if (spanRecordDict.containsKey("path")) {
+
+
+            }
+
+
+            ActionPerformer.addStyleSpan(spanType, spanStart, spanEnd, editTextView)
         }
+
     }
 
-    fun reapplySpansTV(spanEntries: String, textView: TextView) {
+    fun reapplySpansTV(spanData: String, textView: TextView) {
 
-        if (spanEntries == "") return
+        if (spanData == "") return
 
-        val spanEntriesList = convertEntriesStringToList(spanEntries)
+        val spanEntriesList = convertSpanDataToList(spanData)
 
         //use actionperformer
 
         for (entry in spanEntriesList) {
 
-            val entryInfoList = getSpanEntryInfoPairs(entry)
+            val entryInfoList = getSpanRecordInfoPairs(entry)
 
             Log.d("SaveSpans", "entryInfoList: $entryInfoList")
 
@@ -205,37 +226,38 @@ object SpanHelper {
         }
     }
 
-    private fun convertEntriesStringToList(spanEntries: String) : List<String> {
 
-        val spanEntriesList =
-            spanEntries.removeSurrounding("[", "]").split("], [")
+    private fun convertSpanDataToList(spanDataString: String) : List<String> {
 
-        val splitSpanEntries = mutableListOf<String>()
+        val spanRecordList =
+            spanDataString.removeSurrounding("[", "]").split("], [")
 
-        for (entry in spanEntriesList) {
+        val formattedSpanRecords = mutableListOf<String>()
 
-            Log.d("SaveSpans", "entry: $entry")
+        for (spanRecord in spanRecordList) {
 
-            var formattedSpanEntry = entry
-            formattedSpanEntry = formattedSpanEntry.removePrefix("[")
-            formattedSpanEntry = formattedSpanEntry.removeSuffix("]")
+            Log.d("SaveSpans", "spanRecord: $spanRecord")
 
-            splitSpanEntries.add(formattedSpanEntry)
+            val formattedSpanRecord  =
+                GeneralTextHelper.removeCharsFromString(spanRecord, listOf("[", "]"))
+
+            formattedSpanRecords.add(formattedSpanRecord)
         }
 
-        return splitSpanEntries
+        return formattedSpanRecords
     }
 
-    private fun getSpanEntryInfoPairs(entryInfo: String) : List<Pair<String, *>> {
+    private fun getSpanRecordInfoPairs(spanRecord: String) : List<Pair<String, *>> {
 
-        var infoString = entryInfo.replace(":", "")
-        infoString = infoString.replace(",", "")
+        // like "span: ${SpanType.UNDERLINE_SPAN.spanName}, start: $spanStart, end: $spanEnd"
 
-        var infoList = infoString.split(" ")
+        val formattedSpanRecord =
+            GeneralTextHelper.removeCharsFromString(spanRecord, listOf(":", ","))
 
-        //Pair consecutive elements
-        return infoList.chunked(2).map { (
-                it[0] to it.getOrNull(1))
-        }
+        val spanRecordInfoList = formattedSpanRecord.split(" ")
+
+        return BasicUtilityHelper.pairConsecutiveListItems(spanRecordInfoList)
+                as List<Pair<String, *>>
     }
+
 }

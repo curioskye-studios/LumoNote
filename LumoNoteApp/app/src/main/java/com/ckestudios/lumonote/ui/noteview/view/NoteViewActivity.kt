@@ -19,7 +19,7 @@ import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
-import com.ckestudios.lumonote.utils.state.SpanHelper
+import com.ckestudios.lumonote.utils.state.SpanProcessor
 import com.ckestudios.lumonote.utils.state.StateManager
 import java.time.LocalDate
 import java.util.Timer
@@ -192,7 +192,7 @@ class NoteViewActivity : AppCompatActivity() {
             noteViewBinding.modifiedDateTV.text = retrievedNoteDate
             noteViewBinding.noteTitleET.setText(retrievedNote.noteTitle)
             noteViewBinding.noteEditContentET.setText(retrievedNote.noteContent)
-            SpanHelper.reapplySpansETV(retrievedNote.noteSpans, noteViewBinding.noteEditContentET)
+            SpanProcessor.reapplySpansETV(retrievedNote.noteSpans, noteViewBinding.noteEditContentET)
 
             noteViewBinding.pinButtonIV.tag = retrievedNote.notePinned
 
@@ -260,7 +260,7 @@ class NoteViewActivity : AppCompatActivity() {
 
                 val title =  noteViewBinding.noteTitleET.text.toString()
                 val content =  noteViewBinding.noteEditContentET.text.toString()
-                val spans = SpanHelper.extractSpans(noteViewBinding.noteEditContentET)
+                val spans = SpanProcessor.extractSpans(noteViewBinding.noteEditContentET)
                 val pinned: Boolean =  (noteViewBinding.pinButtonIV.tag as Boolean)
 
                 if (existingNoteClicked) {
@@ -359,7 +359,7 @@ class NoteViewActivity : AppCompatActivity() {
         // Collect data from input fields, store in note object
         val title =  noteViewBinding.noteTitleET.text.toString()
         val content =  noteViewBinding.noteEditContentET.text.toString()
-        val spans = SpanHelper.extractSpans(noteViewBinding.noteEditContentET)
+        val spans = SpanProcessor.extractSpans(noteViewBinding.noteEditContentET)
         val pinned: Boolean =  (noteViewBinding.pinButtonIV.tag as Boolean)
 
         Log.d("collectNoteData", pinned.toString())
