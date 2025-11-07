@@ -9,12 +9,13 @@ import android.text.*
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
-import com.ckestudios.lumonote.ui.noteview.other.ImageLineTextWatcher
 import com.ckestudios.lumonote.utils.state.ActionHelper
+import com.ckestudios.lumonote.utils.state.ImageLineTextWatcher
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 import com.ckestudios.lumonote.utils.state.StateManager
 
 class SimpleImageFormatter(private val editTextView: EditText,
+                           private val isActiveEditing: Boolean,
                            private val stateManager: StateManager) {
 
     // Special invisible character (used by Android to represent embedded objects like images)
@@ -94,7 +95,7 @@ class SimpleImageFormatter(private val editTextView: EditText,
         val identifier = ActionHelper.getMultipartIdentifier()
         stateManager.addImageToCache(adjustedBitmap, cursorPos+1, cursorPos+2, identifier)
 
-        if (insertedImageSpan.isNotEmpty()) {
+        if (insertedImageSpan.isNotEmpty() && isActiveEditing) {
 
             spanStateWatcher.addBasicSpan(insertedImageSpan[0], SpanType.IMAGE_SPAN, true,
                 identifier)

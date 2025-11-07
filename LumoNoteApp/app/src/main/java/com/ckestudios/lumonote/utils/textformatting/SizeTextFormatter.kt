@@ -9,6 +9,7 @@ import com.ckestudios.lumonote.data.models.TextSize
 import com.ckestudios.lumonote.utils.state.StateManager
 
 class SizeTextFormatter(override val editTextView: EditText,
+                        override val isActiveEditing: Boolean,
                         private val stateManager: StateManager)
     : RichTextFormatter<RelativeSizeSpan> {
 

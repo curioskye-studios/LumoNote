@@ -7,6 +7,7 @@ interface RichTextFormatter<T> {
 
     val editTextView: EditText
     var etvSpannableContent: Editable
+    val isActiveEditing: Boolean
 
     fun updateSpannableContent()
 

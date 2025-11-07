@@ -9,12 +9,13 @@ import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 import com.ckestudios.lumonote.utils.state.StateManager
 
 class SimpleChecklistFormatter(private val editTextView: EditText,
-                               private val stateManager: StateManager) {
+                               private val isActiveEditing: Boolean,
+                               private val stateManager: StateManager?) {
 
     private lateinit var etvSpannableContent: Editable
     private var shouldRemoveChecklist = false
 
-    private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
+    private val spanStateWatcher = stateManager?.let { SpanStateWatcher(editTextView, it) }
 
     private fun updateSpannableContent() {
 
@@ -74,8 +75,12 @@ class SimpleChecklistFormatter(private val editTextView: EditText,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
 
-                spanStateWatcher.addBasicSpan(span, SpanType.CHECKLIST_SPAN, false,
-                    null)
+                if (isActiveEditing) {
+                    spanStateWatcher?.addBasicSpan(span, SpanType.CHECKLIST_SPAN, false,
+                        null)
+                }
+
+
             }
             line.startsWith("☑") -> {
 
@@ -110,8 +115,10 @@ class SimpleChecklistFormatter(private val editTextView: EditText,
 
         spans.forEach {
 
-            spanStateWatcher.removeStyleSpan(it, SpanType.CHECKLIST_SPAN, false,
-                null)
+            if (isActiveEditing) {
+                spanStateWatcher?.removeStyleSpan(it, SpanType.CHECKLIST_SPAN, false,
+                    null)
+            }
 
             etvSpannableContent.removeSpan(it)
         }

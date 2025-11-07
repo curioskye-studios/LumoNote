@@ -11,9 +11,9 @@ import com.ckestudios.lumonote.utils.state.ActionHelper
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 import com.ckestudios.lumonote.utils.state.StateManager
 
-class BulletTextFormatter(
-    override val editTextView: EditText,
-    private val stateManager: StateManager) : RichTextFormatter<CustomBulletSpan> {
+class BulletTextFormatter(override val editTextView: EditText,
+                    override val isActiveEditing: Boolean,
+                    private val stateManager: StateManager?) : RichTextFormatter<CustomBulletSpan> {
 
     override lateinit var etvSpannableContent: Editable
 
@@ -21,7 +21,7 @@ class BulletTextFormatter(
     private var customBullet: String? = null
     private lateinit var identifier: String
 
-    private val spanStateManager = SpanStateWatcher(editTextView, stateManager)
+    private val spanStateManager = stateManager?.let { SpanStateWatcher(editTextView, it) }
 
     override fun updateSpannableContent() {
 
@@ -167,16 +167,16 @@ class BulletTextFormatter(
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
 
-            if (bulletType == BulletType.DEFAULT) {
+            if (bulletType == BulletType.DEFAULT && isActiveEditing) {
 
-                spanStateManager.addBasicSpan(bulletSpan, SpanType.BULLET_SPAN, false,
+                spanStateManager?.addBasicSpan(bulletSpan, SpanType.BULLET_SPAN, false,
                     null)
-            } else {
+            } else if (isActiveEditing) {
 
                 identifier = ActionHelper.getMultipartIdentifier()
 
-                stateManager.addBulletToCache(customBullet!!, identifier)
-                spanStateManager.addCustomBulletSpan(bulletSpan, identifier)
+                stateManager?.addBulletToCache(customBullet!!, identifier)
+                spanStateManager?.addCustomBulletSpan(bulletSpan, identifier)
             }
 
         }
@@ -189,15 +189,14 @@ class BulletTextFormatter(
 
         for (span in spansList) {
 
-            if (span.getBulletType() == BulletType.DEFAULT) {
+            if (span.getBulletType() == BulletType.DEFAULT && isActiveEditing) {
 
-                spanStateManager.removeStyleSpan(span, SpanType.BULLET_SPAN, false,
+                spanStateManager?.removeStyleSpan(span, SpanType.BULLET_SPAN, false,
                     null)
-            } else {
+            } else if (isActiveEditing) {
 
-                spanStateManager.removeCustomBulletSpan(span, identifier)
+                spanStateManager?.removeCustomBulletSpan(span, identifier)
             }
-
 
             etvSpannableContent.removeSpan(span)
         }
@@ -240,7 +239,7 @@ class BulletTextFormatter(
             editTextView.text?.getSpans(safeStart, selectEnd,
                 CustomBulletSpan::class.java)
 
-        Log.d("bulletedSpans", bulletedSpans?.contentToString() ?: "null")
+//        Log.d("bulletedSpans", bulletedSpans?.contentToString() ?: "null")
 
 
         if (!bulletedSpans.isNullOrEmpty()) {

@@ -156,28 +156,30 @@ class StateManager(private val editTextView: EditText) {
         redoStack.pushActionToStack(redoAction)
     }
 
-
-    fun undoAction(actionInterpreter: ActionInterpreter) {
+    fun processAction(actionInterpreter: ActionInterpreter, isUndo: Boolean) {
 
         this.actionInterpreter = actionInterpreter
 
-        var topAction = undoStack.getTopActionOfStack()
+        val stack = if (isUndo) undoStack else redoStack
 
-        Log.d("SpanWatcher", "undo: $topAction")
+        var topAction = stack.getTopActionOfStack()
+
+        val logText = if (isUndo) "undo" else "redo"
+        Log.d("SpanWatcher", "$logText: $topAction")
+
 
         if (topAction == null) return
 
-        performUndo(topAction)
-
+        performUndoOrRedo(topAction, isUndo)
 
         val firstMultipartIdentifier = topAction.actionMultipartIdentifier ?: return
         var currentMultipartIdentifier: String
 
         while (topAction!!.actionIsMultipart) {
 
-            topAction = undoStack.getTopActionOfStack()
+            topAction = stack.getTopActionOfStack()
 
-            Log.d("SpanWatcher", "undoNextPart: $topAction")
+            Log.d("SpanWatcher", "${logText}NextPart: $topAction")
 
             if (topAction == null) return
 
@@ -188,141 +190,57 @@ class StateManager(private val editTextView: EditText) {
 
             if (currentMultipartIdentifier != firstMultipartIdentifier) return
 
-            performUndo(topAction)
-        }
-    }
-
-    fun redoAction() {
-
-        var topAction = redoStack.getTopActionOfStack()
-
-        Log.d("SpanWatcher", "redo: $topAction")
-
-        if (topAction == null) return
-
-        performRedo(topAction)
-
-
-        val firstMultipartIdentifier = topAction.actionMultipartIdentifier ?: return
-        var currentMultipartIdentifier: String
-
-        while (topAction!!.actionIsMultipart) {
-
-            topAction = redoStack.getTopActionOfStack()
-
-            Log.d("SpanWatcher", "redoNextPart: $topAction")
-
-            if (topAction == null) return
-
-            currentMultipartIdentifier = topAction.actionMultipartIdentifier ?: return
-
-//            Log.d("SpanWatcher", "firstMultipartIdentifier: $firstMultipartIdentifier")
-//            Log.d("SpanWatcher", "currentMultipartIdentifier: $currentMultipartIdentifier")
-
-            if (currentMultipartIdentifier != firstMultipartIdentifier) return
-
-            performRedo(topAction)
+            performUndoOrRedo(topAction, isUndo)
         }
     }
 
 
-    private fun performUndo(undoAction: Action) {
+    private fun performUndoOrRedo(actionToPerform: Action, isUndo: Boolean) {
 
-        setActionToUndo(undoAction)
+        if (isUndo) setActionToUndo(actionToPerform) else setActionToRedo(actionToPerform)
 
-        addToRedo(undoAction)
+        if (isUndo) addToRedo(actionToPerform) else addToUndo(actionToPerform)
 
-        undoStack.popActionFromStack()
+        if (isUndo) undoStack.popActionFromStack() else redoStack.popActionFromStack()
 
-        if (actionToUndo == null) return
+        val actionToUndoOrRedo = if (isUndo) actionToUndo else actionToRedo
+        if (actionToUndoOrRedo == null) return
 
 
-        when (actionToUndo!!.actionType) {
+        when (actionToUndoOrRedo.actionType) {
 
-            ActionType.TEXT -> actionInterpreter.processTextAction(actionToUndo!!,
-                editTextView, true)
+            ActionType.TEXT -> actionInterpreter.interpretBasicAction(actionToUndoOrRedo,
+                isUndo, true)
 
             ActionType.SPAN -> {
 
                 when {
-                    actionToUndo!!.actionInfo == SpanType.IMAGE_SPAN -> {
+                    actionToUndoOrRedo.actionInfo == SpanType.IMAGE_SPAN -> {
 
                         val imageData =
-                            imageCache[actionToUndo!!.actionMultipartIdentifier!!]
+                            imageCache[actionToUndoOrRedo.actionMultipartIdentifier!!]
 
                         if (imageData != null) {
-                            actionInterpreter.processImageSpanAction(actionToUndo!!, editTextView,
-                                true, imageData.first)
+                            actionInterpreter.interpretImageAction(actionToUndoOrRedo,
+                                isUndo, imageData.first)
                         }
                     }
 
-                    actionToUndo!!.actionInfo == SpanType.BULLET_SPAN &&
-                            actionToUndo!!.actionIsMultipart -> {
+                    actionToUndoOrRedo.actionInfo == SpanType.BULLET_SPAN &&
+                            actionToUndoOrRedo.actionIsMultipart -> {
 
                         val customBullet =
-                            customBulletCache[actionToUndo!!.actionMultipartIdentifier!!]
+                            customBulletCache[actionToUndoOrRedo.actionMultipartIdentifier!!]
 
                         if (customBullet != null) {
-                            actionInterpreter.processCustomBulletAction(actionToUndo!!, editTextView,
-                                true, customBullet)
+                            actionInterpreter.interpretCustomBulletAction(actionToUndoOrRedo,
+                                isUndo, customBullet)
                         }
                     }
 
-                    else -> actionInterpreter.processStyleSpanAction(actionToUndo!!, editTextView,
-                        true)
+                    else -> actionInterpreter.interpretBasicAction(actionToUndoOrRedo,
+                        isUndo, false)
                 }
-            }
-        }
-    }
-
-    private fun performRedo(redoAction: Action) {
-
-        setActionToRedo(redoAction)
-
-        addToUndo(redoAction)
-
-        redoStack.popActionFromStack()
-
-        if (actionToRedo == null) return
-
-
-        when (actionToRedo!!.actionType) {
-
-            ActionType.TEXT -> actionInterpreter.processTextAction(actionToRedo!!,
-                editTextView, false)
-
-            ActionType.SPAN -> {
-                 when {
-                     actionToRedo!!.actionInfo == SpanType.IMAGE_SPAN -> {
-
-                         val imageData =
-                             imageCache[actionToRedo!!.actionMultipartIdentifier!!]
-
-                         if (imageData != null) {
-//                             Log.d("SpanWatcher",
-//                                 "Redo Image ID: ${actionToRedo!!.actionMultipartIdentifier}, " +
-//                                         "Cache keys: ${imageCache.keys}")
-
-                             actionInterpreter.processImageSpanAction(actionToRedo!!,
-                                 editTextView, false, imageData.first)
-                         }
-                     }
-
-                     actionToRedo!!.actionInfo == SpanType.BULLET_SPAN &&
-                             actionToRedo!!.actionIsMultipart -> {
-
-                         val customBullet =
-                             customBulletCache[actionToRedo!!.actionMultipartIdentifier!!]
-
-                         if (customBullet != null) {
-                             actionInterpreter.processCustomBulletAction(actionToRedo!!,
-                                 editTextView, false, customBullet)
-                         }
-                     }
-
-                     else -> actionInterpreter.processStyleSpanAction(actionToRedo!!, editTextView,
-                         false)
-                 }
             }
 
         }

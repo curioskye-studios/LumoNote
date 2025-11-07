@@ -99,6 +99,8 @@ object TextFormatterHelper {
 
         editTextView.setLineSpacing(0f, lineSpaceMultiplier)
 
+        if (oldSelectionStart == -1 || oldSelectionEnd == -1) return
+
         // Restore selection
         editTextView.setSelection(oldSelectionStart, oldSelectionEnd)
     }

@@ -48,6 +48,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
 
     }
 
+
     override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {
 
         if (loggingChanges || makingInternalEdits) return
@@ -71,8 +72,6 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
         startSaveChangesTimer()
 
         Log.d("TextWatcher", "On: (start=$start, before=$before, count=$count)")
-
-
     }
 
     override fun afterTextChanged(newText: Editable?) {
@@ -122,6 +121,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
         saveChangesOnPauseTimer = null
     }
 
+
     private fun commitChange() {
 
         loggingChanges = true
@@ -132,139 +132,169 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
         Log.d("TextWatcher", "oldText: $oldText")
         Log.d("TextWatcher", "newText: $newText")
 
-        val objectChar = '\uFFFC'
-        val count1 = oldText.filter { it == objectChar}.length
-        val count2 = newText.filter { it == objectChar}.length
-        Log.d("TextWatcher", "oldText count: $count1")
-        Log.d("TextWatcher", "newText count: $count2")
-
-        // nothing changed
+        // if nothing changed
         if (oldText == newText || beforeTextIsOriginalText()) {
 
             loggingChanges = false
             return
         }
 
-
         // find start and end differences between old and new text
         val changeStart = findChangeStart(oldText, newText)
-        val oldSuffixMatchLength = findChangeEnd(oldText, newText)
-        val newSuffixMatchLength = findChangeEnd(newText, oldText)
+        val oldTextSegment = getOldTextSegment(changeStart, oldText, newText)
+        val newTextSegment = getNewTextSegment(changeStart, oldText, newText)
 
-        // calculate actual text boundaries after trimming matches
-        val oldEndExcludingMatch = oldText.length - oldSuffixMatchLength
-        val newEndExcludingMatch = newText.length - newSuffixMatchLength
+        Log.d("TextWatcher", "Diff → start=$changeStart, oldSeg='$oldTextSegment', " +
+                "newSeg='$newTextSegment'")
 
-        // extract the changed (removed if replaced) portion from old text
-        val oldSegment =
-            if (changeStart < oldEndExcludingMatch)
-                oldText.substring(changeStart, oldEndExcludingMatch.coerceAtMost(oldText.length))
-            else ""
+        processTextChange(changeStart, oldText, newText, oldTextSegment, newTextSegment)
 
-        // extract the changed (added if replaced) portion from new text
-        val newSegment =
-            if (changeStart < newEndExcludingMatch)
-                newText.substring(changeStart, newEndExcludingMatch.coerceAtMost(newText.length))
-            else ""
-
-        Log.d("TextWatcher", "Diff → start=$changeStart, oldSeg='$oldSegment', " +
-                "newSeg='$newSegment'")
-
-
-        when {
-
-            // ADD → user inserted image char after first one logged
-            oldSegment.isEmpty() && newSegment.isEmpty() && count2 > count1 -> {
-
-                val newImageCharPos = newText.lastIndexOf(objectChar)
-
-                val action = Action(
-                    ActionPerformed.ADD,
-                    ActionType.TEXT,
-                    false,
-                    null,
-                    newImageCharPos,
-                    newImageCharPos+1,
-                    objectChar.toString()
-                )
-
-                stateManager.addToUndo(action)
-                Log.d("TextWatcher", "ADD IMAGE: '$objectChar' at $newImageCharPos")
-            }
-
-            // ADD → user inserted text
-            oldSegment.isEmpty() && newSegment.isNotEmpty() -> {
-
-                val action = Action(
-                    ActionPerformed.ADD,
-                    ActionType.TEXT,
-                    false,
-                    null,
-                    changeStart,
-                    changeStart + newSegment.length,
-                    newSegment
-                )
-
-                stateManager.addToUndo(action)
-                Log.d("TextWatcher", "ADD: '$newSegment' at $changeStart")
-            }
-
-            // REMOVE → user deleted text
-            newSegment.isEmpty() && oldSegment.isNotEmpty() -> {
-
-                val action = Action(
-                    ActionPerformed.REMOVE,
-                    ActionType.TEXT,
-                    false,
-                    null,
-                    changeStart,
-                    changeStart + oldSegment.length,
-                    oldSegment
-                )
-
-                stateManager.addToUndo(action)
-                Log.d("TextWatcher", "REMOVE: '$oldSegment' at $changeStart")
-            }
-
-            // REPLACE → user replaced text segment
-            oldSegment.isNotEmpty() && newSegment.isNotEmpty() -> {
-
-                val multipartIdentifier = ActionHelper.getMultipartIdentifier()
-
-                val removeAction = Action(
-                    ActionPerformed.REMOVE,
-                    ActionType.TEXT,
-                    true,
-                    multipartIdentifier,
-                    changeStart,
-                    changeStart + oldSegment.length,
-                    oldSegment
-                )
-
-                val addAction = Action(
-                    ActionPerformed.ADD,
-                    ActionType.TEXT,
-                    true,
-                    multipartIdentifier,
-                    changeStart,
-                    changeStart + newSegment.length,
-                    newSegment
-                )
-
-                // log both removal and insertion for replace
-                stateManager.addToUndo(removeAction)
-                stateManager.addToUndo(addAction)
-
-                Log.d("TextWatcher", "REPLACE: '$oldSegment' → '$newSegment' at $changeStart")
-            }
-        }
-
-        // update baseline text for next diff comparison
+        // update baseline text for next difference comparison
         beforeText = newText
 
         loggingChanges = false
     }
 
+    private fun processTextChange(changeStart: Int, oldText: String, newText: String,
+                                  oldTextSegment: String, newTextSegment: String) {
+
+        val objectChar = '\uFFFC'
+        val oldObjCharCount = oldText.filter { it == objectChar}.length
+        val newObjCharCount = newText.filter { it == objectChar}.length
+        Log.d("TextWatcher", "oldObjCharCount: $oldObjCharCount")
+        Log.d("TextWatcher", "newObjCharCount: $newObjCharCount")
+
+        var actionPerformed: ActionPerformed? = null
+        var actionType: ActionType? = null
+        var isMultipart: Boolean? = null
+        var multipartIdentifier: String? = null
+        var start: Int? = null
+        var end: Int? = null
+        var actionInfo: Any? = null
+
+        when {
+            // ADD → user inserted image char after first one logged
+            oldTextSegment.isEmpty() && newTextSegment.isEmpty() &&
+                    newObjCharCount > oldObjCharCount -> {
+
+                val newImageCharPos = newText.lastIndexOf(objectChar)
+                actionPerformed = ActionPerformed.ADD
+                actionType = ActionType.TEXT
+                isMultipart = false
+                multipartIdentifier = null
+                start = newImageCharPos
+                end = newImageCharPos + 1
+                actionInfo = objectChar.toString()
+
+                Log.d("TextWatcher", "ADD IMAGE: '$objectChar' at $newImageCharPos")
+            }
+
+            // NEWLINE → user only changed a newline
+            oldText.replace("\n", "") == newText.replace("\n", "") -> {
+
+                val diffStart = findChangeStart(oldText, newText)
+                val isAdd = newText.length > oldText.length
+                actionPerformed = if (isAdd) ActionPerformed.ADD else ActionPerformed.REMOVE
+                actionType = ActionType.TEXT
+                isMultipart = false
+                multipartIdentifier = null
+                start = diffStart
+                end = diffStart + 1
+                actionInfo = "\n"
+
+                Log.d("TextWatcher", "NEWLINE ${if (isAdd) "ADD" else "REMOVE"} at $diffStart")
+            }
+
+            // ADD → user inserted text
+            oldTextSegment.isEmpty() && newTextSegment.isNotEmpty() -> {
+
+                actionPerformed = ActionPerformed.ADD
+                actionType = ActionType.TEXT
+                isMultipart = false
+                multipartIdentifier = null
+                start = changeStart
+                end = changeStart + newTextSegment.length
+                actionInfo = newTextSegment
+
+                Log.d("TextWatcher", "ADD: '$newTextSegment' at $changeStart")
+            }
+
+            // REMOVE → user deleted text
+            newTextSegment.isEmpty() && oldTextSegment.isNotEmpty() -> {
+
+                actionPerformed = ActionPerformed.REMOVE
+                actionType = ActionType.TEXT
+                isMultipart = false
+                multipartIdentifier = null
+                start = changeStart
+                end = changeStart + oldTextSegment.length
+                actionInfo = oldTextSegment
+
+                Log.d("TextWatcher", "REMOVE: '$oldTextSegment' at $changeStart")
+            }
+
+            // REPLACE → user replaced text segment
+            oldTextSegment.isNotEmpty() && newTextSegment.isNotEmpty() -> {
+
+                val replaceMultipartIdentifier = ActionHelper.getMultipartIdentifier()
+
+                // two part action, log both removal and insertion for replace
+                saveTextStateToUndo(ActionPerformed.REMOVE, ActionType.TEXT, true,
+                    replaceMultipartIdentifier, changeStart, changeStart + oldTextSegment.length,
+                    oldTextSegment)
+
+                saveTextStateToUndo(ActionPerformed.ADD, ActionType.TEXT, true,
+                    replaceMultipartIdentifier, changeStart, changeStart + newTextSegment.length,
+                    newTextSegment)
+
+                Log.d("TextWatcher", "REPLACE: '$oldTextSegment' → '$newTextSegment' at " +
+                        "$changeStart")
+            }
+
+        }
+
+        if (actionPerformed == null || actionType == null || isMultipart == null || start == null ||
+            end == null) return
+
+        saveTextStateToUndo(actionPerformed, actionType, isMultipart, multipartIdentifier, start,
+            end, actionInfo)
+    }
+
+    private fun saveTextStateToUndo(actionPerformed: ActionPerformed, actionType: ActionType,
+                                    isMultipart: Boolean, multipartIdentifier: String?, start: Int,
+                                    end: Int, actionInfo: Any?) {
+        val action = Action(
+            actionPerformed,
+            actionType,
+            isMultipart,
+            multipartIdentifier,
+            start,
+            end,
+            actionInfo
+        )
+        stateManager.addToUndo(action)
+    }
+
+
+    private fun getOldTextSegment(changeStart: Int, oldText: String, newText: String) : String {
+
+        val oldSuffixMatchLength = findChangeEnd(oldText, newText)
+        val oldEndExcludingMatch = oldText.length - oldSuffixMatchLength
+
+        return if (changeStart < oldEndExcludingMatch)
+            oldText.substring(changeStart, oldEndExcludingMatch.coerceAtMost(oldText.length))
+        else ""
+    }
+
+    private fun getNewTextSegment(changeStart: Int, oldText: String, newText: String) : String {
+
+        val newSuffixMatchLength = findChangeEnd(newText, oldText)
+        val newEndExcludingMatch = newText.length - newSuffixMatchLength
+
+        return if (changeStart < newEndExcludingMatch)
+            newText.substring(changeStart, newEndExcludingMatch.coerceAtMost(newText.length))
+        else ""
+    }
 
 
     private fun findChangeStart(oldText: String, newText: String): Int {
@@ -284,7 +314,6 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
 
         return maxToCompare
     }
-
 
     private fun findChangeEnd(firstText: String, secondText: String): Int {
 
@@ -309,6 +338,5 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
 
         return matchingCharsCount
     }
-
 
 }

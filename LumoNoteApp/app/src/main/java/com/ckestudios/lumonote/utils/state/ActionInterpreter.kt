@@ -6,190 +6,74 @@ import com.ckestudios.lumonote.data.models.Action
 import com.ckestudios.lumonote.data.models.ActionPerformed
 import com.ckestudios.lumonote.data.models.SpanType
 
-class ActionInterpreter(private val textStateWatcher: TextStateWatcher) {
+class ActionInterpreter(private val editTextView: EditText,
+                        private val textStateWatcher: TextStateWatcher) {
 
-    fun processTextAction(action: Action, editTextView: EditText, shouldUndoAction: Boolean){
+    private val actionPerformer = ActionPerformer()
 
-        // Details e.g.: text - ""
+    fun interpretBasicAction(action: Action, shouldUndoAction: Boolean, isTextAction: Boolean) {
 
-        if (shouldUndoAction) {
+        val actionToPerform = getActionToPerform(action, shouldUndoAction)
 
-            when (action.actionPerformed) {
-
-                ActionPerformed.ADD -> performTextAction(ActionPerformed.REMOVE, action,
-                    editTextView)
-
-                ActionPerformed.REMOVE -> performTextAction(ActionPerformed.ADD, action,
-                    editTextView)
-            }
+        if (isTextAction) {
+            actionPerformer.performTextAction(actionToPerform, action, editTextView,
+                textStateWatcher)
         } else {
 
-            performTextAction(action.actionPerformed, action, editTextView)
+            val spanType = action.actionInfo as SpanType
+
+            interpretBasicSpanAction(actionToPerform, action, spanType)
         }
+
     }
 
-    private fun performTextAction(actionPerformed: ActionPerformed, action: Action,
-                                  editTextView: EditText) {
+    private fun interpretBasicSpanAction(actionToPerform: ActionPerformed, action: Action,
+                                         spanType: SpanType) {
 
-        textStateWatcher.setMakingInternalEdits(true)
+        actionPerformer.performBasicSpanAction(actionToPerform, action, editTextView,
+                spanType, textStateWatcher)
+    }
 
-        when (actionPerformed) {
 
-            ActionPerformed.ADD -> {
+    fun interpretCustomBulletAction(action: Action, shouldUndoAction: Boolean,
+                                    customBullet: String) {
 
-                editTextView.text.insert(action.actionStart, action.actionInfo.toString())
+        val actionToPerform = getActionToPerform(action, shouldUndoAction)
+
+        actionPerformer.updateCustomBullet(customBullet)
+
+        actionPerformer.performComplexSpanAction(actionToPerform, action, editTextView,
+            textStateWatcher, true, false)
+
+        actionPerformer.updateCustomBullet(null)
+    }
+
+    fun interpretImageAction(action: Action, shouldUndoAction: Boolean, imageBitmap: Bitmap) {
+
+        val actionToPerform = getActionToPerform(action, shouldUndoAction)
+
+        actionPerformer.updateImageBitmap(imageBitmap)
+
+        actionPerformer.performComplexSpanAction(actionToPerform, action, editTextView,
+                textStateWatcher, false, true)
+
+        actionPerformer.updateImageBitmap(null)
+    }
+
+
+    private fun getActionToPerform(action: Action, shouldUndoAction: Boolean) : ActionPerformed {
+
+        return when {
+
+            shouldUndoAction && action.actionPerformed == ActionPerformed.ADD -> {
+                ActionPerformed.REMOVE
+            }
+            shouldUndoAction && action.actionPerformed == ActionPerformed.REMOVE -> {
+                ActionPerformed.ADD
             }
 
-            ActionPerformed.REMOVE -> editTextView.text.delete(action.actionStart,
-                action.actionEnd)
-        }
-
-        editTextView.setSelection(action.actionEnd.coerceAtMost(editTextView.text.length))
-
-        textStateWatcher.setMakingInternalEdits(false)
-    }
-
-
-
-    fun processStyleSpanAction(action: Action, editTextView: EditText, shouldUndoAction: Boolean){
-
-        // Details e.g.: spantype: spanType.SPAN
-
-        if (shouldUndoAction) {
-
-            when (action.actionPerformed) {
-
-                ActionPerformed.ADD -> performStyleSpanAction(ActionPerformed.REMOVE, action,
-                    editTextView)
-
-                ActionPerformed.REMOVE -> performStyleSpanAction(ActionPerformed.ADD, action,
-                    editTextView)
-            }
-        } else {
-
-            performStyleSpanAction(action.actionPerformed, action, editTextView)
+            else -> action.actionPerformed
         }
     }
-
-    private fun performStyleSpanAction(actionPerformed: ActionPerformed, action: Action,
-                                       editTextView: EditText) {
-
-        val spanType = action.actionInfo as SpanType
-
-
-        textStateWatcher.setMakingInternalEdits(true)
-
-        when (actionPerformed) {
-
-            ActionPerformed.ADD ->
-                ActionPerformer.addStyleSpan(spanType, action.actionStart, action.actionEnd,
-                    editTextView)
-
-            ActionPerformed.REMOVE ->
-                ActionPerformer.removeStyleSpan(spanType, action.actionStart, action.actionEnd,
-                    editTextView)
-        }
-
-
-        editTextView.setSelection(action.actionEnd)
-
-        textStateWatcher.setMakingInternalEdits(false)
-    }
-
-
-
-
-    fun processImageSpanAction(action: Action, editTextView: EditText, shouldUndoAction: Boolean,
-                               imageBitmap: Bitmap) {
-
-        if (shouldUndoAction) {
-
-            when (action.actionPerformed) {
-
-                ActionPerformed.ADD -> performImageSpanAction(ActionPerformed.REMOVE, action,
-                    editTextView, imageBitmap)
-
-                ActionPerformed.REMOVE -> performImageSpanAction(ActionPerformed.ADD, action,
-                    editTextView, imageBitmap)
-            }
-        } else {
-
-            performImageSpanAction(action.actionPerformed, action, editTextView, imageBitmap)
-        }
-    }
-
-    private fun performImageSpanAction(actionPerformed: ActionPerformed, action: Action,
-                                       editTextView: EditText, imageBitmap: Bitmap) {
-
-        val spanType = action.actionInfo as SpanType
-
-
-        textStateWatcher.setMakingInternalEdits(true)
-
-        when (actionPerformed) {
-
-            ActionPerformed.ADD ->
-                ActionPerformer.addImageSpan(action.actionStart, action.actionEnd, editTextView,
-                    imageBitmap)
-
-            ActionPerformed.REMOVE ->
-                ActionPerformer.removeStyleSpan(spanType, action.actionStart, action.actionEnd,
-                    editTextView)
-        }
-
-        editTextView.setSelection(action.actionEnd)
-
-        textStateWatcher.setMakingInternalEdits(false)
-    }
-
-
-
-
-    fun processCustomBulletAction(action: Action, editTextView: EditText, shouldUndoAction: Boolean,
-                                  customBullet: String) {
-
-        if (shouldUndoAction) {
-
-            when (action.actionPerformed) {
-
-                ActionPerformed.ADD -> performCustomBulletAction(ActionPerformed.REMOVE, action,
-                        editTextView, customBullet)
-
-                ActionPerformed.REMOVE -> performCustomBulletAction(ActionPerformed.ADD, action,
-                        editTextView, customBullet)
-            }
-        } else {
-
-            performCustomBulletAction(action.actionPerformed, action, editTextView, customBullet)
-        }
-    }
-
-    private fun performCustomBulletAction(actionPerformed: ActionPerformed, action: Action,
-                                       editTextView: EditText, customBullet: String) {
-
-        val spanType = action.actionInfo as SpanType
-
-
-        textStateWatcher.setMakingInternalEdits(true)
-
-        when (actionPerformed) {
-
-            ActionPerformed.ADD -> {
-                ActionPerformer.addCustomBullet(action.actionStart, action.actionEnd, editTextView,
-                    customBullet)
-            }
-
-            ActionPerformed.REMOVE -> {
-                ActionPerformer.removeStyleSpan(spanType, action.actionStart, action.actionEnd,
-                    editTextView)
-            }
-        }
-
-        editTextView.setSelection(action.actionEnd)
-
-        textStateWatcher.setMakingInternalEdits(false)
-    }
-
-
 
 }

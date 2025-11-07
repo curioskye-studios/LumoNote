@@ -72,9 +72,9 @@ class TextFormatFragment: Fragment() {
         val stateManager =
             editContentSharedViewModel.noteContentStateManager.value as StateManager
 
-        basicTextFormatter = BasicTextFormatter(noteContentET, stateManager)
-        underlineTextFormatter = UnderlineTextFormatter(noteContentET, stateManager)
-        bulletTextFormatter = BulletTextFormatter(noteContentET, stateManager)
+        basicTextFormatter = BasicTextFormatter(noteContentET, true, stateManager)
+        underlineTextFormatter = UnderlineTextFormatter(noteContentET, true, stateManager)
+        bulletTextFormatter = BulletTextFormatter(noteContentET, true, stateManager)
 
 
         detectSelectionFormattingOnChange()

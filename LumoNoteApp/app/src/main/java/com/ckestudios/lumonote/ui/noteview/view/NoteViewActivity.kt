@@ -419,6 +419,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             if (isTrue && runningManualSave && closeNote) {
 
+                stopAutoSave()
                 GeneralUIHelper.closeActivityWithFeedback("Note Created", this,
                     this, true)
             }
@@ -428,6 +429,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             if (isTrue && runningManualSave && closeNote) {
 
+                stopAutoSave()
                 GeneralUIHelper.closeActivityWithFeedback("Note Updated", this,
                     this, true)
             }
@@ -437,6 +439,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             if (isTrue) {
 
+                stopAutoSave()
                 GeneralUIHelper.closeActivityWithFeedback("Note Deleted", this,
                     this, true)
             }

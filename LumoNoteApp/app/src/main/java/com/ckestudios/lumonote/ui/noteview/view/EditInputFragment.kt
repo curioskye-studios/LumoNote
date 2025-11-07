@@ -103,8 +103,10 @@ class EditInputFragment : Fragment() {
         noteContentET.addTextChangedListener(noteContentTextWatcher)
         editContentSharedViewModel.setNoteContentTextWatcher(noteContentTextWatcher)
 
-        simpleChecklistFormatter = SimpleChecklistFormatter(noteContentET, noteContentStateManager)
-        simpleImageFormatter = SimpleImageFormatter(noteContentET, noteContentStateManager)
+        simpleChecklistFormatter = SimpleChecklistFormatter(noteContentET, true,
+            noteContentStateManager)
+        simpleImageFormatter = SimpleImageFormatter(noteContentET, true,
+            noteContentStateManager)
 
         setOnClickListeners()
 
@@ -167,9 +169,10 @@ class EditInputFragment : Fragment() {
             }
 
             undoButtonIV.setOnClickListener {
-                val actionInterpreter = ActionInterpreter(noteContentTextWatcher)
 
-                noteContentStateManager.undoAction(actionInterpreter)
+                val actionInterpreter = ActionInterpreter(noteContentET, noteContentTextWatcher)
+
+                noteContentStateManager.processAction(actionInterpreter, true)
 
                 editInputViewModel.setUndoBtnActive(!noteContentStateManager.checkIfUndoEmpty())
                 editInputViewModel.setRedoBtnActive(!noteContentStateManager.checkIfRedoEmpty())
@@ -177,7 +180,9 @@ class EditInputFragment : Fragment() {
 
             redoButtonIV.setOnClickListener {
 
-                noteContentStateManager.redoAction()
+                val actionInterpreter = ActionInterpreter(noteContentET, noteContentTextWatcher)
+
+                noteContentStateManager.processAction(actionInterpreter, false)
                 editInputViewModel.setUndoBtnActive(!noteContentStateManager.checkIfUndoEmpty())
                 editInputViewModel.setRedoBtnActive(!noteContentStateManager.checkIfRedoEmpty())
             }

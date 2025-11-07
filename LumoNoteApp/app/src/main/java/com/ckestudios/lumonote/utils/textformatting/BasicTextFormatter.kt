@@ -12,12 +12,13 @@ import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 import com.ckestudios.lumonote.utils.state.StateManager
 
 class BasicTextFormatter(override val editTextView: EditText,
-                         private val stateManager: StateManager) : RichTextFormatter<StyleSpan> {
+                         override val isActiveEditing: Boolean,
+                         private val stateManager: StateManager?) : RichTextFormatter<StyleSpan> {
 
     override lateinit var etvSpannableContent: Editable
     private var spanType: SpanType? = null
 
-    private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
+    private val spanStateWatcher = stateManager?.let { SpanStateWatcher(editTextView, it) }
     private var multipartIdentifier: String? = null
 
     override fun updateSpannableContent() {
@@ -103,8 +104,13 @@ class BasicTextFormatter(override val editTextView: EditText,
             )
         }
 
-        val doingNormalization = multipartIdentifier != null
-        spanStateWatcher.addBasicSpan(setSpan!!, spanType!!, doingNormalization, multipartIdentifier)
+        if (isActiveEditing) {
+            val doingNormalization = multipartIdentifier != null
+            spanStateWatcher?.addBasicSpan(setSpan!!, spanType!!, doingNormalization,
+                multipartIdentifier)
+        }
+
+
     }
 
     override fun removeFormatting(selectStart: Int, selectEnd: Int, spansList: Array<StyleSpan>){
@@ -132,8 +138,11 @@ class BasicTextFormatter(override val editTextView: EditText,
 
             // eg. span: 1-9, selection 3-6, runs both
 
-            val doingNormalization = multipartIdentifier != null
-            spanStateWatcher.removeStyleSpan(span, spanType!!, doingNormalization, multipartIdentifier)
+            if (isActiveEditing) {
+                val doingNormalization = multipartIdentifier != null
+                spanStateWatcher?.removeStyleSpan(span, spanType!!, doingNormalization,
+                    multipartIdentifier)
+            }
 
             etvSpannableContent.removeSpan(span)
 
@@ -157,8 +166,10 @@ class BasicTextFormatter(override val editTextView: EditText,
             multipartIdentifier = ActionHelper.getMultipartIdentifier()
 
             // Combine adjacent or overlapping spans
-            TextFormatterHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
-                spanStateWatcher, multipartIdentifier, spanType!!, ::applyFormatting)
+            if (spanStateWatcher != null) {
+                TextFormatterHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
+                    spanStateWatcher, multipartIdentifier, spanType!!, ::applyFormatting)
+            }
 
             multipartIdentifier = null
         }

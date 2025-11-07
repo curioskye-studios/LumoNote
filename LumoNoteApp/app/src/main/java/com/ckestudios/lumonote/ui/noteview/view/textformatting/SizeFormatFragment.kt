@@ -63,7 +63,7 @@ class SizeFormatFragment: Fragment() {
         val stateManager =
             editContentSharedViewModel.noteContentStateManager.value as StateManager
 
-        sizeTextFormatter = SizeTextFormatter(noteContentET, stateManager)
+        sizeTextFormatter = SizeTextFormatter(noteContentET, true, stateManager)
 
         setOnClickListeners()
 

@@ -11,15 +11,16 @@ import com.ckestudios.lumonote.utils.state.ActionHelper
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 import com.ckestudios.lumonote.utils.state.StateManager
 
-class UnderlineTextFormatter(
-    override val editTextView: EditText, private val stateManager: StateManager)
-    : RichTextFormatter<UnderlineTextFormatter.CustomUnderlineSpan> {
+class UnderlineTextFormatter(override val editTextView: EditText,
+                             override val isActiveEditing: Boolean,
+                             private val stateManager: StateManager?) :
+                             RichTextFormatter<UnderlineTextFormatter.CustomUnderlineSpan> {
 
     class CustomUnderlineSpan : UnderlineSpan()
 
     override lateinit var etvSpannableContent: Editable
 
-    private val spanStateWatcher = SpanStateWatcher(editTextView, stateManager)
+    private val spanStateWatcher = stateManager?.let { SpanStateWatcher(editTextView, it) }
     private var multipartIdentifier: String? = null
 
 
@@ -79,9 +80,11 @@ class UnderlineTextFormatter(
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
-        val doingNormalization = multipartIdentifier != null
-        spanStateWatcher.addBasicSpan(span, SpanType.UNDERLINE_SPAN, doingNormalization,
-            multipartIdentifier)
+        if (isActiveEditing) {
+            val doingNormalization = multipartIdentifier != null
+            spanStateWatcher?.addBasicSpan(span, SpanType.UNDERLINE_SPAN, doingNormalization,
+                multipartIdentifier)
+        }
     }
 
     override fun removeFormatting(selectStart: Int, selectEnd: Int,
@@ -110,9 +113,11 @@ class UnderlineTextFormatter(
 
             // eg. span: 1-9, selection 3-6, runs both
 
-            val doingNormalization = multipartIdentifier != null
-            spanStateWatcher.removeStyleSpan(span, SpanType.UNDERLINE_SPAN, doingNormalization,
-                multipartIdentifier)
+            if (isActiveEditing) {
+                val doingNormalization = multipartIdentifier != null
+                spanStateWatcher?.removeStyleSpan(span, SpanType.UNDERLINE_SPAN, doingNormalization,
+                    multipartIdentifier)
+            }
 
             etvSpannableContent.removeSpan(span)
         }
@@ -133,8 +138,10 @@ class UnderlineTextFormatter(
             multipartIdentifier = ActionHelper.getMultipartIdentifier()
 
             // Combine adjacent or overlapping spans
-            TextFormatterHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
-                spanStateWatcher, multipartIdentifier, SpanType.UNDERLINE_SPAN, ::applyFormatting)
+            if (spanStateWatcher != null) {
+                TextFormatterHelper.fixOverlappingSpans(sortedSpans, etvSpannableContent,
+                    spanStateWatcher, multipartIdentifier, SpanType.UNDERLINE_SPAN, ::applyFormatting)
+            }
 
             multipartIdentifier = null
         }

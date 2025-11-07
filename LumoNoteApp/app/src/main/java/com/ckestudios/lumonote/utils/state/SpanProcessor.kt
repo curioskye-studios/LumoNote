@@ -19,6 +19,8 @@ import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 object SpanProcessor {
 
+    private val actionPerformer = ActionPerformer()
+
     fun extractSpans(editTextView: EditText) : String {
 
         var spanString = ""
@@ -31,6 +33,8 @@ object SpanProcessor {
 
         for (span in spans) {
 
+//            Log.d("SaveSpans", "span: ${span.toString()}")
+
             val spanStart = editTextView.text?.getSpanStart(span)
             val spanEnd = editTextView.text?.getSpanEnd(span)
 
@@ -39,7 +43,7 @@ object SpanProcessor {
             val spanEntry = formatSpanEntry(span, spanStart, spanEnd)
 
             if (spanEntry == "") continue
-            Log.d("SaveSpans", "spanEntry: $spanEntry")
+            Log.d("SaveSpans", "spanEntryExtract: $spanEntry")
 
             spanEntries.add(spanEntry)
         }
@@ -69,18 +73,18 @@ object SpanProcessor {
             is UnderlineTextFormatter.CustomUnderlineSpan ->
                 "[span: ${SpanType.UNDERLINE_SPAN.spanName}, start: $spanStart, end: $spanEnd]"
 
+            is ChecklistSpan ->
+                "[span: ${SpanType.CHECKLIST_SPAN.spanName}, start: $spanStart, end: $spanEnd]"
+
             is CustomBulletSpan -> {
                 val custom =
                     if (span.getBulletType() == BulletType.CUSTOM) { span.getCustomBullet() }
                     else null
 
                 "[span: ${SpanType.BULLET_SPAN.spanName}, start: $spanStart, end: $spanEnd, " +
-                        "bulletType: ${span.getBulletType()}, bullet: $custom]"
+                        "bulletType: ${span.getBulletType().bulletName}, bullet: $custom]"
 
             }
-
-            is ChecklistSpan ->
-                "[span: ${SpanType.CHECKLIST_SPAN.spanName}, start: $spanStart, end: $spanEnd]"
 
             is CustomImageSpan -> {
 //                "[span: ${SpanType.IMAGE_SPAN.spanName}, start: $spanStart, end: $spanEnd]"
@@ -127,7 +131,6 @@ object SpanProcessor {
             val spanStart = startValString.toIntOrNull() ?: -1
             val spanEnd = endValString.toIntOrNull() ?: -1
 
-
             if (spanType == null || spanStart == -1 || spanEnd == -1) continue
 
             if (spanRecordDict.containsKey("bulletType") && spanRecordDict.containsKey("bullet")) {
@@ -140,9 +143,14 @@ object SpanProcessor {
                         else -> null
                     }
 
+                Log.d("SaveSpans", "spanStart: $spanStart")
+                Log.d("SaveSpans", "spanEnd: $spanEnd")
+
                 if (bulletType == BulletType.CUSTOM) {
                     customBullet = spanRecordDict["bullet"].toString()
-                    ActionPerformer.addCustomBullet(spanStart, spanEnd, editTextView, customBullet)
+
+                    Log.d("SaveSpans", "point 1")
+                    actionPerformer.addCustomBullet(spanStart, spanEnd, editTextView, customBullet)
                     continue
                 }
             }
@@ -152,8 +160,9 @@ object SpanProcessor {
 
             }
 
+            Log.d("SaveSpans", "spanRecordETV: $spanRecord")
 
-            ActionPerformer.addStyleSpan(spanType, spanStart, spanEnd, editTextView)
+            actionPerformer.addBasicSpan(spanType, spanStart, spanEnd, editTextView)
         }
 
     }
@@ -163,8 +172,6 @@ object SpanProcessor {
         if (spanData == "") return
 
         val spanEntriesList = convertSpanDataToList(spanData)
-
-        //use actionperformer
 
         for (entry in spanEntriesList) {
 
@@ -185,6 +192,7 @@ object SpanProcessor {
                             SpanType.ITALICS_SPAN.spanName -> spanType = SpanType.ITALICS_SPAN
                             SpanType.UNDERLINE_SPAN.spanName -> spanType = SpanType.UNDERLINE_SPAN
                             SpanType.CHECKLIST_SPAN.spanName -> spanType = SpanType.CHECKLIST_SPAN
+                            SpanType.BULLET_SPAN.spanName -> spanType = SpanType.BULLET_SPAN
                         }
                     "start" -> spanStart = (entryInfo.second as String).toInt()
                     "end" -> spanEnd = (entryInfo.second as String).toInt()
@@ -236,7 +244,7 @@ object SpanProcessor {
 
         for (spanRecord in spanRecordList) {
 
-            Log.d("SaveSpans", "spanRecord: $spanRecord")
+            Log.d("SaveSpans", "unformattedSpanRecord: $spanRecord")
 
             val formattedSpanRecord  =
                 GeneralTextHelper.removeCharsFromString(spanRecord, listOf("[", "]"))

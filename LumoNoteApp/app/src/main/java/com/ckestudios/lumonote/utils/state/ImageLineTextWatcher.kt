@@ -1,9 +1,9 @@
-package com.ckestudios.lumonote.ui.noteview.other
+package com.ckestudios.lumonote.utils.state
 
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
-import com.ckestudios.lumonote.utils.state.StateManager
+import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.utils.textformatting.TextFormatterHelper
 
 
