@@ -5,7 +5,6 @@ import android.graphics.Typeface
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.StyleSpan
-import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.Action
 import com.ckestudios.lumonote.data.models.ActionPerformed
@@ -16,12 +15,21 @@ import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
+import com.ckestudios.lumonote.utils.textformatting.BulletTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
-class ActionPerformer() {
+class ActionPerformer(private val editTextView: EditText) {
 
     private var currentCustomBullet: String? = null
     private var currentImageBitmap: Bitmap? = null
+
+    private val basicTextFormatter = BasicTextFormatter(editTextView, false,
+        null)
+    private val underlineTextFormatter =
+        UnderlineTextFormatter(editTextView, false, null)
+    private val bulletTextFormatter = BulletTextFormatter(editTextView, false,
+        null)
+
 
     fun updateCustomBullet(bullet: String?) {
         currentCustomBullet = bullet
@@ -30,7 +38,7 @@ class ActionPerformer() {
         currentImageBitmap = bitmap
     }
 
-    fun performTextAction(actionToPerform: ActionPerformed, action: Action, editTextView: EditText,
+    fun performTextAction(actionToPerform: ActionPerformed, action: Action,
                           textStateWatcher: TextStateWatcher) {
 
         textStateWatcher.setMakingInternalEdits(true)
@@ -103,24 +111,20 @@ class ActionPerformer() {
     fun addBasicSpan(spanType: SpanType, spanStart: Int, spanEnd: Int,
                              editTextView: EditText){
 
-        val basicTextFormatter = BasicTextFormatter(editTextView, false, null)
-        val underlineTextFormatter =
-            UnderlineTextFormatter(editTextView, false, null)
-
         when (spanType) {
 
-            SpanType.BOLD_SPAN, SpanType.ITALICS_SPAN ->
+            SpanType.BOLD_SPAN, SpanType.ITALICS_SPAN -> {
                 basicTextFormatter.setBasicSpanType(spanType, spanStart, spanEnd)
+            }
 
             SpanType.UNDERLINE_SPAN -> underlineTextFormatter.processFormatting(spanStart, spanEnd)
 
             SpanType.BULLET_SPAN -> {
+
                 removeDesiredSpan(SpanType.BULLET_SPAN, spanStart, spanEnd, editTextView)
-                editTextView.text.setSpan(
-                    CustomBulletSpan(30, 6f, BulletType.DEFAULT, null),
-                    spanStart, spanEnd,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+
+                bulletTextFormatter.setBulletType(BulletType.DEFAULT)
+                bulletTextFormatter.applyFormatting(spanStart, spanEnd)
             }
 
             SpanType.CHECKLIST_SPAN -> {
@@ -137,15 +141,11 @@ class ActionPerformer() {
     fun addCustomBullet(spanStart: Int, spanEnd: Int, editTextView: EditText,
                                 customBullet: String){
 
-
-        Log.d("SaveSpans", "point 2")
-
         removeDesiredSpan(SpanType.BULLET_SPAN, spanStart, spanEnd, editTextView)
-        editTextView.text.setSpan(
-            CustomBulletSpan(30, 6f, BulletType.CUSTOM, customBullet),
-            spanStart, spanEnd,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
+
+        bulletTextFormatter.setCustomBullet(customBullet)
+        bulletTextFormatter.setBulletType(BulletType.CUSTOM)
+        bulletTextFormatter.applyFormatting(spanStart, spanEnd)
     }
 
     fun addImageSpan(spanStart: Int, spanEnd: Int, editTextView: EditText, imageBitmap: Bitmap){

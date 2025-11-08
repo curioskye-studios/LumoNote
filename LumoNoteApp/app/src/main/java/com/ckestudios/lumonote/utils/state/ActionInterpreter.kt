@@ -9,15 +9,14 @@ import com.ckestudios.lumonote.data.models.SpanType
 class ActionInterpreter(private val editTextView: EditText,
                         private val textStateWatcher: TextStateWatcher) {
 
-    private val actionPerformer = ActionPerformer()
+    private val actionPerformer = ActionPerformer(editTextView)
 
     fun interpretBasicAction(action: Action, shouldUndoAction: Boolean, isTextAction: Boolean) {
 
         val actionToPerform = getActionToPerform(action, shouldUndoAction)
 
         if (isTextAction) {
-            actionPerformer.performTextAction(actionToPerform, action, editTextView,
-                textStateWatcher)
+            actionPerformer.performTextAction(actionToPerform, action, textStateWatcher)
         } else {
 
             val spanType = action.actionInfo as SpanType

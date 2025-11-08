@@ -19,7 +19,7 @@ class BulletTextFormatter(override val editTextView: EditText,
 
     private var bulletType: BulletType? = null
     private var customBullet: String? = null
-    private lateinit var identifier: String
+    private var identifier: String? = null
 
     private val spanStateManager = stateManager?.let { SpanStateWatcher(editTextView, it) }
 
@@ -28,20 +28,39 @@ class BulletTextFormatter(override val editTextView: EditText,
         etvSpannableContent = editTextView.text
     }
 
+    private fun updateIdentifier() {
+
+        identifier = ActionHelper.getMultipartIdentifier()
+    }
+
+    fun setBulletType(bulletType: BulletType) {
+
+        updateSpannableContent()
+
+        this.bulletType = bulletType
+
+        if (bulletType == BulletType.DEFAULT){
+            setCustomBullet(null)
+        }
+    }
+
+    fun setCustomBullet(bullet: String?) {
+
+        customBullet = bullet
+    }
+
     fun processAsDefaultBullet(selectStart: Int, selectEnd: Int) {
 
-        bulletType = BulletType.DEFAULT
-
-        customBullet = null
+        setBulletType(BulletType.DEFAULT)
 
         processFormatting(selectStart, selectEnd)
     }
 
     fun processAsCustomBullet(selectStart: Int, selectEnd: Int, bullet: String) {
 
-        bulletType = BulletType.CUSTOM
+        setBulletType(BulletType.CUSTOM)
 
-        customBullet = bullet
+        setCustomBullet(bullet)
 
         processFormatting(selectStart, selectEnd)
     }
@@ -171,12 +190,17 @@ class BulletTextFormatter(override val editTextView: EditText,
 
                 spanStateManager?.addBasicSpan(bulletSpan, SpanType.BULLET_SPAN, false,
                     null)
-            } else if (isActiveEditing) {
 
-                identifier = ActionHelper.getMultipartIdentifier()
+            } else if (bulletType == BulletType.CUSTOM && isActiveEditing) {
 
-                stateManager?.addBulletToCache(customBullet!!, identifier)
+                updateIdentifier()
+                stateManager?.addBulletToCache(customBullet!!, identifier!!)
                 spanStateManager?.addCustomBulletSpan(bulletSpan, identifier)
+
+            } else if (bulletType == BulletType.CUSTOM && !isActiveEditing) {
+
+                updateIdentifier()
+                stateManager?.addBulletToCache(customBullet!!, identifier!!)
             }
 
         }
@@ -193,7 +217,7 @@ class BulletTextFormatter(override val editTextView: EditText,
 
                 spanStateManager?.removeStyleSpan(span, SpanType.BULLET_SPAN, false,
                     null)
-            } else if (isActiveEditing) {
+            } else if (span.getBulletType() == BulletType.CUSTOM && isActiveEditing) {
 
                 spanStateManager?.removeCustomBulletSpan(span, identifier)
             }

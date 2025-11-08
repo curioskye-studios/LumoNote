@@ -19,9 +19,11 @@ import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 object SpanProcessor {
 
-    private val actionPerformer = ActionPerformer()
+    private lateinit var actionPerformer: ActionPerformer
 
     fun extractSpans(editTextView: EditText) : String {
+
+        actionPerformer = ActionPerformer(editTextView)
 
         var spanString = ""
         val spanEntries = mutableListOf<String>()
@@ -105,6 +107,8 @@ object SpanProcessor {
     }
 
     fun reapplySpansETV(spanData: String, editTextView: EditText) {
+
+        actionPerformer = ActionPerformer(editTextView)
 
         if (spanData == "") return
         editTextView.text.clearSpans() // remove any lingering spans
