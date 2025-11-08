@@ -6,8 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.ckestudios.lumonote.data.repository.NoteRepository
 import com.ckestudios.lumonote.data.models.Note
+import com.ckestudios.lumonote.data.repository.NoteRepository
 import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -85,7 +85,7 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
         // reset value
         setNoteWasDeleted(false)
     }
-    fun saveNote(note: Note, shouldUseAsync: Boolean) {
+    fun saveNote(note: Note) {
 
         if (isNewNote.value == true) {
 
@@ -94,16 +94,14 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
             // Call database helper object and invoke note insertion method w/ new note
             noteRepository.insertItem(note)
 
-            if (shouldUseAsync) setNoteWasCreatedAsync(true)
-            else setNoteWasCreated(true)
+            setNoteWasCreated(true)
 
         } else {
 
             // Call database helper object and invoke note update method w/ updated note
             noteRepository.updateItem(note)
 
-            if (shouldUseAsync) setNoteWasUpdatedAsync(true)
-            else setNoteWasUpdated(true)
+            setNoteWasUpdated(true)
         }
     }
 
@@ -127,32 +125,15 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
         _isNewNote.value = isNew
     }
 
-    fun setIsNewNoteAsync(isNew: Boolean) {
-        // Use liveData.postValue(value) instead of liveData.value = value.
-        // It's called asynchronous.
-        _isNewNote.postValue(isNew)
-    }
-
-
     private fun setNoteWasCreated(flag: Boolean) {
         _noteWasCreated.value = flag
         _noteWasUpdated.value = !flag
     }
-    private fun setNoteWasCreatedAsync(flag: Boolean) {
-        _noteWasCreated.postValue(flag)
-        _noteWasUpdated.postValue(!flag)
-    }
-
 
     private fun setNoteWasUpdated(flag: Boolean) {
         _noteWasUpdated.value = flag
         _noteWasCreated.value = !flag
     }
-    private fun setNoteWasUpdatedAsync(flag: Boolean) {
-        _noteWasUpdated.postValue(flag)
-        _noteWasCreated.postValue(!flag)
-    }
-
 
     private fun setNoteWasDeleted(flag: Boolean){
         _noteWasDeleted.value = flag

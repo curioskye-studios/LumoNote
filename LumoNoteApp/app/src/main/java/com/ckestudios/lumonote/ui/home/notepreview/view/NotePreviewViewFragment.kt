@@ -216,7 +216,7 @@ class NotePreviewViewFragment : Fragment() {
             //update note in database with new pinned status
             if (noteAppSharedViewModel.currentPreviewNoteID.value != -1) {
 
-                var noteData = noteAppSharedViewModel.getNote(
+                val noteData = noteAppSharedViewModel.getNote(
                     noteAppSharedViewModel.currentPreviewNoteID.value!!
                 )
 
@@ -225,7 +225,7 @@ class NotePreviewViewFragment : Fragment() {
                 Log.d("NoteFrag", "$noteData")
 
                 noteAppSharedViewModel.setIsNewNote(false)
-                noteAppSharedViewModel.saveNote(noteData, false)
+                noteAppSharedViewModel.saveNote(noteData)
 
                 noteAppSharedViewModel.setCurrentPreviewNoteID(-1)
             }

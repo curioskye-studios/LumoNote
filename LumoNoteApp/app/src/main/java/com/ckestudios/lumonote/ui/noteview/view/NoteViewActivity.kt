@@ -1,8 +1,6 @@
 package com.ckestudios.lumonote.ui.noteview.view
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +9,7 @@ import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.data.repository.NoteRepository
 import com.ckestudios.lumonote.databinding.ActivityNoteViewBinding
+import com.ckestudios.lumonote.ui.noteview.other.NoteSaveHelper
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
@@ -22,8 +21,6 @@ import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.state.SpanProcessor
 import com.ckestudios.lumonote.utils.state.StateManager
 import java.time.LocalDate
-import java.util.Timer
-import kotlin.concurrent.timer
 
 
 class NoteViewActivity : AppCompatActivity() {
@@ -33,16 +30,16 @@ class NoteViewActivity : AppCompatActivity() {
     // Stores reference to id of current note being updated, stays -1 if not found
     private var noteID: Int = -1
     private var existingNoteClicked: Boolean = false
-    private lateinit var retrievedNote: Note
+    private var retrievedNote: Note? = null
 
     private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
     private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
 
-    private var autoSaveTimer: Timer? = null
-    private var runningAutoSave = false
     private var runningManualSave = false
     private var closeNote = false
+
+    private lateinit var noteSaveHelper: NoteSaveHelper
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,6 +56,8 @@ class NoteViewActivity : AppCompatActivity() {
 
         noteAppSharedViewModel = ViewModelProvider(this, appSharedViewFactory)
             .get(NoteAppSharedViewModel::class.java)
+
+        noteSaveHelper = NoteSaveHelper(noteAppSharedViewModel)
 
         inputSharedViewModel = ViewModelProvider(this).get(InputSharedViewModel::class.java)
 
@@ -79,7 +78,7 @@ class NoteViewActivity : AppCompatActivity() {
             return
         } else {
 
-            populateUIWithNoteData(isExistingNote)
+            populateUIWithNoteData()
         }
 
 
@@ -89,8 +88,6 @@ class NoteViewActivity : AppCompatActivity() {
             noteViewBinding.root)
         BasicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteEditContentET,
             noteViewBinding.root)
-
-        runAutoSave()
 
         notifyIfEditing()
 
@@ -113,30 +110,6 @@ class NoteViewActivity : AppCompatActivity() {
         runOnUiThread {
             noteViewBinding.modifiedDateTV.text = convertedDate
         }
-    }
-
-
-    private fun runAutoSave(){
-
-        stopAutoSave()
-
-        // run every 5s
-        autoSaveTimer = timer(initialDelay = 500, period = 15000) {
-
-            runningAutoSave = true
-
-            updateRetrievedNote()
-
-            collectNoteData()
-
-            runningAutoSave = false
-        }
-    }
-
-    private fun stopAutoSave(){
-
-        autoSaveTimer?.cancel()
-        autoSaveTimer = null
     }
 
 
@@ -176,26 +149,39 @@ class NoteViewActivity : AppCompatActivity() {
     }
 
 
-    private fun populateUIWithNoteData(usingExistingNote: Boolean) {
+    private fun commitNoteChanges() {
 
-        if (usingExistingNote) {
+        val noteDataDict =
+            noteSaveHelper.getNoteDataDict(noteViewBinding.noteTitleET,
+                noteViewBinding.noteEditContentET, noteViewBinding.pinButtonIV)
 
-//            Log.d("populateUIWithNoteData", retrievedNote.noteModifiedDate)
+        updateRetrievedNote()
+
+        noteSaveHelper.collectNoteData(retrievedNote, noteDataDict)
+
+        if (!(noteSaveHelper.noteHasNotChanged(retrievedNote, noteDataDict))) {
+            updateModifiedDate()
+        }
+    }
+
+
+    private fun populateUIWithNoteData() {
+
+        if (retrievedNote != null) {
 
             // Parse the modified date as a date object
-            val convertedDate = LocalDate.parse(retrievedNote.noteModifiedDate);
+            val convertedDate = LocalDate.parse(retrievedNote!!.noteModifiedDate);
             val retrievedNoteDate = GeneralTextHelper.formatDate(convertedDate)
 
-            Log.d("noteData", retrievedNote.notePinned.toString())
+            Log.d("noteData", retrievedNote!!.notePinned.toString())
 
             // Populate the view note activity UI w/ the pre-existing note data
             noteViewBinding.modifiedDateTV.text = retrievedNoteDate
-            noteViewBinding.noteTitleET.setText(retrievedNote.noteTitle)
-            noteViewBinding.noteEditContentET.setText(retrievedNote.noteContent)
-            SpanProcessor.reapplySpansETV(retrievedNote.noteSpans, noteViewBinding.noteEditContentET)
+            noteViewBinding.noteTitleET.setText(retrievedNote!!.noteTitle)
+            noteViewBinding.noteEditContentET.setText(retrievedNote!!.noteContent)
+            SpanProcessor.reapplySpansETV(retrievedNote!!.noteSpans, noteViewBinding.noteEditContentET)
 
-            noteViewBinding.pinButtonIV.tag = retrievedNote.notePinned
-
+            noteViewBinding.pinButtonIV.tag = retrievedNote!!.notePinned
             GeneralButtonIVHelper.updatePinHighlight(noteViewBinding.pinButtonIV, this,
                 R.drawable.selected_background)
         }
@@ -220,8 +206,7 @@ class NoteViewActivity : AppCompatActivity() {
                     backButtonIV)
 
                 runningManualSave = true
-
-                collectNoteData()
+                commitNoteChanges()
 
                 finish()
             }
@@ -252,21 +237,15 @@ class NoteViewActivity : AppCompatActivity() {
                     saveButtonIV)
 
                 runningManualSave = true
+                commitNoteChanges()
 
-                updateRetrievedNote()
-
-                collectNoteData()
-
-
-                val title =  noteViewBinding.noteTitleET.text.toString()
-                val content =  noteViewBinding.noteEditContentET.text.toString()
-                val spans = SpanProcessor.extractSpans(noteViewBinding.noteEditContentET)
-                val pinned: Boolean =  (noteViewBinding.pinButtonIV.tag as Boolean)
+                val noteDataDict =
+                    noteSaveHelper.getNoteDataDict(noteViewBinding.noteTitleET,
+                        noteViewBinding.noteEditContentET, noteViewBinding.pinButtonIV)
 
                 if (existingNoteClicked) {
 
-                    if (!(retrievedNote.noteTitle == title && retrievedNote.noteContent == content &&
-                        retrievedNote.notePinned == pinned && retrievedNote.noteSpans == spans)) {
+                    if (!(noteSaveHelper.noteHasNotChanged(retrievedNote, noteDataDict))) {
                         GeneralUIHelper.displayFeedbackToast(this@NoteViewActivity,
                             "Changes Saved", false)
                     } else {
@@ -284,7 +263,7 @@ class NoteViewActivity : AppCompatActivity() {
                 runningManualSave = true
                 closeNote = true
 
-                collectNoteData()
+                commitNoteChanges()
 
                 finish()
             }
@@ -298,12 +277,13 @@ class NoteViewActivity : AppCompatActivity() {
                         runningManualSave = true
                         closeNote = true
 
-                        collectNoteData()
+                        commitNoteChanges()
 
                         finish()
                     }
                 }
-            onBackPressedDispatcher.addCallback(this@NoteViewActivity, backButtonPressedCallback)
+            onBackPressedDispatcher.addCallback(this@NoteViewActivity,
+                backButtonPressedCallback)
 
         }
 
@@ -339,76 +319,8 @@ class NoteViewActivity : AppCompatActivity() {
             noteContentIsEditing.observe(this@NoteViewActivity){ isTrue ->
 
                 noteViewBinding.noteEditContentET.isCursorVisible = isTrue
-
-                if (isTrue) {
-                    runAutoSave()
-                } else {
-                    stopAutoSave()
-                    collectNoteData()
-                }
             }
-
         }
-    }
-
-
-
-    // Collects and submits note to database upon clicking save button
-    private fun collectNoteData() {
-
-        // Collect data from input fields, store in note object
-        val title =  noteViewBinding.noteTitleET.text.toString()
-        val content =  noteViewBinding.noteEditContentET.text.toString()
-        val spans = SpanProcessor.extractSpans(noteViewBinding.noteEditContentET)
-        val pinned: Boolean =  (noteViewBinding.pinButtonIV.tag as Boolean)
-
-        Log.d("collectNoteData", pinned.toString())
-        Log.d("SaveSpans", "spans: $spans")
-
-        // Format: YYYY-MM-DD
-        val currentDate = LocalDate.now().toString()
-
-        val created = currentDate
-        val modified = currentDate
-
-
-        // If an existing note was clicked on rather than the create button
-        if (existingNoteClicked) {
-
-            if (retrievedNote.noteTitle == title && retrievedNote.noteContent == content &&
-                retrievedNote.notePinned == pinned && retrievedNote.noteSpans == spans) return
-
-            updateModifiedDate()
-
-            if (runningAutoSave) noteAppSharedViewModel.setIsNewNoteAsync(false)
-            else noteAppSharedViewModel.setIsNewNote(false)
-
-            val updatedNote = Note(retrievedNote.noteID, title, content, spans,
-                retrievedNote.noteCreatedDate, modified, pinned)
-
-            noteAppSharedViewModel.saveNote(updatedNote, runningAutoSave)
-
-            if (runningAutoSave) {
-
-                // switch to main thread
-                Handler(Looper.getMainLooper()).post {
-
-                    GeneralUIHelper.displayFeedbackToast(this, "Auto saved",
-                        false)
-                }
-            }
-
-        } else {
-
-            if (runningAutoSave) return
-
-            noteAppSharedViewModel.setIsNewNote(true)
-
-            val newNote = Note(0, title, content, spans, created, modified, pinned)
-
-            noteAppSharedViewModel.saveNote(newNote, false)
-        }
-
     }
 
 
@@ -419,7 +331,6 @@ class NoteViewActivity : AppCompatActivity() {
 
             if (isTrue && runningManualSave && closeNote) {
 
-                stopAutoSave()
                 GeneralUIHelper.closeActivityWithFeedback("Note Created", this,
                     this, true)
             }
@@ -429,7 +340,6 @@ class NoteViewActivity : AppCompatActivity() {
 
             if (isTrue && runningManualSave && closeNote) {
 
-                stopAutoSave()
                 GeneralUIHelper.closeActivityWithFeedback("Note Updated", this,
                     this, true)
             }
@@ -439,7 +349,6 @@ class NoteViewActivity : AppCompatActivity() {
 
             if (isTrue) {
 
-                stopAutoSave()
                 GeneralUIHelper.closeActivityWithFeedback("Note Deleted", this,
                     this, true)
             }
