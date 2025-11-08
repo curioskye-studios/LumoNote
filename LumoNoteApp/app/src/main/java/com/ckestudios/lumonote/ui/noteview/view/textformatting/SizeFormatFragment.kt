@@ -13,7 +13,6 @@ import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.state.StateManager
 import com.ckestudios.lumonote.utils.textformatting.SizeTextFormatter
 
 
@@ -60,10 +59,7 @@ class SizeFormatFragment: Fragment() {
         noteContentET =
             editContentSharedViewModel.noteContentEditTextView.value as CustomSelectionET
 
-        val stateManager =
-            editContentSharedViewModel.noteContentStateManager.value as StateManager
-
-        sizeTextFormatter = SizeTextFormatter(noteContentET, true, stateManager)
+        sizeTextFormatter = SizeTextFormatter(noteContentET, true)
 
         setOnClickListeners()
 

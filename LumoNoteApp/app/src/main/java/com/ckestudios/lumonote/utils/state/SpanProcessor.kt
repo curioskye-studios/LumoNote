@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.TextView
 import com.ckestudios.lumonote.data.models.BulletType
 import com.ckestudios.lumonote.data.models.SpanType
+import com.ckestudios.lumonote.data.models.TextSize
 import com.ckestudios.lumonote.ui.noteview.other.ChecklistSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
@@ -19,11 +20,9 @@ import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 object SpanProcessor {
 
-    private lateinit var actionPerformer: ActionPerformer
-
     fun extractSpans(editTextView: EditText) : String {
 
-        actionPerformer = ActionPerformer(editTextView)
+        val actionPerformer = ActionPerformer(editTextView)
 
         var spanString = ""
         val spanEntries = mutableListOf<String>()
@@ -94,12 +93,14 @@ object SpanProcessor {
             }
 
             is RelativeSizeSpan -> {
-//                val size = when (span.sizeChange) {
-//                    1.4f -> TextSize.H1
-//                    1.2f -> TextSize.H2
-//                }
-//                "[span: ${size.sizeName}, start: $spanStart, end: $spanEnd]"
-                ""
+                val size = when (span.sizeChange) {
+                    1.4f -> TextSize.H1
+                    1.2f -> TextSize.H2
+                    else -> null
+                }
+                if (size != null) "[span: ${SpanType.SIZE_SPAN.spanName}, start: $spanStart, " +
+                        "end: $spanEnd, size: ${size.sizeName}]"
+                else ""
             }
 
             else -> ""
@@ -108,7 +109,7 @@ object SpanProcessor {
 
     fun reapplySpansETV(spanData: String, editTextView: EditText) {
 
-        actionPerformer = ActionPerformer(editTextView)
+        val actionPerformer = ActionPerformer(editTextView)
 
         if (spanData == "") return
         editTextView.text.clearSpans() // remove any lingering spans
@@ -126,6 +127,7 @@ object SpanProcessor {
                     SpanType.UNDERLINE_SPAN.spanName -> SpanType.UNDERLINE_SPAN
                     SpanType.CHECKLIST_SPAN.spanName -> SpanType.CHECKLIST_SPAN
                     SpanType.BULLET_SPAN.spanName -> SpanType.BULLET_SPAN
+                    SpanType.SIZE_SPAN.spanName -> SpanType.SIZE_SPAN
                     else -> null
                 }
 
@@ -162,6 +164,19 @@ object SpanProcessor {
             if (spanRecordDict.containsKey("path")) {
 
 
+            }
+
+            if (spanRecordDict.containsKey("size")) {
+
+                val sizeType =
+                    when (spanRecordDict["size"]) {
+                        TextSize.H1.sizeName -> TextSize.H1
+                        TextSize.H2.sizeName -> TextSize.H2
+                        else -> null
+                    }
+
+                if (sizeType != null) actionPerformer.addSizeSpan(spanStart, spanEnd, sizeType)
+                continue
             }
 
             Log.d("SaveSpans", "spanRecordETV: $spanRecord")
@@ -213,11 +228,9 @@ object SpanProcessor {
 
                     SpanType.UNDERLINE_SPAN -> UnderlineTextFormatter.CustomUnderlineSpan()
 
-                    SpanType.BULLET_SPAN -> null
-
-                    SpanType.IMAGE_SPAN -> null
-
                     SpanType.CHECKLIST_SPAN -> ChecklistSpan(textView.context)
+
+                    else -> null
                 }
 
                 val builder = SpannableStringBuilder()

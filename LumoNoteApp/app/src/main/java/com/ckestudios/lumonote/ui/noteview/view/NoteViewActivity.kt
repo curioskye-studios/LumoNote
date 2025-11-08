@@ -252,6 +252,9 @@ class NoteViewActivity : AppCompatActivity() {
                         GeneralUIHelper.displayFeedbackToast(this@NoteViewActivity,
                             "Up to date", false)
                     }
+                } else {
+                    GeneralUIHelper.displayFeedbackToast(this@NoteViewActivity,
+                            "Please exit note to save & Try again", false)
                 }
             }
 

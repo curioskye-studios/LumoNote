@@ -6,11 +6,9 @@ import android.text.style.RelativeSizeSpan
 import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.TextSize
-import com.ckestudios.lumonote.utils.state.StateManager
 
 class SizeTextFormatter(override val editTextView: EditText,
-                        override val isActiveEditing: Boolean,
-                        private val stateManager: StateManager)
+                        override val isActiveEditing: Boolean)
     : RichTextFormatter<RelativeSizeSpan> {
 
     override lateinit var etvSpannableContent: Editable
@@ -109,9 +107,11 @@ class SizeTextFormatter(override val editTextView: EditText,
 
     override fun applyFormatting(start: Int, end: Int) {
 
+        updateSpannableContent()
+
         val safeEnd = if (start == end) end + 1 else end
 
-        var relativeSpan= when (sizeType) {
+        val relativeSpan= when (sizeType) {
             TextSize.H1 -> RelativeSizeSpan(TextSize.H1.scaleFactor)
             TextSize.H2 -> RelativeSizeSpan(TextSize.H2.scaleFactor)
             else -> null

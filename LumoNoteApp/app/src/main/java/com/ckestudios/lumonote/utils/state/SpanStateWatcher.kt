@@ -46,6 +46,8 @@ class SpanStateWatcher(private val editTextView: EditText,
             SpanType.IMAGE_SPAN -> currentImageSpans.add(span as CustomImageSpan)
 
             SpanType.CHECKLIST_SPAN -> currChecklistSpans.add(span as ChecklistSpan)
+
+            else -> return
         }
 
         val spanStart = editTextView.text.getSpanStart(span)
@@ -81,6 +83,8 @@ class SpanStateWatcher(private val editTextView: EditText,
                 SpanType.IMAGE_SPAN -> currentImageSpans
 
                 SpanType.CHECKLIST_SPAN -> currChecklistSpans
+
+                else -> mutableListOf()
             }
 
         if (spanList.isEmpty()) return

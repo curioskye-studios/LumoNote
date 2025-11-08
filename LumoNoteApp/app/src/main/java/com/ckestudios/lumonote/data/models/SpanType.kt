@@ -7,5 +7,6 @@ enum class SpanType(val spanName: String) {
     UNDERLINE_SPAN("underline"),
     BULLET_SPAN("bullet"),
     IMAGE_SPAN("image"),
-    CHECKLIST_SPAN("checklist")
+    CHECKLIST_SPAN("checklist"),
+    SIZE_SPAN("size")
 }

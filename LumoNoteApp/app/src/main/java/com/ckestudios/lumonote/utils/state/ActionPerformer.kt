@@ -10,12 +10,14 @@ import com.ckestudios.lumonote.data.models.Action
 import com.ckestudios.lumonote.data.models.ActionPerformed
 import com.ckestudios.lumonote.data.models.BulletType
 import com.ckestudios.lumonote.data.models.SpanType
+import com.ckestudios.lumonote.data.models.TextSize
 import com.ckestudios.lumonote.ui.noteview.other.ChecklistSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 import com.ckestudios.lumonote.utils.textformatting.BasicTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.BulletTextFormatter
+import com.ckestudios.lumonote.utils.textformatting.SizeTextFormatter
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 class ActionPerformer(private val editTextView: EditText) {
@@ -29,6 +31,7 @@ class ActionPerformer(private val editTextView: EditText) {
         UnderlineTextFormatter(editTextView, false, null)
     private val bulletTextFormatter = BulletTextFormatter(editTextView, false,
         null)
+    private val sizeTextFormatter = SizeTextFormatter(editTextView, false)
 
 
     fun updateCustomBullet(bullet: String?) {
@@ -168,6 +171,12 @@ class ActionPerformer(private val editTextView: EditText) {
         (editTextView as CustomSelectionET).triggerSelectionChanged()
     }
 
+    fun addSizeSpan(spanStart: Int, spanEnd: Int, textSize: TextSize) {
+
+        sizeTextFormatter.setSizeSpanType(textSize)
+        sizeTextFormatter.applyFormatting(spanStart, spanEnd)
+    }
+
 
 
     private fun removeDesiredSpan(spanType: SpanType, targetSpanStart: Int, targetSpanEnd: Int,
@@ -207,6 +216,8 @@ class ActionPerformer(private val editTextView: EditText) {
             SpanType.IMAGE_SPAN -> CustomImageSpan::class.java
 
             SpanType.CHECKLIST_SPAN -> ChecklistSpan::class.java
+
+            else -> null
         }
 
 
