@@ -49,4 +49,6 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6") // latest at 2025
     implementation ("com.github.afsalkodasseri:KalendarView:2.7")
+    implementation ("com.google.android.flexbox:flexbox:3.0.0")
+
 }

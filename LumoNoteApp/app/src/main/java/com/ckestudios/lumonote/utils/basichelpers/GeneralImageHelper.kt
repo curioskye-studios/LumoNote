@@ -18,4 +18,13 @@ object GeneralImageHelper {
         return file.absolutePath // Return the path to save in DB
     }
 
+    fun deleteImageFromInternalStorage(context: Context, fileName: String): Boolean {
+        val file = File(context.filesDir, "$fileName.jpg")
+        return if (file.exists()) {
+            file.delete()
+        } else {
+            false // File not found
+        }
+    }
+
 }

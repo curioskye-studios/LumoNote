@@ -87,19 +87,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:paddingEnd="16dp"
-                    android:paddingLeft="42dp"
+                    android:paddingLeft="54dp"
                     android:scrollbars="none"
                     android:clipToPadding="false"/>
 
                 <!-- Floating Add button -->
                 <ImageView
-                    android:id="@+id/tagAddButtonIV"
+                    android:id="@+id/tagEditButtonIV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="12dp"
+                    android:layout_marginStart="12dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
                     android:paddingTop="10dp"
                     android:paddingBottom="12dp"
-                    android:src="@drawable/baseline_add_24"
+                    android:src="@drawable/baseline_edit_24"
                     app:tint="@color/gold"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"/>

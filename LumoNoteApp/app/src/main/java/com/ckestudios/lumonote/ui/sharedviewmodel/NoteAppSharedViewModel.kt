@@ -85,6 +85,7 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
         // reset value
         setNoteWasDeleted(false)
     }
+
     fun saveNote(note: Note) {
 
         if (isNewNote.value == true) {
