@@ -1,4 +1,4 @@
-package com.ckestudios.lumonote.ui.noteview.view.textformatting
+package com.ckestudios.lumonote.ui.noteview.view.notecontentinput
 
 import android.os.Bundle
 import android.view.LayoutInflater

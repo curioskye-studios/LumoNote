@@ -1,4 +1,4 @@
-package com.ckestudios.lumonote.ui.noteview.view
+package com.ckestudios.lumonote.ui.noteview.view.notecontentinput
 
 import android.net.Uri
 import android.os.Bundle

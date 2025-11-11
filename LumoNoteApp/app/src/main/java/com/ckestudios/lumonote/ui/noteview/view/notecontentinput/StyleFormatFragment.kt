@@ -1,4 +1,4 @@
-package com.ckestudios.lumonote.ui.noteview.view.textformatting
+package com.ckestudios.lumonote.ui.noteview.view.notecontentinput
 
 import android.content.Intent
 import android.os.Bundle
