@@ -29,12 +29,17 @@ class TagAppSharedViewModel(application: Application, private val tagRepository:
 
     private val _noTagsCreated = MutableLiveData<Boolean>()
     val noTagsCreated: LiveData<Boolean> = _noTagsCreated
+    private val _noTagsAttached = MutableLiveData<Boolean>()
+    val noTagsAttached: LiveData<Boolean> = _noTagsAttached
 
     // Track the currently highlighted/selected item, by default first item is highlighted
     private val _selectedNotePreviewTagPos = MutableLiveData<Int>().apply {
         value = 0
     }
     val selectedNotePreviewTagPos: LiveData<Int> = _selectedNotePreviewTagPos
+
+    private val _currentNoteTagsSelected = MutableLiveData<List<Tag>>()
+    val currentNoteTagsSelected: LiveData<List<Tag>> = _currentNoteTagsSelected
 
 
     init {
@@ -110,10 +115,6 @@ class TagAppSharedViewModel(application: Application, private val tagRepository:
         _notifyRefresh.value = shouldRefresh
     }
 
-    fun setCurrentNotePreviewTagPos(newPosition: Int) {
-
-        _selectedNotePreviewTagPos.value = newPosition
-    }
 
     private fun setTagWasCreated(flag: Boolean) {
         _tagWasCreated.value = flag
@@ -129,12 +130,28 @@ class TagAppSharedViewModel(application: Application, private val tagRepository:
         _tagWasDeleted.value = flag
     }
 
-    private fun setNoTagsCreated(isTrue: Boolean){
-        _noTagsCreated.value = isTrue
-    }
-
     private fun setEmptyTagDeleted(isTrue: Boolean){
         _emptyTagDeleted.value = isTrue
     }
 
+
+    private fun setNoTagsCreated(isTrue: Boolean){
+        _noTagsCreated.value = isTrue
+    }
+
+    private fun setNoTagsAttached(isTrue: Boolean){
+        _noTagsAttached.value = isTrue
+    }
+
+
+    fun setCurrentNotePreviewTagPos(newPosition: Int) {
+
+        _selectedNotePreviewTagPos.value = newPosition
+    }
+    fun setCurrentNoteTagsSelected(tags: List<Tag>) {
+
+        _currentNoteTagsSelected.value = tags
+
+        setNoTagsAttached(tags.isEmpty())
+    }
 }

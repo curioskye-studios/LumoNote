@@ -6,20 +6,111 @@
 
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingBottom="16dp"
+
     android:background="@color/black"
     android:clickable="true"
 
     tools:context=".ui.noteview.view.taginput.TagInputFragment">
 
     <RelativeLayout
+        android:id="@+id/tagSelectorSectionRL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="12dp"
+
+        android:paddingBottom="24dp"
+        android:paddingTop="12dp"
+
+        android:background="@drawable/calendar_background">
+
+        <RelativeLayout
+            android:id="@+id/tagSelectorLblRL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="12dp">
+
+            <TextView
+                android:id="@+id/tagSelectorLabelTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter"
+
+                android:layout_marginStart="24dp"
+                android:paddingTop="3dp"
+                android:layout_centerVertical="true"
+
+                android:text="Select Relevant Tags"
+                android:textColor="@color/light_grey_1"
+                android:textStyle="bold"
+                android:textSize="13sp">
+
+            </TextView>
+
+            <ImageView
+                android:id="@+id/closeSelectorButtonIV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginTop="14dp"
+
+                android:padding="8dp"
+
+                android:src="@drawable/baseline_close_24"
+                app:tint="@color/gold" />
+
+        </RelativeLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tagSelectorHolderRV"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+
+            android:clipToPadding="false"
+            android:paddingStart="12dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginTop="16dp"
+
+            android:layout_below="@id/tagSelectorLblRL"/>
+
+
+    </RelativeLayout>
+
+
+
+    <RelativeLayout
         android:id="@+id/tagSectionLabelRL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+
         android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp"
         android:layout_marginEnd="12dp"
-        android:layout_marginBottom="12dp">
+        android:layout_marginBottom="12dp"
+        android:layout_below="@id/tagSelectorSectionRL"
+        >
+
+        <ImageView
+            android:id="@+id/tagImageIV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="14dp"
+
+            android:src="@drawable/shoppingmode_24px"
+            app:tint="@color/light_grey_2" />
 
         <TextView
             android:id="@+id/tagLabelTV"
@@ -27,31 +118,31 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
 
-            android:layout_marginStart="12dp"
             android:fontFamily="@font/inter"
 
             android:paddingTop="3dp"
             android:text="Tags:"
-            android:textColor="@color/light_grey_3"
-            android:textSize="13sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:textColor="@color/light_grey_2"
+            android:layout_toRightOf="@id/tagImageIV"
+            android:textSize="13sp">
 
         </TextView>
 
         <ImageView
             android:id="@+id/addTagButtonIV"
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
+
             android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+
             android:layout_marginStart="12dp"
             android:paddingStart="12dp"
             android:paddingTop="12dp"
             android:paddingEnd="12dp"
 
             android:paddingBottom="12dp"
-            android:src="@drawable/new_label_24px"
+            android:src="@drawable/baseline_add_24"
             app:tint="@color/gold" />
 
     </RelativeLayout>
@@ -64,26 +155,30 @@
 
         android:paddingEnd="16dp"
         android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
         android:layout_marginTop="12dp"
 
         android:scrollbars="none"
 
         android:layout_below="@id/tagSectionLabelRL" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tagSelectorHolderRV"
+
+
+
+    <TextView
+        android:id="@+id/noTagsMessageTV"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:clipToPadding="false"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter"
 
-        android:paddingEnd="16dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginTop="12dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:lineSpacingMultiplier="1.2"
+        android:layout_below="@id/tagDisplayHolderRV"
 
-        android:scrollbars="none"
-
-        android:layout_below="@id/tagDisplayHolderRV" />
+        android:text="No tags attached. Tap + above to attach a tag."
+        android:textColor="@color/light_grey_2"
+        android:textSize="14sp"
+        android:textStyle="bold">
+    </TextView>
 
 </RelativeLayout>

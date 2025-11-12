@@ -152,7 +152,7 @@
                 android:layout_marginEnd="10dp"
 
                 android:text="Last Edited:"
-                android:textColor="@color/light_grey_3"
+                android:textColor="@color/light_grey_2"
                 android:textSize="13sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -221,7 +221,7 @@
                 android:minHeight="48dp"
 
                 android:paddingRight="10dp"
-                android:paddingBottom="50dp"
+                android:paddingBottom="60dp"
                 android:layout_marginStart="24dp"
                 android:layout_marginEnd="10dp"
 
@@ -240,15 +240,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:paddingBottom="150dp"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
                     app:layout_constraintBottom_toBottomOf="parent"
 
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/noteEditContentET"
-                    app:layout_constraintWidth_max="550dp" />
+                    app:layout_constraintTop_toBottomOf="@+id/noteEditContentET" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

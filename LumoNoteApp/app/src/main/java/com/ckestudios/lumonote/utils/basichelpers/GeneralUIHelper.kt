@@ -73,4 +73,9 @@ object GeneralUIHelper {
         displayFeedbackToast(context, feedback, longDisplayPeriod)
     }
 
+    fun intToPx(num: Int, context: Context): Int {
+
+        return (num * context.resources.displayMetrics.density).toInt()
+    }
+
 }

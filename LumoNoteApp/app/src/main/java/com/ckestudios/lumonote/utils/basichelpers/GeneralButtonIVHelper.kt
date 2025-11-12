@@ -42,13 +42,22 @@ object GeneralButtonIVHelper {
 
     fun playSelectionIndication(context: Context, buttonIV: ImageView) {
 
+        indicateAsSelection(context, buttonIV)
+
+
+    }
+
+    fun indicateAsSelection(context: Context, buttonIV: ImageView) {Handler(Looper.getMainLooper()).postDelayed({
+
+        removeAsSelection(buttonIV)
+    }, 500) // Delay in milliseconds (500ms = 0.5 seconds)
+
         changeBtnBackgroundRes(context, buttonIV, R.drawable.selected_background,
             R.color.light_grey_2)
+    }
+    fun removeAsSelection(buttonIV: ImageView) {
 
-        Handler(Looper.getMainLooper()).postDelayed({
-
-            removeButtonBackground(buttonIV)
-        }, 500) // Delay in milliseconds (500ms = 0.3 seconds)
+        removeButtonBackground(buttonIV)
     }
 
 

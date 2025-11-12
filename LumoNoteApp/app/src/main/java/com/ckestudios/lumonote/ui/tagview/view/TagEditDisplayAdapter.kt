@@ -61,8 +61,6 @@ class TagEditDisplayAdapter(private val onClickDeleteFunction: (Int) -> Unit,
         // Note: position of the tags can change dynamically at runtime, state should be tracked
         val tag = tagsList[position]
         val tagID = tag.tagID
-
-        // Populate the UI tag at that position
         holder.tagID.text = tagID.toString()
 
         if (holder.tagEditName.text != null) {

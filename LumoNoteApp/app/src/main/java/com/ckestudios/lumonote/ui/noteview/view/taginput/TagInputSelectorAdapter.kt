@@ -1,6 +1,7 @@
 package com.ckestudios.lumonote.ui.noteview.view.taginput
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
@@ -15,10 +16,11 @@ import com.ckestudios.lumonote.data.models.Tag
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
-class TagInputDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
-    : RecyclerView.Adapter<TagInputDisplayAdapter.TagDisplayViewHolder>(){
+class TagInputSelectorAdapter(private val onTagClickedFunction: (MutableList<Int>) -> Unit)
+    : RecyclerView.Adapter<TagInputSelectorAdapter.TagDisplayViewHolder>(){
 
     private var tagsList = mutableListOf<Tag>()
+    private var selectedTagIDs = mutableListOf<Int>()
 
 
     // The layout from which this view data is accessed is passed into this later
@@ -26,6 +28,7 @@ class TagInputDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
 
         val tagCardView: CardView = tagDisplayView.findViewById(R.id.tagItemCV)
         val tagLayoutView: LinearLayout = tagDisplayView.findViewById(R.id.tagItemLayoutLL)
+        val tagID: TextView = tagDisplayView.findViewById(R.id.tagIdTV)
         val tagName: TextView = tagDisplayView.findViewById(R.id.tagNameTV)
     }
 
@@ -38,7 +41,7 @@ class TagInputDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
         return TagDisplayViewHolder(tagDisplayView)
     }
 
-
+    // Returns the total number of items in the data set held by the adapter
     override fun getItemCount(): Int {
 
         return tagsList.size
@@ -49,13 +52,25 @@ class TagInputDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
 
         // Find and store the equivalent tag object in the list meant to be same as in UI
         val tag = tagsList[position]
+        val tagID = tag.tagID
+
         // Populate the UI tag at that position
         holder.tagName.text = tag.tagName
+        holder.tagID.text = tagID.toString()
+        holder.tagCardView.tag = false
+
+        setTagMargin(holder)
+        setDefaultTagStyle(holder, holder.itemView.context)
         // Note: position of the tags can change dynamically at runtime, state should be tracked
 
-        highlightTag(holder)
-    }
+        holder.tagCardView.setOnClickListener {
 
+            holder.tagCardView.tag = !(holder.tagCardView.tag as Boolean)
+
+            updateSelectedTagsList(holder, tagID)
+            highlightActiveTags(holder)
+        }
+    }
 
     // Ensure UI stays up-to-date with tagss list
     fun refreshData(newTags: List<Tag>) {
@@ -65,26 +80,57 @@ class TagInputDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
         notifyDataSetChanged()
     }
 
+    private fun updateSelectedTagsList(holder: TagDisplayViewHolder, tagID: Int) {
 
-    private fun highlightTag(holder: TagDisplayViewHolder) {
+        val tagIDInList = selectedTagIDs.contains(tagID)
+
+        if (holder.tagCardView.tag == true && !tagIDInList) {
+            selectedTagIDs.add(tagID)
+        } else if (holder.tagCardView.tag == false && tagIDInList) {
+            selectedTagIDs.remove(tagID)
+        }
+
+        onTagClickedFunction(selectedTagIDs)
+    }
+
+
+    private fun highlightActiveTags(holder: TagDisplayViewHolder) {
 
         val context = holder.itemView.context
 
+        // Apply selected/highlight style
+        if (holder.tagCardView.tag == true) {
+
+            holder.tagLayoutView.setBackgroundColor(ContextCompat.getColor(context,
+                R.color.gold))
+            holder.tagName.setTextColor(ContextCompat.getColor(context, R.color.black))
+            holder.tagName.setTypeface(null, Typeface.BOLD)
+        }
+        else {
+
+            setDefaultTagStyle(holder, context)
+        }
+    }
+
+    private fun setDefaultTagStyle(holder: TagDisplayViewHolder, context: Context) {
+
         holder.tagLayoutView.setBackgroundColor(ContextCompat.getColor(context,
-            R.color.black_3))
+            R.color.dark_grey_variant))
         holder.tagName.setTextColor(ContextCompat.getColor(context, R.color.light_grey_1))
         holder.tagName.setTypeface(null, Typeface.NORMAL)
+    }
+
+    private fun setTagMargin(holder: TagDisplayViewHolder) {
 
         holder.tagCardView.apply {
 
             val params = layoutParams as ViewGroup.MarginLayoutParams
 
-            params.bottomMargin = GeneralUIHelper.intToPx(12, context)
-            params.rightMargin = GeneralUIHelper.intToPx(8, context)
+            params.bottomMargin = GeneralUIHelper.intToPx(0, context)
+            params.rightMargin = GeneralUIHelper.intToPx(6, context)
 
             layoutParams = params
         }
-
     }
 
 }
