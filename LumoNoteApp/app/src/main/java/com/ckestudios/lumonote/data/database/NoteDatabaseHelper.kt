@@ -1,10 +1,11 @@
 package com.ckestudios.lumonote.data.database
 
 import android.content.ContentValues
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import com.ckestudios.lumonote.data.models.Note
 
-class NoteDatabaseHelper (
+class NoteDatabaseHelper(
     private val noteTableName: String,
     private val noteIDColumn: String,
     private val noteTitleColumn: String,
@@ -15,13 +16,9 @@ class NoteDatabaseHelper (
     private val notePinnedColumn: String
 ) {
 
-    // Handles insertion of new notes into the database
+    // Insert a new note safely
     fun insertNote(note: Note, db: SQLiteDatabase) {
-
-        // ContentValues class stores values associated with column names
         val values = ContentValues().apply {
-
-            // ID not needed since sqlite provides unique ids
             put(noteTitleColumn, note.noteTitle)
             put(noteContentColumn, note.noteContent)
             put(noteSpansColumn, note.noteSpans)
@@ -30,77 +27,86 @@ class NoteDatabaseHelper (
             put(notePinnedColumn, note.notePinned.toString())
         }
 
-        db.insert(noteTableName, null, values)
-        db.close()
+        try {
+            db.insertOrThrow(noteTableName, null, values)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
     }
 
-    // Retrieve all notes in the database
+    // Retrieve all notes safely
     fun getAllNotes(db: SQLiteDatabase): List<Note> {
-
         val notesList = mutableListOf<Note>()
+        var cursor: Cursor? = null
 
-        val query = "SELECT * FROM $noteTableName"
-        val cursor = db.rawQuery(query, null)
+        try {
+            val query = "SELECT * FROM $noteTableName"
+            cursor = db.rawQuery(query, null)
 
-        /*
-            Move the cursor to the next row. This method will return false if the
-            cursor is already past the last entry in the result set.
-         */
-        while (cursor.moveToNext()) {
+            if (cursor.moveToFirst()) {
+                do {
+                    val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
+                    val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
+                    val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
+                    val spans = cursor.getString(cursor.getColumnIndexOrThrow(noteSpansColumn))
+                    val created = cursor.getString(cursor.getColumnIndexOrThrow(noteCreatedColumn))
+                    val modified = cursor.getString(cursor.getColumnIndexOrThrow(noteModifiedColumn))
+                    val pinned = cursor.getString(cursor.getColumnIndexOrThrow(notePinnedColumn))
 
-            val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
-            val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
-            val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
-            val spans = cursor.getString(cursor.getColumnIndexOrThrow(noteSpansColumn))
-            val createdDate = cursor.getString(cursor.getColumnIndexOrThrow(noteCreatedColumn))
-            val modifiedDate = cursor.getString(cursor.getColumnIndexOrThrow(noteModifiedColumn))
-            val isPinned = cursor.getString(cursor.getColumnIndexOrThrow(notePinnedColumn))
-
-            val note = Note(id, title, content, spans, createdDate, modifiedDate, isPinned.toBoolean())
-
-            notesList.add(note)
+                    notesList.add(
+                        Note(id, title, content, spans, created, modified, pinned.toBoolean())
+                    )
+                } while (cursor.moveToNext())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cursor?.close()
+            db.close()
         }
-
-        cursor.close()
-        db.close()
 
         return notesList
     }
 
+    // Retrieve notes by creation date safely
     fun getNotesByDate(date: String, db: SQLiteDatabase): List<Note> {
-
         val notesList = mutableListOf<Note>()
+        var cursor: Cursor? = null
 
-        val query = "SELECT * FROM $noteTableName WHERE $noteCreatedColumn = ?"
-        val cursor = db.rawQuery(query, arrayOf(date))
+        try {
+            val query = "SELECT * FROM $noteTableName WHERE $noteCreatedColumn = ?"
+            cursor = db.rawQuery(query, arrayOf(date))
 
-        while (cursor.moveToNext()) {
+            if (cursor.moveToFirst()) {
+                do {
+                    val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
+                    val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
+                    val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
+                    val spans = cursor.getString(cursor.getColumnIndexOrThrow(noteSpansColumn))
+                    val created = cursor.getString(cursor.getColumnIndexOrThrow(noteCreatedColumn))
+                    val modified = cursor.getString(cursor.getColumnIndexOrThrow(noteModifiedColumn))
+                    val pinned = cursor.getString(cursor.getColumnIndexOrThrow(notePinnedColumn))
 
-            val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
-            val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
-            val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
-            val spans = cursor.getString(cursor.getColumnIndexOrThrow(noteSpansColumn))
-            val createdDate = cursor.getString(cursor.getColumnIndexOrThrow(noteCreatedColumn))
-            val modifiedDate = cursor.getString(cursor.getColumnIndexOrThrow(noteModifiedColumn))
-            val isPinned = cursor.getString(cursor.getColumnIndexOrThrow(notePinnedColumn))
-
-            val note = Note(id, title, content, spans, createdDate, modifiedDate, isPinned.toBoolean())
-
-            notesList.add(note)
+                    notesList.add(
+                        Note(id, title, content, spans, created, modified, pinned.toBoolean())
+                    )
+                } while (cursor.moveToNext())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cursor?.close()
+            db.close()
         }
-
-        cursor.close()
-        db.close()
 
         return notesList
     }
 
-
-    // Update a note in the database w/ the edited version
-    fun updateNote(note: Note, db: SQLiteDatabase){
-
+    // Update an existing note safely
+    fun updateNote(note: Note, db: SQLiteDatabase) {
         val values = ContentValues().apply {
-
             put(noteTitleColumn, note.noteTitle)
             put(noteContentColumn, note.noteContent)
             put(noteSpansColumn, note.noteSpans)
@@ -111,47 +117,56 @@ class NoteDatabaseHelper (
         val whereClause = "$noteIDColumn = ?"
         val whereArgs = arrayOf(note.noteID.toString())
 
-        db.update(noteTableName, values, whereClause, whereArgs)
-        db.close()
+        try {
+            db.update(noteTableName, values, whereClause, whereArgs)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
     }
 
+    // Get a specific note by ID safely (returns null if not found)
+    fun getNoteByID(noteID: Int, db: SQLiteDatabase): Note? {
+        var note: Note? = null
+        var cursor: Cursor? = null
 
-    // Get a specific note from the database using its id
-    fun getNoteByID(noteID: Int, db: SQLiteDatabase): Note {
+        try {
+            val query = "SELECT * FROM $noteTableName WHERE $noteIDColumn = ?"
+            cursor = db.rawQuery(query, arrayOf(noteID.toString()))
 
-        val query = "SELECT * FROM $noteTableName WHERE $noteIDColumn = $noteID"
-        val cursor = db.rawQuery(query, null)
+            if (cursor.moveToFirst()) {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
+                val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
+                val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
+                val spans = cursor.getString(cursor.getColumnIndexOrThrow(noteSpansColumn))
+                val created = cursor.getString(cursor.getColumnIndexOrThrow(noteCreatedColumn))
+                val modified = cursor.getString(cursor.getColumnIndexOrThrow(noteModifiedColumn))
+                val pinned = cursor.getString(cursor.getColumnIndexOrThrow(notePinnedColumn))
 
-        /*
-            Move the cursor to the first row. This method will return false
-            if the cursor is empty.
-            Returns: boolean - whether the move succeeded.
-        */
-        cursor.moveToFirst()
+                note = Note(id, title, content, spans, created, modified, pinned.toBoolean())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cursor?.close()
+            db.close()
+        }
 
-        val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
-        val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
-        val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
-        val spans = cursor.getString(cursor.getColumnIndexOrThrow(noteSpansColumn))
-        val created = cursor.getString(cursor.getColumnIndexOrThrow(noteCreatedColumn))
-        val modified = cursor.getString(cursor.getColumnIndexOrThrow(noteModifiedColumn))
-        val pinned = cursor.getString(cursor.getColumnIndexOrThrow(notePinnedColumn))
-
-        cursor.close()
-        db.close()
-
-        return Note(id, title, content, spans, created, modified, pinned.toBoolean())
+        return note
     }
 
-
-    // Remove a specific note from the database using its id
+    // Delete a specific note safely
     fun deleteNote(noteID: Int, db: SQLiteDatabase) {
-
         val whereClause = "$noteIDColumn = ?"
         val whereArgs = arrayOf(noteID.toString())
 
-        db.delete(noteTableName, whereClause, whereArgs)
-        db.close()
+        try {
+            db.delete(noteTableName, whereClause, whereArgs)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
     }
-
 }

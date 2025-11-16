@@ -57,10 +57,12 @@ class TagInputSelectorAdapter(private val onTagClickedFunction: (MutableList<Int
         // Populate the UI tag at that position
         holder.tagName.text = tag.tagName
         holder.tagID.text = tagID.toString()
-        holder.tagCardView.tag = false
+        holder.tagCardView.tag = tagID in selectedTagIDs
+
+//        Log.d("TagDebug", "tagID: $tagID in selectedTagIDs - ${tagID in selectedTagIDs}.")
+        highlightActiveTags(holder)
 
         setTagMargin(holder)
-        setDefaultTagStyle(holder, holder.itemView.context)
         // Note: position of the tags can change dynamically at runtime, state should be tracked
 
         holder.tagCardView.setOnClickListener {
@@ -68,9 +70,12 @@ class TagInputSelectorAdapter(private val onTagClickedFunction: (MutableList<Int
             holder.tagCardView.tag = !(holder.tagCardView.tag as Boolean)
 
             updateSelectedTagsList(holder, tagID)
+            onTagClickedFunction(selectedTagIDs)
+
             highlightActiveTags(holder)
         }
     }
+
 
     // Ensure UI stays up-to-date with tagss list
     fun refreshData(newTags: List<Tag>) {
@@ -78,6 +83,12 @@ class TagInputSelectorAdapter(private val onTagClickedFunction: (MutableList<Int
         tagsList.clear()
         tagsList.addAll(newTags)
         notifyDataSetChanged()
+    }
+
+
+    fun setSelectedTagsList(newSelectedTagIDs: List<Int>){
+
+        selectedTagIDs = newSelectedTagIDs.toMutableList()
     }
 
     private fun updateSelectedTagsList(holder: TagDisplayViewHolder, tagID: Int) {
@@ -89,8 +100,6 @@ class TagInputSelectorAdapter(private val onTagClickedFunction: (MutableList<Int
         } else if (holder.tagCardView.tag == false && tagIDInList) {
             selectedTagIDs.remove(tagID)
         }
-
-        onTagClickedFunction(selectedTagIDs)
     }
 
 
@@ -98,18 +107,19 @@ class TagInputSelectorAdapter(private val onTagClickedFunction: (MutableList<Int
 
         val context = holder.itemView.context
 
-        // Apply selected/highlight style
         if (holder.tagCardView.tag == true) {
-
-            holder.tagLayoutView.setBackgroundColor(ContextCompat.getColor(context,
-                R.color.gold))
-            holder.tagName.setTextColor(ContextCompat.getColor(context, R.color.black))
-            holder.tagName.setTypeface(null, Typeface.BOLD)
-        }
-        else {
-
+            setHighlightTagStyle(holder, context)
+        } else {
             setDefaultTagStyle(holder, context)
         }
+    }
+
+    private fun setHighlightTagStyle(holder: TagDisplayViewHolder, context: Context) {
+
+        holder.tagLayoutView.setBackgroundColor(ContextCompat.getColor(context,
+            R.color.gold))
+        holder.tagName.setTextColor(ContextCompat.getColor(context, R.color.black))
+        holder.tagName.setTypeface(null, Typeface.BOLD)
     }
 
     private fun setDefaultTagStyle(holder: TagDisplayViewHolder, context: Context) {

@@ -138,6 +138,7 @@ class NoteViewActivity : AppCompatActivity() {
             }
 
             updateRetrievedNote()
+            noteAppSharedViewModel.setCurrentOpenNoteID(noteID)
         }
 
         return existingNoteClicked

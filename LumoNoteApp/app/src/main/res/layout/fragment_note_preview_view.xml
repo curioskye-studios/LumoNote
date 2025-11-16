@@ -117,6 +117,25 @@
                 android:paddingRight="12dp"
                 android:layout_below="@id/tagSectionLayoutRL"/>
 
+            <TextView
+                android:id="@+id/noNotesMessageTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter"
+
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:lineSpacingMultiplier="1.2"
+                android:layout_below="@id/notesPreviewRV"
+
+                android:text="No notes. Tap the circle below to create a new note."
+                android:textColor="@color/light_grey_2"
+                android:textSize="16sp"
+                android:textStyle="bold">
+            </TextView>
+
         </RelativeLayout>
 
 

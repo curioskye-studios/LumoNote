@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.ckestudios.lumonote.data.repository.NoteRepository
 import com.ckestudios.lumonote.data.repository.Repository
 import com.ckestudios.lumonote.data.repository.TagRepository
+import com.ckestudios.lumonote.data.repository.TaggedRepository
 
 
 // A custom ViewModelFactory is needed because our ViewModel has a constructor parameter
@@ -39,6 +40,12 @@ class AppSharedViewFactory(
 
             @Suppress("UNCHECKED_CAST")
             return TagAppSharedViewModel(Application(), repository as TagRepository) as T
+        }
+
+        if (modelClass.isAssignableFrom(TaggedAppSharedViewModel::class.java)) {
+
+            @Suppress("UNCHECKED_CAST")
+            return TaggedAppSharedViewModel(Application(), repository as TaggedRepository) as T
         }
 
         // If some other ViewModel type is requested, we throw an error.

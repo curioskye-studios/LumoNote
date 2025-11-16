@@ -20,8 +20,12 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
 
     private val _notes = MutableLiveData<List<Note>>()
     val notes: LiveData<List<Note>> = _notes
+
     private val _notesOnDate = MutableLiveData<List<Note>>()
     val notesOnDate: LiveData<List<Note>> = _notesOnDate
+    private val _noNotes = MutableLiveData(false)
+    val noNotes: LiveData<Boolean> = _noNotes
+
     private val _notifyRefresh = MutableLiveData<Boolean>()
     val notifyRefresh: LiveData<Boolean> = _notifyRefresh
 
@@ -43,6 +47,9 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
     private val _currentPreviewNoteID = MutableLiveData(-1)
     val currentPreviewNoteID: LiveData<Int> = _currentPreviewNoteID
 
+    private val _currentOpenNoteID = MutableLiveData(-1)
+    val currentOpenNoteID: LiveData<Int> = _currentOpenNoteID
+
 
     init {
 
@@ -56,6 +63,8 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
 
         viewModelScope.launch {
             _notes.value = noteRepository.getItems()
+
+            _noNotes.value = notes.value?.isEmpty()
         }
     }
 
@@ -70,7 +79,7 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
         _notifyRefresh.value = shouldRefresh
     }
 
-    fun getNote(noteID: Int) : Note {
+    fun getNote(noteID: Int) : Note? {
         // Call database helper object and invoke get note method to pull note from database
         return noteRepository.getItemByID(noteID)
     }
@@ -107,17 +116,19 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
     }
 
     fun updateCurrentPinStatus(isPinned: Boolean) {
-
         _currentNotePinned.value = isPinned
     }
 
     fun updatePreviewPinStatus(isPinned: Boolean) {
-
         _previewNotePinned.value = isPinned
     }
 
     fun setCurrentPreviewNoteID(noteID: Int) {
         _currentPreviewNoteID.value = noteID
+    }
+
+    fun setCurrentOpenNoteID(noteID: Int) {
+        _currentOpenNoteID.value = noteID
     }
 
 

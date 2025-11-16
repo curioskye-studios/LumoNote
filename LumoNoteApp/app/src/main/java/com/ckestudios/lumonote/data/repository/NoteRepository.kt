@@ -14,7 +14,7 @@ class NoteRepository (context: Context) : Repository {
         return dbConnection.getAllNotes()
     }
 
-    override fun getItemByID(noteID: Int): Note {
+    override fun getItemByID(noteID: Int): Note? {
 
         return dbConnection.getNoteByID(noteID)
     }

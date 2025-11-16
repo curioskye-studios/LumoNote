@@ -3,19 +3,14 @@ package com.ckestudios.lumonote.data.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.data.models.Tag
 
-
-// This class handles all database operations needed for notes CRUD
-
-// Inherits from SQLiteOpenHelper class to allow for sqlite database operates
-class DatabaseHelper (context: Context)
-    : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class DatabaseHelper(context: Context) :
+    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        // Stores constants used for database access
-
         private const val DATABASE_NAME = "LumoNote.db"
         private const val DATABASE_VERSION = 2
 
@@ -35,12 +30,11 @@ class DatabaseHelper (context: Context)
         private const val TAGGED_TABLE_NAME = "Tagged"
         private const val TAGGED_TAGID_COLUMN = "TagID"
         private const val TAGGED_NOTEID_COLUMN = "NoteID"
-
     }
 
     private val noteDatabaseHelper = NoteDatabaseHelper(
-        NOTE_TABLE_NAME, NOTE_ID_COLUMN, NOTE_TITLE_COLUMN, NOTE_CONTENT_COLUMN, NOTE_SPANS_COLUMN,
-        NOTE_CREATED_COLUMN, NOTE_MODIFIED_COLUMN, NOTE_PINNED_COLUMN
+        NOTE_TABLE_NAME, NOTE_ID_COLUMN, NOTE_TITLE_COLUMN, NOTE_CONTENT_COLUMN,
+        NOTE_SPANS_COLUMN, NOTE_CREATED_COLUMN, NOTE_MODIFIED_COLUMN, NOTE_PINNED_COLUMN
     )
 
     private val tagDatabaseHelper = TagDatabaseHelper(
@@ -51,132 +45,224 @@ class DatabaseHelper (context: Context)
         TAGGED_TABLE_NAME, TAGGED_TAGID_COLUMN, TAGGED_NOTEID_COLUMN
     )
 
-
     override fun onCreate(db: SQLiteDatabase?) {
+        try {
+            db?.execSQL(
+                "CREATE TABLE $NOTE_TABLE_NAME (" +
+                        "$NOTE_ID_COLUMN INTEGER PRIMARY KEY, " +
+                        "$NOTE_TITLE_COLUMN TEXT, " +
+                        "$NOTE_CONTENT_COLUMN TEXT, " +
+                        "$NOTE_SPANS_COLUMN TEXT, " +
+                        "$NOTE_CREATED_COLUMN TEXT, " +
+                        "$NOTE_MODIFIED_COLUMN TEXT, " +
+                        "$NOTE_PINNED_COLUMN TEXT)"
+            )
 
-        val createNoteTableQuery = "CREATE TABLE $NOTE_TABLE_NAME " +
-            "(" +
-                "$NOTE_ID_COLUMN INTEGER PRIMARY KEY, " +
-                "$NOTE_TITLE_COLUMN TEXT, " +
-                "$NOTE_CONTENT_COLUMN TEXT, " +
-                "$NOTE_SPANS_COLUMN TEXT, " +
-                "$NOTE_CREATED_COLUMN TEXT, " +
-                "$NOTE_MODIFIED_COLUMN TEXT, " +
-                "$NOTE_PINNED_COLUMN TEXT" +
-            ")"
+            db?.execSQL(
+                "CREATE TABLE $TAG_TABLE_NAME (" +
+                        "$TAG_ID_COLUMN INTEGER PRIMARY KEY, " +
+                        "$TAG_NAME_COLUMN TEXT UNIQUE)"
+            )
 
-        val createTagTableQuery = "CREATE TABLE $TAG_TABLE_NAME " +
-            "(" +
-                "$TAG_ID_COLUMN INTEGER PRIMARY KEY, " +
-                "$TAG_NAME_COLUMN TEXT UNIQUE" +
-            ")"
-
-        val createTaggedTableQuery = "CREATE TABLE $TAGGED_TABLE_NAME " +
-            "(" +
-                "$TAGGED_TAGID_COLUMN INTEGER, " +
-                "$TAGGED_NOTEID_COLUMN INTEGER, " +
-                "PRIMARY KEY($TAGGED_TAGID_COLUMN, $TAGGED_NOTEID_COLUMN), " +
-                "FOREIGN KEY($TAGGED_TAGID_COLUMN) REFERENCES $TAG_TABLE_NAME($TAG_ID_COLUMN), " +
-                "FOREIGN KEY($TAGGED_NOTEID_COLUMN) REFERENCES $NOTE_TABLE_NAME($NOTE_ID_COLUMN)" +
-            ")"
-
-
-        db?.execSQL(createNoteTableQuery)
-        db?.execSQL(createTagTableQuery)
-        db?.execSQL(createTaggedTableQuery)
+            db?.execSQL(
+                "CREATE TABLE $TAGGED_TABLE_NAME (" +
+                        "$TAGGED_TAGID_COLUMN INTEGER, " +
+                        "$TAGGED_NOTEID_COLUMN INTEGER, " +
+                        "PRIMARY KEY($TAGGED_TAGID_COLUMN, $TAGGED_NOTEID_COLUMN), " +
+                        "FOREIGN KEY($TAGGED_TAGID_COLUMN) REFERENCES $TAG_TABLE_NAME($TAG_ID_COLUMN), " +
+                        "FOREIGN KEY($TAGGED_NOTEID_COLUMN) REFERENCES $NOTE_TABLE_NAME($NOTE_ID_COLUMN))"
+            )
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error creating tables", e)
+        }
     }
 
     override fun onConfigure(db: SQLiteDatabase?) {
-
-        super.onConfigure(db)
-        db?.setForeignKeyConstraintsEnabled(true)
+        try {
+            super.onConfigure(db)
+            db?.setForeignKeyConstraintsEnabled(true)
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error configuring DB", e)
+        }
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-
-        // Prevents duplicate tables of the same name being created
-        val dropNoteTableQuery = "DROP TABLE IF EXISTS $NOTE_TABLE_NAME"
-        val dropTagTableQuery = "DROP TABLE IF EXISTS $TAG_TABLE_NAME"
-        val dropTaggedTableQuery = "DROP TABLE IF EXISTS $TAGGED_TABLE_NAME"
-
-        db?.execSQL(dropNoteTableQuery)
-        db?.execSQL(dropTagTableQuery)
-        db?.execSQL(dropTaggedTableQuery)
-        onCreate(db)
-    }
-
-
-    // NOTE DATABASE FUNCTIONS
-    fun insertNote(note: Note) {
-        val db = writableDatabase // Database manipulator object
-        noteDatabaseHelper.insertNote(note, db)
-    }
-    fun getAllNotes(): List<Note> {
-        val db = writableDatabase
-        return noteDatabaseHelper.getAllNotes(db)
-    }
-    fun getNotesByDate(date: String): List<Note> {
-        val db = readableDatabase
-        return noteDatabaseHelper.getNotesByDate(date, db)
-    }
-    fun updateNote(note: Note){
-        val db = writableDatabase
-        noteDatabaseHelper.updateNote(note, db)
-    }
-    fun getNoteByID(noteID: Int): Note {
-        val db = readableDatabase
-        return noteDatabaseHelper.getNoteByID(noteID, db)
-    }
-    fun deleteNote(noteID: Int) {
-        val db = writableDatabase
-        noteDatabaseHelper.deleteNote(noteID, db)
-    }
-
-
-    // TAG DATABASE FUNCTIONS
-    fun insertTag(tag: Tag) {
-        val db = writableDatabase // Database manipulator object
-        tagDatabaseHelper.insertTag(tag, db)
-    }
-    fun getAllTags(): List<Tag> {
-        val db = writableDatabase
-        return tagDatabaseHelper.getAllTags(db)
-    }
-    fun updateTag(tag: Tag){
-        val db = writableDatabase
-        tagDatabaseHelper.updateTag(tag, db)
-    }
-    fun getTagByID(tagID: Int): Tag {
-        val db = readableDatabase
-        return tagDatabaseHelper.getTagByID(tagID, db)
-    }
-    fun deleteTag(tagID: Int) {
-        val db = writableDatabase
-        tagDatabaseHelper.deleteTag(tagID, db)
-    }
-
-
-    // TAGGED DATABASE FUNCTIONS
-    fun insertTagged(tagID: Int, noteID: Int) {
-        val db = writableDatabase // Database manipulator object
-        taggedDatabaseHelper.insertTagged(tagID, noteID, db)
-    }
-    fun getTagsByNoteID(noteID: Int): List<Tag> {
-        val db = readableDatabase
-        val tagList = mutableListOf<Tag>()
-        val tagIDs = taggedDatabaseHelper.getTagsByNoteID(noteID, db)
-
-        //get corresponding tags by ID and add to list
-        for (tagID in tagIDs) {
-            tagList.add(getTagByID(tagID))
+        try {
+            db?.execSQL("DROP TABLE IF EXISTS $TAGGED_TABLE_NAME")
+            db?.execSQL("DROP TABLE IF EXISTS $TAG_TABLE_NAME")
+            db?.execSQL("DROP TABLE IF EXISTS $NOTE_TABLE_NAME")
+            onCreate(db)
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error upgrading DB", e)
         }
-
-        return tagList
     }
+
+
+
+    // --- NOTE FUNCTIONS ---
+    fun insertNote(note: Note) {
+        try {
+            writableDatabase.use { db ->
+                noteDatabaseHelper.insertNote(note, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error inserting note", e)
+        }
+    }
+
+    fun getAllNotes(): List<Note> {
+        return try {
+            readableDatabase.use { db ->
+                noteDatabaseHelper.getAllNotes(db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error getting all notes", e)
+            emptyList()
+        }
+    }
+
+    fun getNotesByDate(date: String): List<Note> {
+        return try {
+            readableDatabase.use { db ->
+                noteDatabaseHelper.getNotesByDate(date, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error getting notes by date", e)
+            emptyList()
+        }
+    }
+
+    fun updateNote(note: Note) {
+        try {
+            writableDatabase.use { db ->
+                noteDatabaseHelper.updateNote(note, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error updating note", e)
+        }
+    }
+
+    fun getNoteByID(noteID: Int): Note? {
+        return try {
+            readableDatabase.use { db ->
+                noteDatabaseHelper.getNoteByID(noteID, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error getting note by ID", e)
+            null
+        }
+    }
+
+    fun deleteNote(noteID: Int) {
+        try {
+            writableDatabase.use { db ->
+                noteDatabaseHelper.deleteNote(noteID, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error deleting note", e)
+        }
+    }
+
+
+
+
+    // --- TAG FUNCTIONS ---
+    fun insertTag(tag: Tag) {
+        try {
+            writableDatabase.use { db ->
+                tagDatabaseHelper.insertTag(tag, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error inserting tag", e)
+        }
+    }
+
+    fun getAllTags(): List<Tag> {
+        return try {
+            readableDatabase.use { db ->
+                tagDatabaseHelper.getAllTags(db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error getting all tags", e)
+            emptyList()
+        }
+    }
+
+    fun updateTag(tag: Tag) {
+        try {
+            writableDatabase.use { db ->
+                tagDatabaseHelper.updateTag(tag, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error updating tag", e)
+        }
+    }
+
+    fun getTagByID(tagID: Int): Tag? {
+        return try {
+            readableDatabase.use { db ->
+                tagDatabaseHelper.getTagByID(tagID, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error getting tag by ID", e)
+            null
+        }
+    }
+
+    fun deleteTag(tagID: Int) {
+        try {
+            writableDatabase.use { db ->
+                tagDatabaseHelper.deleteTag(tagID, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error deleting tag", e)
+        }
+    }
+
+
+
+    // --- TAGGED FUNCTIONS ---
+    fun insertTagged(tagID: Int, noteID: Int) {
+        try {
+            writableDatabase.use { db ->
+                taggedDatabaseHelper.insertTagged(tagID, noteID, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error inserting tagged record", e)
+        }
+    }
+
     fun deleteTagged(tagID: Int, noteID: Int) {
-        val db = writableDatabase
-        taggedDatabaseHelper.deleteTagged(tagID, noteID, db)
+        try {
+            writableDatabase.use { db ->
+                taggedDatabaseHelper.deleteTagged(tagID, noteID, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error deleting tagged record", e)
+        }
     }
 
+    fun getTagsByNoteID(noteID: Int): List<Tag> {
+        return try {
+            readableDatabase.use { db ->
+                val tagIDs = taggedDatabaseHelper.getTagsByNoteID(noteID, db)
+                tagIDs.mapNotNull { id -> getTagByID(id) }
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error getting tags by note ID", e)
+            emptyList()
+        }
+    }
 
+    fun getNotesByTagID(tagID: Int): List<Note> {
+        return try {
+            readableDatabase.use { db ->
+                val noteIDs = taggedDatabaseHelper.getNotesByTagID(tagID, db)
+                noteIDs.mapNotNull { id -> getNoteByID(id) }
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error getting notes by tag ID", e)
+            emptyList()
+        }
+    }
 }

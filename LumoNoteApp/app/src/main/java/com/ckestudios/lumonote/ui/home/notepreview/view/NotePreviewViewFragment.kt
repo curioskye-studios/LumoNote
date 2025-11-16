@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,6 +20,7 @@ import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.TagAppSharedViewModel
 import com.ckestudios.lumonote.ui.tagview.view.TagViewActivity
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 
 class NotePreviewViewFragment : Fragment() {
 
@@ -217,77 +217,82 @@ class NotePreviewViewFragment : Fragment() {
     private fun observeNoteAppVMValues() {
 
         // Observe changes
-        noteAppSharedViewModel.notes.observe(viewLifecycleOwner) { notes ->
-            notePreviewAdapter.refreshData(notes)
-        }
+        noteAppSharedViewModel.apply {
 
-        // Observe changes
-        noteAppSharedViewModel.notifyRefresh.observe(viewLifecycleOwner) { shouldRefresh ->
-
-            if (shouldRefresh == true) {
-                noteAppSharedViewModel.loadAllNotes()
-            }
-        }
-
-        // Observe changes
-        noteAppSharedViewModel.previewNotePinned.observe(viewLifecycleOwner) { isPinned ->
-
-            //update note in database with new pinned status
-            if (noteAppSharedViewModel.currentPreviewNoteID.value != -1) {
-
-                val noteData = noteAppSharedViewModel.getNote(
-                    noteAppSharedViewModel.currentPreviewNoteID.value!!
-                )
-
-                noteData.notePinned = isPinned
-
-                Log.d("NoteFrag", "$noteData")
-
-                noteAppSharedViewModel.setIsNewNote(false)
-                noteAppSharedViewModel.saveNote(noteData)
-
-                noteAppSharedViewModel.setCurrentPreviewNoteID(-1)
+            notes.observe(viewLifecycleOwner) { notes ->
+                notePreviewAdapter.refreshData(notes)
             }
 
-            givePinnedStatusToast(isPinned)
+            noNotes.observe(viewLifecycleOwner) { isTrue ->
 
-            noteAppSharedViewModel.setNotifyRefresh(true)
-            noteAppSharedViewModel.setNotifyRefresh(false)
+                GeneralUIHelper.changeViewVisibility(notePrevViewBinding.noNotesMessageTV,
+                    isTrue)
+            }
+
+            // Observe changes
+            notifyRefresh.observe(viewLifecycleOwner) { shouldRefresh ->
+
+                if (shouldRefresh == true) {
+                    loadAllNotes()
+                }
+            }
+
+            // Observe changes
+            previewNotePinned.observe(viewLifecycleOwner) { isPinned ->
+
+                //update note in database with new pinned status
+                if (currentPreviewNoteID.value != -1) {
+
+                    val noteData = getNote(currentPreviewNoteID.value!!)
+
+                    if (noteData == null) return@observe
+
+                    noteData.notePinned = isPinned
+
+                    Log.d("NoteFrag", "$noteData")
+
+                    setIsNewNote(false)
+                    saveNote(noteData)
+
+                    setCurrentPreviewNoteID(-1)
+                }
+
+                givePinnedStatusToast(isPinned)
+
+                setNotifyRefresh(true)
+                setNotifyRefresh(false)
+            }
+
         }
     }
 
 
     private fun observeTagAppVMValues() {
 
-        // Observe changes
-        tagAppSharedViewModel.tags.observe(viewLifecycleOwner) { tags ->
-            tagDisplayAdapter.refreshData(tags)
-        }
+        tagAppSharedViewModel.apply {
 
-        tagAppSharedViewModel.notifyRefresh.observe(viewLifecycleOwner) { shouldRefresh ->
-            if (shouldRefresh == true) {
-                tagAppSharedViewModel.loadAllTags()
+            tags.observe(viewLifecycleOwner) { tags ->
+                tagDisplayAdapter.refreshData(tags)
             }
-        }
 
-        // Observe selection
-        tagAppSharedViewModel.selectedNotePreviewTagPos.observe(viewLifecycleOwner) { position ->
-            tagDisplayAdapter.setSelectedPosition(position)
+            notifyRefresh.observe(viewLifecycleOwner) { shouldRefresh ->
+                if (shouldRefresh == true) {
+                    loadAllTags()
+                }
+            }
+
+            selectedNotePreviewTagPos.observe(viewLifecycleOwner) { position ->
+                tagDisplayAdapter.setSelectedPosition(position)
+            }
         }
     }
 
 
     private fun givePinnedStatusToast(isPinned: Boolean) {
 
-        if (isPinned) {
+        val status = if (isPinned) "Note Pinned" else "Note Unpinned"
 
-            // Put small notification popup at bottom of screen
-            Toast.makeText(requireContext(), "Note Pinned", Toast.LENGTH_SHORT).show()
-        } else {
-
-            // Put small notification popup at bottom of screen
-            Toast.makeText(requireContext(), "Note Unpinned", Toast.LENGTH_SHORT).show()
-        }
+        GeneralUIHelper.displayFeedbackToast(requireContext(), status, false)
     }
 
 

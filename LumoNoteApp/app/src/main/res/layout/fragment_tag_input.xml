@@ -124,9 +124,28 @@
             android:text="Tags:"
             android:textColor="@color/light_grey_2"
             android:layout_toRightOf="@id/tagImageIV"
+            android:textStyle="bold"
             android:textSize="13sp">
 
         </TextView>
+
+        <ImageView
+            android:id="@+id/saveTagButtonIV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+
+            android:layout_toLeftOf="@id/addTagButtonIV"
+            android:layout_centerVertical="true"
+
+            android:layout_marginStart="12dp"
+            android:paddingStart="12dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="12dp"
+
+            android:paddingBottom="12dp"
+            android:src="@drawable/baseline_save_24"
+            app:tint="@color/light_grey_2" />
 
         <ImageView
             android:id="@+id/addTagButtonIV"

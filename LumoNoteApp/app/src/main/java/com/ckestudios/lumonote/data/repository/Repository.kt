@@ -6,7 +6,7 @@ interface Repository {
 
     fun getItems() : List<Item>
 
-    fun getItemByID(itemID: Int) : Item
+    fun getItemByID(itemID: Int) : Item?
 
     fun insertItem(item: Item)
 

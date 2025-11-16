@@ -24,7 +24,7 @@ class TagRepository (private val context: Context) : Repository {
         return dbConnection.getAllTags()
     }
 
-    override fun getItemByID(itemID: Int): Item {
+    override fun getItemByID(itemID: Int): Item? {
 
         return dbConnection.getTagByID(itemID)
     }

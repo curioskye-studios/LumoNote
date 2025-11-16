@@ -1,6 +1,7 @@
 package com.ckestudios.lumonote.data.database
 
 import android.content.ContentValues
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import com.ckestudios.lumonote.data.models.Tag
 
@@ -12,94 +13,98 @@ class TagDatabaseHelper(
 
     // Handles insertion of new tags into the database
     fun insertTag(tag: Tag, db: SQLiteDatabase) {
-
-        // ContentValues class stores values associated with column names
         val values = ContentValues().apply {
-
-            // ID not needed since sqlite provides unique ids
             put(tagNameColumn, tag.tagName)
         }
 
-        db.insert(tagTableName, null, values)
-        db.close()
+        try {
+            db.insertOrThrow(tagTableName, null, values)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
     }
 
-
-    // Retrieve all tags in the database
+    // Retrieve all tags in the database safely
     fun getAllTags(db: SQLiteDatabase): List<Tag> {
-
         val tagsList = mutableListOf<Tag>()
+        var cursor: Cursor? = null
 
-        val query = "SELECT * FROM $tagTableName"
-        val cursor = db.rawQuery(query, null)
+        try {
+            val query = "SELECT * FROM $tagTableName"
+            cursor = db.rawQuery(query, null)
 
-        /*
-            Move the cursor to the next row. This method will return false if the
-            cursor is already past the last entry in the result set.
-         */
-        while (cursor.moveToNext()) {
-
-            val id = cursor.getInt(cursor.getColumnIndexOrThrow(tagIDColumn))
-            val name = cursor.getString(cursor.getColumnIndexOrThrow(tagNameColumn))
-
-            val tag = Tag(id, name)
-
-            tagsList.add(tag)
+            if (cursor.moveToFirst()) {
+                do {
+                    val id = cursor.getInt(cursor.getColumnIndexOrThrow(tagIDColumn))
+                    val name = cursor.getString(cursor.getColumnIndexOrThrow(tagNameColumn))
+                    tagsList.add(Tag(id, name))
+                } while (cursor.moveToNext())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cursor?.close()
+            db.close()
         }
-
-        cursor.close()
-        db.close()
 
         return tagsList
     }
 
-
-    // Update a tag in the database w/ the edited version
-    fun updateTag(tag: Tag, db: SQLiteDatabase){
-
+    // Update a tag in the database safely
+    fun updateTag(tag: Tag, db: SQLiteDatabase) {
         val values = ContentValues().apply {
-
             put(tagNameColumn, tag.tagName)
         }
 
         val whereClause = "$tagIDColumn = ?"
         val whereArgs = arrayOf(tag.tagID.toString())
 
-        db.update(tagTableName, values, whereClause, whereArgs)
-        db.close()
+        try {
+            db.update(tagTableName, values, whereClause, whereArgs)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
     }
 
+    // Get a specific tag by ID safely (returns null if not found)
+    fun getTagByID(tagID: Int, db: SQLiteDatabase): Tag? {
+        var tag: Tag? = null
+        var cursor: Cursor? = null
 
-    // Get a specific tag from the database using its id
-    fun getTagByID(tagID: Int, db: SQLiteDatabase): Tag {
+        try {
+            val query = "SELECT * FROM $tagTableName WHERE $tagIDColumn = ?"
+            cursor = db.rawQuery(query, arrayOf(tagID.toString()))
 
-        val query = "SELECT * FROM $tagTableName WHERE $tagIDColumn = $tagID"
-        val cursor = db.rawQuery(query, null)
+            if (cursor.moveToFirst()) {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow(tagIDColumn))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow(tagNameColumn))
+                tag = Tag(id, name)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cursor?.close()
+            db.close()
+        }
 
-        /*
-            Move the cursor to the first row. This method will return false
-            if the cursor is empty.
-            Returns: boolean - whether the move succeeded.
-        */
-        cursor.moveToFirst()
-
-        val id = cursor.getInt(cursor.getColumnIndexOrThrow(tagIDColumn))
-        val name = cursor.getString(cursor.getColumnIndexOrThrow(tagNameColumn))
-
-        cursor.close()
-        db.close()
-
-        return Tag(id, name)
+        return tag
     }
 
-
-    // Remove a specific tag from the database using its id
+    // Remove a specific tag safely
     fun deleteTag(tagID: Int, db: SQLiteDatabase) {
-
         val whereClause = "$tagIDColumn = ?"
         val whereArgs = arrayOf(tagID.toString())
 
-        db.delete(tagTableName, whereClause, whereArgs)
-        db.close()
+        try {
+            db.delete(tagTableName, whereClause, whereArgs)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
     }
 }
