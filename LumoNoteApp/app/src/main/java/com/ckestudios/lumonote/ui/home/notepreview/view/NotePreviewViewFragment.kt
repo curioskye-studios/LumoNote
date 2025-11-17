@@ -11,13 +11,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.data.repository.NoteRepository
 import com.ckestudios.lumonote.data.repository.TagRepository
+import com.ckestudios.lumonote.data.repository.TaggedRepository
 import com.ckestudios.lumonote.databinding.FragmentNotePreviewViewBinding
+import com.ckestudios.lumonote.ui.home.notepreview.viewmodel.NotePrevViewModel
 import com.ckestudios.lumonote.ui.noteview.view.NoteViewActivity
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.TagAppSharedViewModel
+import com.ckestudios.lumonote.ui.sharedviewmodel.TaggedAppSharedViewModel
 import com.ckestudios.lumonote.ui.tagview.view.TagViewActivity
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
@@ -36,9 +40,12 @@ class NotePreviewViewFragment : Fragment() {
 
     private lateinit var notePreviewAdapter: NotePreviewAdapter
     private lateinit var tagDisplayAdapter: TagDisplayAdapter
+    private lateinit var pinnedNotePrevAdapter: PinnedNotePreviewAdapter
 
+    private lateinit var notePrevViewModel: NotePrevViewModel
     private lateinit var tagAppSharedViewModel: TagAppSharedViewModel
     private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
+    private lateinit var taggedAppSharedViewModel: TaggedAppSharedViewModel
 
 
     // Called when the Fragment creates its view
@@ -57,8 +64,11 @@ class NotePreviewViewFragment : Fragment() {
 
         super.onCreate(savedInstanceState)
 
+        notePrevViewModel = ViewModelProvider(this).get(NotePrevViewModel::class.java)
+
         val noteRepository = NoteRepository(requireContext()) // DB
-        val tagRepository = TagRepository(requireContext()) // DB
+        val tagRepository = TagRepository(requireContext())
+        val taggedRepository = TaggedRepository(requireContext())
 
         // Custom ViewModelProviders know how to build viewmodels w/ dbconnection dependency
         noteAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(noteRepository))
@@ -66,6 +76,9 @@ class NotePreviewViewFragment : Fragment() {
 
         tagAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(tagRepository))
             .get(TagAppSharedViewModel::class.java)
+
+        taggedAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(taggedRepository))
+            .get(TaggedAppSharedViewModel::class.java)
     }
 
 
@@ -89,6 +102,8 @@ class NotePreviewViewFragment : Fragment() {
         setupAdapterDisplays()
 
         setupListeners()
+
+        observeNotePrevVMValues()
 
         observeNoteAppVMValues()
 
@@ -114,6 +129,7 @@ class NotePreviewViewFragment : Fragment() {
     private fun initializeAdapters() {
 
         notePreviewAdapter = NotePreviewAdapter (
+
             setNoteIDToOpen =
                 { noteID ->
 
@@ -124,22 +140,43 @@ class NotePreviewViewFragment : Fragment() {
             whenCurrentNotePinClicked =
                 { isPinned, currentNoteID ->
 
-//                    Log.d("NoteFrag", isPinned.toString())
-//                    Log.d("NoteFrag", currentNoteID.toString())
+                    noteAppSharedViewModel.setCurrentPreviewNoteID(currentNoteID)
+                    noteAppSharedViewModel.updatePreviewPinStatus(isPinned)
+                }
+        )
+
+        pinnedNotePrevAdapter = PinnedNotePreviewAdapter(
+
+            setNoteIDToOpen =
+                { noteID ->
+                    openNoteViewActivity(noteID)
+                },
+            whenCurrentNotePinClicked =
+                { isPinned, currentNoteID ->
 
                     noteAppSharedViewModel.setCurrentPreviewNoteID(currentNoteID)
                     noteAppSharedViewModel.updatePreviewPinStatus(isPinned)
                 }
         )
 
+
         tagDisplayAdapter = TagDisplayAdapter (
 
             onTagClickedFunction =
-            { position ->
+                { position, tagID ->
 
-                tagAppSharedViewModel.setCurrentNotePreviewTagPos(position)
-            }
+                    tagAppSharedViewModel.setCurrentNotePreviewTagPos(position)
+
+                    val tag = tagAppSharedViewModel.getTag(tagID)
+
+                    if (tag.tagName != "All Notes") {
+                        notePrevViewModel.setCurrentSelectedTag(tag)
+                    } else {
+                        notePrevViewModel.setCurrentSelectedTag(null)
+                    }
+                }
         )
+
     }
 
 
@@ -152,11 +189,17 @@ class NotePreviewViewFragment : Fragment() {
         notePrevViewBinding.notesPreviewRV.adapter = notePreviewAdapter
 
 
+        // Define layout and adapter to use for pinned notes display
+        notePrevViewBinding.pinnedNotesPreviewRV.layoutManager = StaggeredGridLayoutManager(2,
+            StaggeredGridLayoutManager.VERTICAL)
+
+        notePrevViewBinding.pinnedNotesPreviewRV.adapter =  pinnedNotePrevAdapter
+
+
         // Define layout and adapter to use for tag display
         notePrevViewBinding.tagsHolderRV.layoutManager = LinearLayoutManager(requireContext(),
             LinearLayoutManager.HORIZONTAL, false)
 
-        //notePrevViewBinding.tagsHolderRV.setHasFixedSize(true) // optional but avoids measurement issues
         notePrevViewBinding.tagsHolderRV.adapter = tagDisplayAdapter
     }
 
@@ -164,13 +207,9 @@ class NotePreviewViewFragment : Fragment() {
 
     private fun setupListeners() {
 
-        // Calls reference to the create note floating button
         notePrevViewBinding.apply {
 
             createButtonIV.setOnClickListener {
-
-                GeneralButtonIVHelper.playSelectionIndication(requireContext(),
-                    createButtonIV)
 
                 val intent = Intent(requireContext(), NoteViewActivity::class.java)
                 startActivity(intent)
@@ -209,27 +248,61 @@ class NotePreviewViewFragment : Fragment() {
             putExtra("note_id", noteID)
         }
 
-        // Starts the update note activity
         requireContext().startActivity(intent)
+    }
+
+
+    private fun observeNotePrevVMValues() {
+
+        notePrevViewModel.apply {
+
+            currentSelectedTag.observe(viewLifecycleOwner) {
+
+                noteAppSharedViewModel.setNotifyRefresh(true)
+                noteAppSharedViewModel.setNotifyRefresh(false)
+
+                val notes = noteAppSharedViewModel.notes.value!!
+
+                updateDisplayedNotes(notes)
+            }
+
+            noNotes.observe(viewLifecycleOwner) { isTrue ->
+
+                GeneralUIHelper.changeViewVisibility(notePrevViewBinding.unpinnedSectionLayoutRL,
+                    !isTrue)
+                GeneralUIHelper.changeViewVisibility(notePrevViewBinding.noNotesMessageTV,
+                    isTrue)
+            }
+
+            noPinnedNotes.observe(viewLifecycleOwner) { isTrue ->
+
+                GeneralUIHelper.changeViewVisibility(notePrevViewBinding.pinnedSectionLayoutRL,
+                    !isTrue)
+                GeneralUIHelper.changeViewVisibility(notePrevViewBinding.unpinnedLabelTV,
+                    !isTrue)
+            }
+
+            noUnpinnedNotes.observe(viewLifecycleOwner) { isTrue ->
+
+                GeneralUIHelper.changeViewVisibility(notePrevViewBinding.unpinnedSectionLayoutRL,
+                    !isTrue)
+                GeneralUIHelper.changeViewVisibility(notePrevViewBinding.unpinnedLabelTV,
+                    !isTrue)
+            }
+        }
+
     }
 
 
     private fun observeNoteAppVMValues() {
 
-        // Observe changes
         noteAppSharedViewModel.apply {
 
             notes.observe(viewLifecycleOwner) { notes ->
-                notePreviewAdapter.refreshData(notes)
+
+                updateDisplayedNotes(notes)
             }
 
-            noNotes.observe(viewLifecycleOwner) { isTrue ->
-
-                GeneralUIHelper.changeViewVisibility(notePrevViewBinding.noNotesMessageTV,
-                    isTrue)
-            }
-
-            // Observe changes
             notifyRefresh.observe(viewLifecycleOwner) { shouldRefresh ->
 
                 if (shouldRefresh == true) {
@@ -237,7 +310,6 @@ class NotePreviewViewFragment : Fragment() {
                 }
             }
 
-            // Observe changes
             previewNotePinned.observe(viewLifecycleOwner) { isPinned ->
 
                 //update note in database with new pinned status
@@ -276,6 +348,7 @@ class NotePreviewViewFragment : Fragment() {
             }
 
             notifyRefresh.observe(viewLifecycleOwner) { shouldRefresh ->
+
                 if (shouldRefresh == true) {
                     loadAllTags()
                 }
@@ -285,6 +358,43 @@ class NotePreviewViewFragment : Fragment() {
                 tagDisplayAdapter.setSelectedPosition(position)
             }
         }
+    }
+
+    private fun updateNoNotesMessage(hasSelectedTag: Boolean) {
+
+        val message =
+            if (hasSelectedTag) {
+                "No notes with this tag selected yet."
+            } else {
+                "No notes. Tap + below to create a new note."
+            }
+
+        notePrevViewBinding.noNotesMessageTV.text = message
+    }
+
+
+    private fun updateDisplayedNotes(notes: List<Note>) {
+
+        val selectedTag = notePrevViewModel.currentSelectedTag.value
+
+        val notesToDisplay =
+            if (selectedTag != null) {
+                taggedAppSharedViewModel.getNotesByTagID(selectedTag.tagID)
+            } else {
+                notes
+            }
+
+        val unfilteredPinned = notesToDisplay.filter { !it.notePinned }
+        val filteredPinned = notesToDisplay.filter { it.notePinned }
+
+        notePreviewAdapter.refreshData(unfilteredPinned)
+        pinnedNotePrevAdapter.refreshData(filteredPinned)
+
+        updateNoNotesMessage(selectedTag != null)
+        notePrevViewModel.updateNoNotesFlag(notesToDisplay)
+
+        notePrevViewModel.updateNoPinnedNotesFlag(filteredPinned)
+        notePrevViewModel.updateNoUnpinnedNotesFlag(unfilteredPinned)
     }
 
 

@@ -23,8 +23,6 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
 
     private val _notesOnDate = MutableLiveData<List<Note>>()
     val notesOnDate: LiveData<List<Note>> = _notesOnDate
-    private val _noNotes = MutableLiveData(false)
-    val noNotes: LiveData<Boolean> = _noNotes
 
     private val _notifyRefresh = MutableLiveData<Boolean>()
     val notifyRefresh: LiveData<Boolean> = _notifyRefresh
@@ -63,8 +61,6 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
 
         viewModelScope.launch {
             _notes.value = noteRepository.getItems()
-
-            _noNotes.value = notes.value?.isEmpty()
         }
     }
 
@@ -80,18 +76,16 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
     }
 
     fun getNote(noteID: Int) : Note? {
-        // Call database helper object and invoke get note method to pull note from database
+
         return noteRepository.getItemByID(noteID)
     }
 
     fun deleteNote(noteID: Int) {
-        // Call database helper object and invoke delete note method w/ note id
+
         noteRepository.deleteItem(noteID)
 
-        // notify activity
+        // notify activity & reset
         setNoteWasDeleted(true)
-
-        // reset value
         setNoteWasDeleted(false)
     }
 
@@ -101,18 +95,21 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
 
             Log.d("noteDataDate", note.noteModifiedDate)
 
-            // Call database helper object and invoke note insertion method w/ new note
             noteRepository.insertItem(note)
 
             setNoteWasCreated(true)
 
         } else {
 
-            // Call database helper object and invoke note update method w/ updated note
             noteRepository.updateItem(note)
 
             setNoteWasUpdated(true)
         }
+    }
+
+    fun getNotesByPinnedStatus(getUnpinned: Boolean): List<Note> {
+
+        return noteRepository.getNotesByPinnedStatus(getUnpinned)
     }
 
     fun updateCurrentPinStatus(isPinned: Boolean) {

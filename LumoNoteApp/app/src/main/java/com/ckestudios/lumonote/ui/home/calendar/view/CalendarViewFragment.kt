@@ -9,11 +9,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ckestudios.lumonote.data.repository.NoteRepository
+import com.ckestudios.lumonote.data.repository.TagRepository
+import com.ckestudios.lumonote.data.repository.TaggedRepository
 import com.ckestudios.lumonote.databinding.FragmentCalendarViewBinding
 import com.ckestudios.lumonote.ui.home.calendar.viewmodel.CalendarViewModel
 import com.ckestudios.lumonote.ui.noteview.view.NoteViewActivity
+import com.ckestudios.lumonote.ui.noteview.view.taginput.TagInputDisplayAdapter
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
+import com.ckestudios.lumonote.ui.sharedviewmodel.TagAppSharedViewModel
+import com.ckestudios.lumonote.ui.sharedviewmodel.TaggedAppSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
@@ -34,9 +39,12 @@ class CalendarViewFragment : Fragment() {
     private val calendarViewBinding get() = _calendarViewBinding!!
 
     private lateinit var calendarNotePreviewAdapter: CalendarNotePreviewAdapter
+    private  lateinit var tagInputDisplayAdapter: TagInputDisplayAdapter
 
     private lateinit var calendarViewModel: CalendarViewModel
     private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
+    private lateinit var tagAppSharedViewModel: TagAppSharedViewModel
+    private lateinit var taggedAppSharedViewModel: TaggedAppSharedViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,11 +52,16 @@ class CalendarViewFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         val noteRepository = NoteRepository(requireContext()) // DB
-        val appSharedVMConstructor = AppSharedViewFactory(noteRepository) // Factory
+        val tagRepository = TagRepository(requireContext())
+        val taggedRepository = TaggedRepository(requireContext())
 
         // Custom ViewModelProviders know how to build viewmodels w/ dbconnection dependency
-        noteAppSharedViewModel = ViewModelProvider(this, appSharedVMConstructor)
+        noteAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(noteRepository))
             .get(NoteAppSharedViewModel::class.java)
+        tagAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(tagRepository))
+            .get(TagAppSharedViewModel::class.java)
+        taggedAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(taggedRepository))
+            .get(TaggedAppSharedViewModel::class.java)
 
         calendarViewModel = ViewModelProvider(this).get(CalendarViewModel::class.java)
     }
@@ -148,7 +161,6 @@ class CalendarViewFragment : Fragment() {
 
     private fun observeNoteAppVMValues() {
 
-        // Observe changes
         noteAppSharedViewModel.notesOnDate.observe(viewLifecycleOwner) { notesOnDate ->
 
             calendarNotePreviewAdapter.refreshData(notesOnDate)
@@ -185,9 +197,8 @@ class CalendarViewFragment : Fragment() {
                 GeneralUIHelper.changeViewVisibility(calendarViewBinding.noNotesMessageTV,
                         !hasNotes)
             }
-
-            
         }
+
     }
 
 

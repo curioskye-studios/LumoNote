@@ -14,7 +14,7 @@ import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.models.Tag
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
-class TagDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
+class TagDisplayAdapter(private val onTagClickedFunction: (Int, Int) -> Unit)
     : RecyclerView.Adapter<TagDisplayAdapter.TagDisplayViewHolder>(){
 
     private var tagsList = mutableListOf<Tag>()
@@ -50,6 +50,7 @@ class TagDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
 
         // Find and store the equivalent tag object in the list meant to be same as in UI
         val tag = tagsList[position]
+        val tagID = tag.tagID
         // Populate the UI tag at that position
         holder.tagName.text = tag.tagName
         // Note: position of the tags can change dynamically at runtime, state should be tracked
@@ -60,7 +61,7 @@ class TagDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
         // Handle click to change selection
         holder.tagCardView.setOnClickListener {
 
-            onTagClickedFunction(position)
+            onTagClickedFunction(position, tagID)
         }
     }
 

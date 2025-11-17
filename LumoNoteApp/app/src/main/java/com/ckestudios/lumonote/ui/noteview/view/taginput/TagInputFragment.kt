@@ -109,13 +109,7 @@ class TagInputFragment : Fragment() {
 
     private fun setupAdaptersDisplay() {
 
-        tagInputDisplayAdapter = TagInputDisplayAdapter (
-
-            onTagClickedFunction = {
-                position ->
-
-            }
-        )
+        tagInputDisplayAdapter = TagInputDisplayAdapter ()
 
         tagInputSelectorAdapter = TagInputSelectorAdapter (
 

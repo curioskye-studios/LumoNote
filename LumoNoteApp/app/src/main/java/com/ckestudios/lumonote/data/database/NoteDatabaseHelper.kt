@@ -70,8 +70,44 @@ class NoteDatabaseHelper(
         return notesList
     }
 
+    // Retrieve notes by pinned status safely
+    fun getNotesByPinnedStatus(getUnpinned: Boolean, db: SQLiteDatabase): List<Note> {
+
+        val notesList = mutableListOf<Note>()
+        var cursor: Cursor? = null
+
+        try {
+            val query = "SELECT * FROM $noteTableName WHERE $notePinnedColumn = ?"
+            cursor = db.rawQuery(query, arrayOf(getUnpinned.toString()))
+
+            if (cursor.moveToFirst()) {
+                do {
+                    val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
+                    val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
+                    val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
+                    val spans = cursor.getString(cursor.getColumnIndexOrThrow(noteSpansColumn))
+                    val created = cursor.getString(cursor.getColumnIndexOrThrow(noteCreatedColumn))
+                    val modified = cursor.getString(cursor.getColumnIndexOrThrow(noteModifiedColumn))
+                    val pinned = cursor.getString(cursor.getColumnIndexOrThrow(notePinnedColumn))
+
+                    notesList.add(
+                        Note(id, title, content, spans, created, modified, pinned.toBoolean())
+                    )
+                } while (cursor.moveToNext())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cursor?.close()
+            db.close()
+        }
+
+        return notesList
+    }
+
     // Retrieve notes by creation date safely
     fun getNotesByDate(date: String, db: SQLiteDatabase): List<Note> {
+
         val notesList = mutableListOf<Note>()
         var cursor: Cursor? = null
 

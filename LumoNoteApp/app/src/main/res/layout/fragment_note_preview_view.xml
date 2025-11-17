@@ -78,10 +78,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="12dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="22dp"
                 android:layout_alignParentTop="true">
 
-                <!-- Horizontal RecyclerView -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/tagsHolderRV"
                     android:layout_width="match_parent"
@@ -108,14 +107,75 @@
 
             </RelativeLayout>
 
-            <!-- Notes preview list below tags section -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/notesPreviewRV"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingBottom="24dp"
-                android:paddingRight="12dp"
-                android:layout_below="@id/tagSectionLayoutRL"/>
+            <RelativeLayout
+                android:id="@+id/pinnedSectionLayoutRL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tagSectionLayoutRL"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:id="@+id/pinnedLabelTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:paddingTop="3dp"
+                    android:layout_marginBottom="24dp"
+                    android:layout_marginStart="24dp"
+
+                    android:fontFamily="@font/inter"
+
+                    android:text="Pinned Notes"
+                    android:textColor="@color/light_grey_2"
+                    android:textStyle="bold"
+                    android:textSize="13sp">
+                </TextView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/pinnedNotesPreviewRV"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingBottom="12dp"
+                    android:paddingRight="12dp"
+                    android:layout_below="@id/pinnedLabelTV"/>
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/unpinnedSectionLayoutRL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/pinnedSectionLayoutRL"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:id="@+id/unpinnedLabelTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:paddingTop="3dp"
+                    android:layout_marginBottom="24dp"
+                    android:layout_marginStart="24dp"
+
+                    android:fontFamily="@font/inter"
+
+                    android:text="Unpinned Notes"
+                    android:textColor="@color/light_grey_2"
+                    android:textStyle="bold"
+                    android:textSize="13sp">
+                </TextView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/notesPreviewRV"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingBottom="24dp"
+                    android:paddingRight="12dp"
+                    android:layout_below="@id/unpinnedLabelTV"/>
+
+            </RelativeLayout>
+
 
             <TextView
                 android:id="@+id/noNotesMessageTV"
@@ -123,16 +183,16 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter"
 
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="12dp"
                 android:layout_marginBottom="16dp"
                 android:paddingStart="24dp"
                 android:paddingEnd="24dp"
                 android:lineSpacingMultiplier="1.2"
-                android:layout_below="@id/notesPreviewRV"
+                android:layout_below="@id/unpinnedSectionLayoutRL"
 
-                android:text="No notes. Tap the circle below to create a new note."
+                android:text="No notes. Tap + below to create a new note."
                 android:textColor="@color/light_grey_2"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold">
             </TextView>
 
@@ -165,9 +225,9 @@
             app:layout_constraintVertical_bias="0.5" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/baseline_edit_24"
+            android:layout_width="31dp"
+            android:layout_height="31dp"
+            android:src="@drawable/library_add_24px"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"

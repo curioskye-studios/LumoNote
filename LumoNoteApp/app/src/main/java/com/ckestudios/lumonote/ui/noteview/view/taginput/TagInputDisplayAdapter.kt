@@ -15,7 +15,7 @@ import com.ckestudios.lumonote.data.models.Tag
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
-class TagInputDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
+class TagInputDisplayAdapter()
     : RecyclerView.Adapter<TagInputDisplayAdapter.TagDisplayViewHolder>(){
 
     private var tagsList = mutableListOf<Tag>()
@@ -84,7 +84,6 @@ class TagInputDisplayAdapter(private val onTagClickedFunction: (Int) -> Unit)
 
             layoutParams = params
         }
-
     }
 
 }

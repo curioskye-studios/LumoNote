@@ -15,9 +15,9 @@ import com.ckestudios.lumonote.utils.state.SpanProcessor
 
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
-class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
-                         private val whenCurrentNotePinClicked: (Boolean, Int) -> Unit)
-    : RecyclerView.Adapter<NotePreviewAdapter.NotePreviewViewHolder>() {
+class PinnedNotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
+                               private val whenCurrentNotePinClicked: (Boolean, Int) -> Unit)
+    : RecyclerView.Adapter<PinnedNotePreviewAdapter.NotePreviewViewHolder>() {
 
     private val notesList = mutableListOf<Note>()
 

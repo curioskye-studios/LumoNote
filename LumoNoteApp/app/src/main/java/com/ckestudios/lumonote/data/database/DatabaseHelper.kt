@@ -132,6 +132,17 @@ class DatabaseHelper(context: Context) :
         }
     }
 
+    fun getNotesByPinnedStatus(getUnpinned: Boolean): List<Note> {
+        return try {
+            readableDatabase.use { db ->
+                noteDatabaseHelper.getNotesByPinnedStatus(getUnpinned, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error getting notes by pinned status", e)
+            emptyList()
+        }
+    }
+
     fun updateNote(note: Note) {
         try {
             writableDatabase.use { db ->

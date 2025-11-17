@@ -4,28 +4,15 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.data.models.Tag
 import com.ckestudios.lumonote.data.repository.TaggedRepository
-import kotlinx.coroutines.launch
 
 class TaggedAppSharedViewModel(application: Application, private val taggedRepository: TaggedRepository)
     : AndroidViewModel(application) {
 
     private val _notifyRefresh = MutableLiveData<Boolean>()
     val notifyRefresh: LiveData<Boolean> = _notifyRefresh
-
-
-    init {
-
-        loadAllTags()
-    }
-
-    fun loadAllTags() {
-
-        viewModelScope.launch {
-        }
-    }
 
 
     fun insertTagged(tagID: Int, noteID: Int) {
@@ -35,17 +22,23 @@ class TaggedAppSharedViewModel(application: Application, private val taggedRepos
         updateNotifyRefresh()
     }
 
+    fun deleteTagged(tagID: Int, noteID: Int) {
+
+        taggedRepository.deleteTagged(tagID, noteID)
+
+        updateNotifyRefresh()
+    }
+
     fun getTagsByNoteID(noteID: Int): List<Tag> {
 
         return taggedRepository.getTagsByNoteID(noteID)
     }
 
-    fun deleteTagged(tagID: Int, noteID: Int) {
+    fun getNotesByTagID(tagID: Int): List<Note> {
 
-        return taggedRepository.deleteTagged(tagID, noteID)
-
-        updateNotifyRefresh()
+        return taggedRepository.getNotesByTagID(tagID)
     }
+
 
 
     private fun updateNotifyRefresh() {
