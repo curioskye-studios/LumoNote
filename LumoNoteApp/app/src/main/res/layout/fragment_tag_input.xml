@@ -52,6 +52,23 @@
             </TextView>
 
             <ImageView
+                android:id="@+id/editTagButtonIV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_toEndOf="@id/tagSelectorLabelTV"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="12dp"
+
+                android:paddingStart="8dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="9dp"
+
+                android:src="@drawable/baseline_edit_24"
+                app:tint="@color/gold" />
+
+            <ImageView
                 android:id="@+id/closeSelectorButtonIV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -83,6 +100,25 @@
             android:layout_marginTop="16dp"
 
             android:layout_below="@id/tagSelectorLblRL"/>
+
+        <TextView
+            android:id="@+id/noTagsAvailableMsgTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter"
+            android:layout_marginTop="16dp"
+
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:lineSpacingMultiplier="1.2"
+            android:layout_below="@id/tagSelectorHolderRV"
+
+            android:text="No tags available to select. Tap the edit icon above to create tags."
+            android:textColor="@color/light_grey_2"
+            android:textSize="14sp"
+            android:textStyle="bold">
+        </TextView>
+
 
 
     </RelativeLayout>

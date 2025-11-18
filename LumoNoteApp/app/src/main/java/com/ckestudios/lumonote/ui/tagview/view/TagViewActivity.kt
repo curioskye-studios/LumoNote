@@ -64,6 +64,12 @@ class TagViewActivity : AppCompatActivity() {
                         "Empty tag will be deleted", false)
                 }
 
+                if (tagNameIsTaken(tagName)) {
+                    GeneralUIHelper.displayFeedbackToast( this,
+                        "Tag name already exists", false)
+                    return@TagEditDisplayAdapter
+                }
+
                 if (oldTag.tagName != tagName) {
                     tagAppSharedViewModel.updateTag(Tag(tagID, tagName))
                 } else {
@@ -77,6 +83,22 @@ class TagViewActivity : AppCompatActivity() {
         tagViewBinding.tagsHolderRV.adapter = tagEditDisplayAdapter
     }
 
+    private fun tagNameIsTaken(newTagName: String): Boolean {
+
+        val tags = tagAppSharedViewModel.tags.value!!
+        val existingTagNames = tags.map { it.tagName }
+
+        return newTagName in existingTagNames
+    }
+
+    private fun newTagAlreadyCreated(): Boolean {
+
+        val tags = tagAppSharedViewModel.tags.value!!
+        val existingTagNames = tags.map { it.tagName }
+
+        return "New Tag" in existingTagNames
+    }
+
     private fun setOnClickListeners() {
 
         tagViewBinding.apply {
@@ -85,8 +107,12 @@ class TagViewActivity : AppCompatActivity() {
 
                 GeneralButtonIVHelper.playSelectionIndication(this@TagViewActivity,
                     addButtonIV)
-
-                tagAppSharedViewModel.createTag(Tag(0, "New Tag"))
+                if (newTagAlreadyCreated()) {
+                    GeneralUIHelper.displayFeedbackToast( this@TagViewActivity,
+                        "New tag already created. Please rename", false)
+                } else {
+                    tagAppSharedViewModel.createTag(Tag(0, "New Tag"))
+                }
             }
 
             backButtonIV.setOnClickListener {

@@ -1,5 +1,6 @@
 package com.ckestudios.lumonote.ui.noteview.view.taginput
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -19,6 +20,7 @@ import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.TagAppSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.TaggedAppSharedViewModel
+import com.ckestudios.lumonote.ui.tagview.view.TagViewActivity
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.google.android.flexbox.FlexDirection
@@ -98,6 +100,7 @@ class TagInputFragment : Fragment() {
         super.onResume()
 
         tagAppSharedViewModel.loadAllTags()
+        loadNoteTags()
     }
 
     override fun onDestroyView() {
@@ -190,6 +193,20 @@ class TagInputFragment : Fragment() {
 
             }
 
+            editTagButtonIV.setOnClickListener {
+
+                GeneralButtonIVHelper.playSelectionIndication(requireContext(), editTagButtonIV)
+
+                Handler(Looper.getMainLooper()).postDelayed({
+
+                    // open tagviewactivity
+                    val intent = Intent (activity, TagViewActivity::class.java)
+                    activity?.startActivity(intent)
+
+                }, 300) // Delay in milliseconds (300ms = 0.3 seconds)
+
+            }
+
 //            saveTagButtonIV.setOnClickListener {
 //
 //                GeneralButtonIVHelper.playSelectionIndication(requireContext(), saveTagButtonIV)
@@ -248,6 +265,14 @@ class TagInputFragment : Fragment() {
 
                 GeneralUIHelper.changeViewVisibility(tagInputViewBinding.noTagsMessageTV,
                     hasTags)
+            }
+
+            noTagsCreated.observe(viewLifecycleOwner) { isTrue ->
+
+                GeneralUIHelper.changeViewVisibility(tagInputViewBinding.tagSelectorHolderRV,
+                    !isTrue)
+                GeneralUIHelper.changeViewVisibility(tagInputViewBinding.noTagsAvailableMsgTV,
+                    isTrue)
             }
         }
     }
