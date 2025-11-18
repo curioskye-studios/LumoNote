@@ -38,9 +38,9 @@ class NotePreviewViewFragment : Fragment() {
     // The "!!" means it assumes _notePrevViewBinding is not null between onCreateView & onDestroyView
     private val notePrevViewBinding get() = _notePrevViewBinding!!
 
-    private lateinit var notePreviewAdapter: NotePreviewAdapter
+    private lateinit var unpinnedNotePrevAdapter: UnpinnedNotePrevAdapter
     private lateinit var tagDisplayAdapter: TagDisplayAdapter
-    private lateinit var pinnedNotePrevAdapter: PinnedNotePreviewAdapter
+    private lateinit var pinnedNotePrevAdapter: PinnedNotePrevAdapter
 
     private lateinit var notePrevViewModel: NotePrevViewModel
     private lateinit var tagAppSharedViewModel: TagAppSharedViewModel
@@ -128,12 +128,12 @@ class NotePreviewViewFragment : Fragment() {
 
     private fun initializeAdapters() {
 
-        notePreviewAdapter = NotePreviewAdapter (
+        unpinnedNotePrevAdapter = UnpinnedNotePrevAdapter (
 
             setNoteIDToOpen =
                 { noteID ->
 
-                    // notePreviewAdapter takes in a function as a parameter
+                    // unpinnedNotePrevAdapter takes in a function as a parameter
                     // this is the functionality assigned whenever this runs in the adapter
                     openNoteViewActivity(noteID)
                 },
@@ -145,7 +145,7 @@ class NotePreviewViewFragment : Fragment() {
                 }
         )
 
-        pinnedNotePrevAdapter = PinnedNotePreviewAdapter(
+        pinnedNotePrevAdapter = PinnedNotePrevAdapter(
 
             setNoteIDToOpen =
                 { noteID ->
@@ -186,7 +186,7 @@ class NotePreviewViewFragment : Fragment() {
         notePrevViewBinding.notesPreviewRV.layoutManager = StaggeredGridLayoutManager(2,
             StaggeredGridLayoutManager.VERTICAL)
 
-        notePrevViewBinding.notesPreviewRV.adapter = notePreviewAdapter
+        notePrevViewBinding.notesPreviewRV.adapter = unpinnedNotePrevAdapter
 
 
         // Define layout and adapter to use for pinned notes display
@@ -387,7 +387,7 @@ class NotePreviewViewFragment : Fragment() {
         val unfilteredPinned = notesToDisplay.filter { !it.notePinned }
         val filteredPinned = notesToDisplay.filter { it.notePinned }
 
-        notePreviewAdapter.refreshData(unfilteredPinned)
+        unpinnedNotePrevAdapter.refreshData(unfilteredPinned)
         pinnedNotePrevAdapter.refreshData(filteredPinned)
 
         updateNoNotesMessage(selectedTag != null)

@@ -129,7 +129,7 @@ class NoteViewActivity : AppCompatActivity() {
         // If an existing note was clicked on rather than the create button
         if (existingNoteClicked) {
 
-            // Retrieve the data passed in from NotePreviewAdapter.kt
+            // Retrieve the data passed in from UnpinnedNotePrevAdapter.kt
             noteID = intent.getIntExtra("note_id", -1)
 
             // If no note found, exit activity

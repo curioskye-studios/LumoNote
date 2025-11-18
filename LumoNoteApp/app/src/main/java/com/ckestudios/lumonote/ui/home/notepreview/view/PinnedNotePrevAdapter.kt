@@ -11,13 +11,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.state.SpanProcessor
 
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
-class PinnedNotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
-                               private val whenCurrentNotePinClicked: (Boolean, Int) -> Unit)
-    : RecyclerView.Adapter<PinnedNotePreviewAdapter.NotePreviewViewHolder>() {
+class PinnedNotePrevAdapter(private val setNoteIDToOpen: (Int) -> Unit,
+                            private val whenCurrentNotePinClicked: (Boolean, Int) -> Unit)
+    : RecyclerView.Adapter<PinnedNotePrevAdapter.NotePreviewViewHolder>() {
 
     private val notesList = mutableListOf<Note>()
 
@@ -55,12 +56,17 @@ class PinnedNotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
         // index in the list
         holder.titlePreview.text = note.noteTitle
         holder.contentPreview.text = note.noteContent
+
+        val showTitleView = note.noteTitle.isNotEmpty()
+        GeneralUIHelper.changeViewVisibility(holder.titlePreview, showTitleView)
+
+        val showContentView = note.noteContent.isNotEmpty()
+        GeneralUIHelper.changeViewVisibility(holder.contentPreview, showContentView)
+
         SpanProcessor.reapplySpansTV(note.noteSpans, holder.contentPreview)
         holder.pinPreview.tag = note.notePinned
         GeneralButtonIVHelper.updatePinHighlight(holder.pinPreview, holder.pinPreview.context,
             R.drawable.selected_background)
-
-        //Log.d("NoteFrag", "pinnedPreview: ${holder.pinPreview.tag}")
 
 
         holder.noteCardPreview.setOnClickListener {

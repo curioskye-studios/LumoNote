@@ -48,6 +48,40 @@ class TaggedDatabaseHelper(
         }
     }
 
+    fun deleteTaggedByTagID(tagID: Int, db: SQLiteDatabase) {
+        try {
+            val whereClause = "$taggedTagIDColumn = ?"
+            val whereArgs = arrayOf(tagID.toString())
+
+            db.delete(taggedTableName, whereClause, whereArgs)
+        } catch (e: Exception) {
+            Log.e("TaggedDatabaseHelper", "Error deleting tagged record", e)
+        } finally {
+            try {
+                db.close()
+            } catch (e: Exception) {
+                Log.e("TaggedDatabaseHelper", "Error closing DB after delete", e)
+            }
+        }
+    }
+
+    fun deleteTaggedByNoteID(noteID: Int, db: SQLiteDatabase) {
+        try {
+            val whereClause = "$taggedNoteIDColumn = ?"
+            val whereArgs = arrayOf(noteID.toString())
+
+            db.delete(taggedTableName, whereClause, whereArgs)
+        } catch (e: Exception) {
+            Log.e("TaggedDatabaseHelper", "Error deleting tagged record", e)
+        } finally {
+            try {
+                db.close()
+            } catch (e: Exception) {
+                Log.e("TaggedDatabaseHelper", "Error closing DB after delete", e)
+            }
+        }
+    }
+
     // Get all tag IDs linked to a specific note
     fun getTagsByNoteID(noteID: Int, db: SQLiteDatabase): List<Int> {
         val tagIDList = mutableListOf<Int>()

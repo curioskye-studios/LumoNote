@@ -17,7 +17,17 @@ class TaggedRepository (context: Context) : Repository{
 
     fun deleteTagged(tagID: Int, noteID: Int) {
 
-        return dbConnection.deleteTagged(tagID, noteID)
+        dbConnection.deleteTagged(tagID, noteID)
+    }
+
+    fun deleteTaggedByTagID(tagID: Int) {
+
+        dbConnection.deleteTaggedByTagID(tagID)
+    }
+
+    fun deleteTaggedByNoteID(noteID: Int) {
+
+        dbConnection.deleteTaggedByNoteID(noteID)
     }
 
     fun getTagsByNoteID(noteID: Int): List<Tag> {

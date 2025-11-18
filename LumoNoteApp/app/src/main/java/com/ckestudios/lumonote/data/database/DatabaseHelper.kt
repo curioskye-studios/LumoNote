@@ -166,6 +166,7 @@ class DatabaseHelper(context: Context) :
 
     fun deleteNote(noteID: Int) {
         try {
+            deleteTaggedByNoteID(noteID)
             writableDatabase.use { db ->
                 noteDatabaseHelper.deleteNote(noteID, db)
             }
@@ -222,6 +223,7 @@ class DatabaseHelper(context: Context) :
 
     fun deleteTag(tagID: Int) {
         try {
+            deleteTaggedByTagID(tagID)
             writableDatabase.use { db ->
                 tagDatabaseHelper.deleteTag(tagID, db)
             }
@@ -229,6 +231,7 @@ class DatabaseHelper(context: Context) :
             Log.e("DatabaseHelper", "Error deleting tag", e)
         }
     }
+
 
 
 
@@ -247,6 +250,26 @@ class DatabaseHelper(context: Context) :
         try {
             writableDatabase.use { db ->
                 taggedDatabaseHelper.deleteTagged(tagID, noteID, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error deleting tagged record", e)
+        }
+    }
+
+    fun deleteTaggedByTagID(tagID: Int) {
+        try {
+            writableDatabase.use { db ->
+                taggedDatabaseHelper.deleteTaggedByTagID(tagID, db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error deleting tagged record", e)
+        }
+    }
+
+    fun deleteTaggedByNoteID(noteID: Int) {
+        try {
+            writableDatabase.use { db ->
+                taggedDatabaseHelper.deleteTaggedByNoteID(noteID, db)
             }
         } catch (e: Exception) {
             Log.e("DatabaseHelper", "Error deleting tagged record", e)

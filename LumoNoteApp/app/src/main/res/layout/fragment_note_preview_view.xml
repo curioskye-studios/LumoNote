@@ -120,7 +120,7 @@
                     android:layout_height="wrap_content"
 
                     android:paddingTop="3dp"
-                    android:layout_marginBottom="24dp"
+                    android:layout_marginBottom="16dp"
                     android:layout_marginStart="24dp"
 
                     android:fontFamily="@font/inter"
@@ -155,7 +155,7 @@
                     android:layout_height="wrap_content"
 
                     android:paddingTop="3dp"
-                    android:layout_marginBottom="24dp"
+                    android:layout_marginBottom="16dp"
                     android:layout_marginStart="24dp"
 
                     android:fontFamily="@font/inter"
@@ -190,7 +190,7 @@
                 android:lineSpacingMultiplier="1.2"
                 android:layout_below="@id/unpinnedSectionLayoutRL"
 
-                android:text="No notes. Tap + below to create a new note."
+                android:text="No notes. Tap the + button below to create a new note."
                 android:textColor="@color/light_grey_2"
                 android:textSize="15sp"
                 android:textStyle="bold">
