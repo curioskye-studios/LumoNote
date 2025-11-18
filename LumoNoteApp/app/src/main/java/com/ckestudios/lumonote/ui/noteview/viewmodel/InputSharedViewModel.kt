@@ -10,6 +10,10 @@ class InputSharedViewModel : ViewModel() {
     private val _shouldOpenFormatter = MutableLiveData(false)
     val shouldOpenFormatter: LiveData<Boolean> get() = _shouldOpenFormatter
 
+    private val _shouldUpdateModifiedDate = MutableLiveData(false)
+    val shouldUpdateModifiedDate: LiveData<Boolean> get() = _shouldUpdateModifiedDate
+
+
     private val _noteContentIsEditing = MutableLiveData(false)
     val noteContentIsEditing: LiveData<Boolean> get() = _noteContentIsEditing
 
@@ -26,6 +30,11 @@ class InputSharedViewModel : ViewModel() {
     fun setShouldOpenFormatter(open: Boolean) {
 
         _shouldOpenFormatter.value = open
+    }
+
+    fun setShouldUpdateModifiedDate(shouldUpdate: Boolean) {
+
+        _shouldUpdateModifiedDate.value = shouldUpdate
     }
 
     fun setNoteContentIsEditing(focused: Boolean) {

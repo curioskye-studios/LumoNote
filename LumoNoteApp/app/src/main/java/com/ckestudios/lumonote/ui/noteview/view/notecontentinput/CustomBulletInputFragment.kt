@@ -1,41 +1,31 @@
 package com.ckestudios.lumonote.ui.noteview.view.notecontentinput
 
 import android.app.AlertDialog
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.isDigitsOnly
+import androidx.fragment.app.DialogFragment
 import com.ckestudios.lumonote.R
-import com.ckestudios.lumonote.databinding.ActivityCustomBulletBinding
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletResource
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
 
-class CustomBulletInputActivity() : AppCompatActivity() {
-
-    private lateinit var customBulletBinding: ActivityCustomBulletBinding
+class CustomBulletInputFragment() : DialogFragment() {
 
     private var userInput = ""
 
+    private var dialog: AlertDialog? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
 
-        super.onCreate(savedInstanceState)
-
-        customBulletBinding = ActivityCustomBulletBinding.inflate(layoutInflater)
-        setContentView(customBulletBinding.root)
-
-        showAlertDialog()
-    }
-
-    private fun showAlertDialog() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val dialogView =
-            LayoutInflater.from(this).inflate(R.layout.dialog_custom_bullet, null)
+            LayoutInflater.from(requireContext()).inflate(R.layout.dialog_custom_bullet, null)
 
-        val dialog = AlertDialog.Builder(this)
+        dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .create()
 
@@ -52,8 +42,7 @@ class CustomBulletInputActivity() : AppCompatActivity() {
 
         cancelButton.setOnClickListener {
 
-            dialog.dismiss()
-            finish()
+            dialog?.dismiss()
         }
 
         okButton.setOnClickListener {
@@ -77,12 +66,17 @@ class CustomBulletInputActivity() : AppCompatActivity() {
 
                 CustomBulletResource.setCustomBullet(userInput)
 
-                dialog.dismiss()
-                finish()
+                dialog?.dismiss()
             }
         }
 
-        dialog.show()
+        return dialog as AlertDialog
+    }
+
+    override fun onDestroy() {
+        dialog?.dismiss()
+        dialog = null
+        super.onDestroy()
     }
 
 }

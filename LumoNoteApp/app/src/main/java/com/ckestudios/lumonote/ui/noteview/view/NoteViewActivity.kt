@@ -14,9 +14,8 @@ import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
-import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralDateHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import com.ckestudios.lumonote.utils.state.SpanProcessor
 import com.ckestudios.lumonote.utils.state.StateManager
@@ -84,9 +83,9 @@ class NoteViewActivity : AppCompatActivity() {
 
         // Setup Functionality
 
-        BasicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteTitleET,
+        GeneralUIHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteTitleET,
             noteViewBinding.root)
-        BasicUtilityHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteEditContentET,
+        GeneralUIHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteEditContentET,
             noteViewBinding.root)
 
         notifyIfEditing()
@@ -105,7 +104,7 @@ class NoteViewActivity : AppCompatActivity() {
 
         // Format: YYYY-MM-DD
         val currentDate = LocalDate.parse(LocalDate.now().toString())
-        val convertedDate = GeneralTextHelper.formatDate(currentDate)
+        val convertedDate = GeneralDateHelper.formatDate(currentDate)
 
         runOnUiThread {
             noteViewBinding.modifiedDateTV.text = convertedDate
@@ -154,7 +153,8 @@ class NoteViewActivity : AppCompatActivity() {
 
         val noteDataDict =
             noteSaveHelper.getNoteDataDict(noteViewBinding.noteTitleET,
-                noteViewBinding.noteEditContentET, noteViewBinding.pinButtonIV)
+                noteViewBinding.noteEditContentET,noteViewBinding.modifiedDateTV,
+                noteViewBinding.pinButtonIV)
 
         updateRetrievedNote()
 
@@ -172,7 +172,7 @@ class NoteViewActivity : AppCompatActivity() {
 
             // Parse the modified date as a date object
             val convertedDate = LocalDate.parse(retrievedNote!!.noteModifiedDate);
-            val retrievedNoteDate = GeneralTextHelper.formatDate(convertedDate)
+            val retrievedNoteDate = GeneralDateHelper.formatDate(convertedDate)
 
             Log.d("noteData", retrievedNote!!.notePinned.toString())
 
@@ -190,7 +190,7 @@ class NoteViewActivity : AppCompatActivity() {
         else {
 
             // Display the modified date as current date
-            noteViewBinding.modifiedDateTV.text = GeneralTextHelper.formatDate(LocalDate.now())
+            noteViewBinding.modifiedDateTV.text = GeneralDateHelper.formatDate(LocalDate.now())
 
             // set isPinned to false
             noteViewBinding.pinButtonIV.tag = false
@@ -242,7 +242,8 @@ class NoteViewActivity : AppCompatActivity() {
 
                 val noteDataDict =
                     noteSaveHelper.getNoteDataDict(noteViewBinding.noteTitleET,
-                        noteViewBinding.noteEditContentET, noteViewBinding.pinButtonIV)
+                        noteViewBinding.noteEditContentET, noteViewBinding.modifiedDateTV,
+                        noteViewBinding.pinButtonIV)
 
                 if (existingNoteClicked) {
 
@@ -324,6 +325,16 @@ class NoteViewActivity : AppCompatActivity() {
 
                 noteViewBinding.noteEditContentET.isCursorVisible = isTrue
             }
+
+            shouldUpdateModifiedDate.observe(this@NoteViewActivity) { shouldUpdate ->
+
+                if (shouldUpdate) {
+
+                    updateModifiedDate()
+                    commitNoteChanges()
+                }
+            }
+
         }
     }
 

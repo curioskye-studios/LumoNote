@@ -31,7 +31,11 @@
             android:layout_height="wrap_content"
             android:hint="eg. ->"
             android:textColorHint="@color/light_grey_2"
-            app:hintTextColor="@color/light_grey_2">
+            app:hintTextColor="@color/light_grey_2"
+            app:boxBackgroundMode="outline"
+            app:boxStrokeColor="@color/light_grey_2"
+            app:boxStrokeWidth="1dp"
+            app:boxStrokeWidthFocused="2dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/textInputET"
@@ -41,6 +45,7 @@
                 android:textSize="16sp"
                 android:fontFamily="@font/inter"/>
         </com.google.android.material.textfield.TextInputLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.data.repository.NoteRepository
-import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralDateHelper
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.Date
@@ -53,7 +53,7 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
 
         loadAllNotes()
 
-        val currentDateAsLocalDate = BasicUtilityHelper.convertDateToLocalDate(Date())
+        val currentDateAsLocalDate = GeneralDateHelper.convertDateToLocalDate(Date())
         loadAllNotesOnDate(currentDateAsLocalDate)
     }
 

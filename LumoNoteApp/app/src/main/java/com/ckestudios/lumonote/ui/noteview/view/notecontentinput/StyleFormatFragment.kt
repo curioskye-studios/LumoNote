@@ -1,6 +1,5 @@
 package com.ckestudios.lumonote.ui.noteview.view.notecontentinput
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -135,8 +134,7 @@ class StyleFormatFragment: Fragment() {
 
                 setOnLongClickListener {
 
-                    val intent = Intent(requireContext(), CustomBulletInputActivity::class.java)
-                    startActivity(intent)
+                    CustomBulletInputFragment().show(parentFragmentManager, "customBulletDialog")
 
                     updateBulletedActive()
 

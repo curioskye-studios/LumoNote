@@ -19,8 +19,7 @@ import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.TagAppSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.TaggedAppSharedViewModel
-import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
-import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralDateHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import java.time.LocalDate
 import java.util.Date
@@ -82,7 +81,7 @@ class CalendarViewFragment : Fragment() {
 
         // Initialize calendar selected date
         val todayCurrentDate = Date()
-        val todayCurrentLocalDate = BasicUtilityHelper.convertDateToLocalDate(Date())
+        val todayCurrentLocalDate = GeneralDateHelper.convertDateToLocalDate(Date())
 
         calendarViewBinding.calendarDateSelectorKV.setInitialSelectedDate(todayCurrentDate)
         calendarViewModel.setSelectedDate(todayCurrentLocalDate)
@@ -152,7 +151,7 @@ class CalendarViewFragment : Fragment() {
         calendarViewBinding.calendarDateSelectorKV.setDateSelector { selectedDate ->
 
             val selectedDateAsLocalDate =
-                BasicUtilityHelper.convertDateToLocalDate(selectedDate)
+                GeneralDateHelper.convertDateToLocalDate(selectedDate)
 
             calendarViewModel.setSelectedDate(selectedDateAsLocalDate)
         }
@@ -182,7 +181,7 @@ class CalendarViewFragment : Fragment() {
                     calendarViewBinding.selectedDateTV.text = "Today"
                 } else {
 
-                    val dateWithWeekDay = GeneralTextHelper.formatDate(date)
+                    val dateWithWeekDay = GeneralDateHelper.formatDate(date)
 
                     val dateNoWeekday =  dateWithWeekDay.substring(5)
 

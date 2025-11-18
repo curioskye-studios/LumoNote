@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 
 object GeneralUIHelper {
 
@@ -49,6 +50,11 @@ object GeneralUIHelper {
         // 'WindowInsetsCompat.Type.ime()' specifically represents the on-screen keyboard.
         insetsController?.show(WindowInsetsCompat.Type.ime())
 
+    }
+
+    fun clearETViewFocusOnHideKeyboard(editTextView: CustomSelectionET, rootView: View) {
+
+        editTextView.clearFocusOnKeyboardHide(rootView)
     }
 
 

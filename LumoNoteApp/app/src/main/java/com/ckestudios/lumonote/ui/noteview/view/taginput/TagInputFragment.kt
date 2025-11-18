@@ -16,6 +16,7 @@ import com.ckestudios.lumonote.data.repository.TagRepository
 import com.ckestudios.lumonote.data.repository.TaggedRepository
 import com.ckestudios.lumonote.databinding.FragmentTagInputBinding
 import com.ckestudios.lumonote.ui.noteview.other.TaggedSaveHelper
+import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.TagAppSharedViewModel
@@ -33,6 +34,7 @@ class TagInputFragment : Fragment() {
     private var _tagInputViewBinding: FragmentTagInputBinding? = null
     private val tagInputViewBinding get() = _tagInputViewBinding!!
 
+    private lateinit var inputSharedViewModel: InputSharedViewModel
     private lateinit var tagAppSharedViewModel: TagAppSharedViewModel
     private lateinit var taggedAppSharedViewModel: TaggedAppSharedViewModel
     private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
@@ -50,16 +52,19 @@ class TagInputFragment : Fragment() {
 
         super.onCreate(savedInstanceState)
 
+        inputSharedViewModel =
+            ViewModelProvider(requireActivity()).get(InputSharedViewModel::class.java)
+
         val tagRepository = TagRepository(requireContext()) // DB
         val taggedRepository = TaggedRepository(requireContext()) // DB
         val noteRepository = NoteRepository(requireContext()) // DB
 
-        tagAppSharedViewModel = ViewModelProvider(requireActivity(), AppSharedViewFactory(tagRepository))
-            .get(TagAppSharedViewModel::class.java)
-        taggedAppSharedViewModel = ViewModelProvider(requireActivity(), AppSharedViewFactory(taggedRepository))
-            .get(TaggedAppSharedViewModel::class.java)
-        noteAppSharedViewModel = ViewModelProvider(requireActivity(), AppSharedViewFactory(noteRepository))
-            .get(NoteAppSharedViewModel::class.java)
+        tagAppSharedViewModel = ViewModelProvider(requireActivity(),
+            AppSharedViewFactory(tagRepository)).get(TagAppSharedViewModel::class.java)
+        taggedAppSharedViewModel = ViewModelProvider(requireActivity(),
+            AppSharedViewFactory(taggedRepository)).get(TaggedAppSharedViewModel::class.java)
+        noteAppSharedViewModel = ViewModelProvider(requireActivity(),
+            AppSharedViewFactory(noteRepository)).get(NoteAppSharedViewModel::class.java)
 
         taggedSaveHelper = TaggedSaveHelper(taggedAppSharedViewModel, tagAppSharedViewModel)
     }
@@ -128,6 +133,9 @@ class TagInputFragment : Fragment() {
                 if (noteID != -1) {
 
                     taggedSaveHelper.commitNoteTags(newTagList, noteID)
+
+                    inputSharedViewModel.setShouldUpdateModifiedDate(true)
+                    inputSharedViewModel.setShouldUpdateModifiedDate(false) // reset
 
                     GeneralUIHelper.displayFeedbackToast(requireContext(), "Selection Saved",
                         false)

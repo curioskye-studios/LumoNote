@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.models.Tag
 import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
-import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
 class TagEditDisplayAdapter(private val onClickDeleteFunction: (Int) -> Unit,
@@ -87,7 +87,7 @@ class TagEditDisplayAdapter(private val onClickDeleteFunction: (Int) -> Unit,
 
                 holder.tagSaveButton.visibility = View.INVISIBLE
 
-                BasicUtilityHelper.clearETViewFocusOnHideKeyboard(tagEditName, itemView)
+                GeneralUIHelper.clearETViewFocusOnHideKeyboard(tagEditName, itemView)
                 tagEditName.clearFocus()
 
                 onClickSaveFunction(tagID, tagEditName.text.toString())
