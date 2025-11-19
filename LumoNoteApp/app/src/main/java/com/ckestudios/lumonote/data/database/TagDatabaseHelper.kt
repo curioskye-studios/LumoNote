@@ -52,6 +52,31 @@ class TagDatabaseHelper(
         return tagsList
     }
 
+    // Retrieve last inserted tag safely
+    fun getLastInsertedTag(db: SQLiteDatabase): Tag? {
+
+        var tag: Tag? = null
+        var cursor: Cursor? = null
+
+        try {
+            val query = "SELECT * FROM $tagTableName ORDER BY $tagIDColumn DESC LIMIT 1"
+            cursor = db.rawQuery(query, null)
+
+            if (cursor.moveToFirst()) {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow(tagIDColumn))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow(tagNameColumn))
+                tag = Tag(id, name)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cursor?.close()
+            db.close()
+        }
+
+        return tag
+    }
+
     // Update a tag in the database safely
     fun updateTag(tag: Tag, db: SQLiteDatabase) {
         val values = ContentValues().apply {

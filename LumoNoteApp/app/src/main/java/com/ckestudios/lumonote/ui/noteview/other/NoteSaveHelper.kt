@@ -8,8 +8,33 @@ import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.GeneralDateHelper
 import com.ckestudios.lumonote.utils.state.SpanProcessor
 import java.time.LocalDate
+import java.util.Timer
+import kotlin.concurrent.timer
 
 class NoteSaveHelper (private val noteAppSharedViewModel: NoteAppSharedViewModel) {
+
+    private var autoSaveTimer: Timer? = null
+
+    fun runAutoSave(onTimerEndFunction: () -> Unit){
+
+        stopAutoSave()
+
+        // run every 5s
+        autoSaveTimer = timer(initialDelay = 500, period = 15000) {
+
+            noteAppSharedViewModel.setRunningAutoSave(true)
+
+            onTimerEndFunction()
+
+            noteAppSharedViewModel.setRunningAutoSave(false)
+        }
+    }
+
+    fun stopAutoSave(){
+
+        autoSaveTimer?.cancel()
+        autoSaveTimer = null
+    }
 
 
     fun getNoteDataDict(noteTitleET: EditText, noteContentET: EditText, modifiedDateTV: TextView,
@@ -45,13 +70,35 @@ class NoteSaveHelper (private val noteAppSharedViewModel: NoteAppSharedViewModel
         }
     }
 
+    fun backupNewNote() {
+
+        val currentDate = LocalDate.now().toString()
+        val created = currentDate
+        val modified = currentDate
+
+        noteAppSharedViewModel.setIsNewNote(true)
+
+        val newNote = Note(
+            0,
+            "",
+            "",
+            "",
+            created,
+            modified,
+            false
+        )
+
+        noteAppSharedViewModel.saveNote(newNote, false)
+    }
+
 
 
     fun collectNoteData(retrievedNote: Note?, noteDataDict: MutableMap<String, Any>) {
 
+        val runningAutoSave = noteAppSharedViewModel.runningAutoSave.value!!
+
         // Format: YYYY-MM-DD
         val currentDate = LocalDate.now().toString()
-        val created = currentDate
         val modified = currentDate
 
         // If an existing note was clicked on rather than the create button
@@ -59,7 +106,8 @@ class NoteSaveHelper (private val noteAppSharedViewModel: NoteAppSharedViewModel
 
             if (noteHasNotChanged(retrievedNote, noteDataDict)) return
 
-            noteAppSharedViewModel.setIsNewNote(false)
+            if (runningAutoSave) noteAppSharedViewModel.setIsNewNoteAsync(false)
+            else noteAppSharedViewModel.setIsNewNote(false)
 
             val updatedNote = Note(
                 retrievedNote.noteID,
@@ -71,24 +119,9 @@ class NoteSaveHelper (private val noteAppSharedViewModel: NoteAppSharedViewModel
                 noteDataDict["pinned"] as Boolean
             )
 
-            noteAppSharedViewModel.saveNote(updatedNote)
-
-        } else {
-
-            noteAppSharedViewModel.setIsNewNote(true)
-
-            val newNote = Note(
-                0,
-                noteDataDict["title"] as String,
-                noteDataDict["content"] as String,
-                noteDataDict["spans"] as String,
-                created,
-                modified,
-                noteDataDict["pinned"] as Boolean
-            )
-
-            noteAppSharedViewModel.saveNote(newNote)
+            noteAppSharedViewModel.saveNote(updatedNote, runningAutoSave)
         }
 
     }
+
 }

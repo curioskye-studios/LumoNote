@@ -36,7 +36,6 @@ class NoteViewActivity : AppCompatActivity() {
     private lateinit var editContentSharedViewModel: EditContentSharedViewModel
     private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
 
-    private var runningManualSave = false
     private var closeNote = false
 
     private lateinit var noteSaveHelper: NoteSaveHelper
@@ -79,6 +78,7 @@ class NoteViewActivity : AppCompatActivity() {
         } else {
 
             populateUIWithNoteData()
+            if (!existingNoteClicked)  noteSaveHelper.backupNewNote()
         }
 
 
@@ -88,6 +88,8 @@ class NoteViewActivity : AppCompatActivity() {
             noteViewBinding.root)
         GeneralUIHelper.clearETViewFocusOnHideKeyboard(noteViewBinding.noteEditContentET,
             noteViewBinding.root)
+
+        noteSaveHelper.runAutoSave { commitNoteChanges() }
 
         notifyIfEditing()
 
@@ -146,7 +148,10 @@ class NoteViewActivity : AppCompatActivity() {
 
     private fun updateRetrievedNote() {
 
+        val newNoteBackup = noteAppSharedViewModel.newNoteBackup.value
+
         if (existingNoteClicked) retrievedNote = noteAppSharedViewModel.getNote(noteID)
+        if (newNoteBackup != null) retrievedNote = newNoteBackup
     }
 
 
@@ -162,6 +167,7 @@ class NoteViewActivity : AppCompatActivity() {
         noteSaveHelper.collectNoteData(retrievedNote, noteDataDict)
 
         if (!(noteSaveHelper.noteHasNotChanged(retrievedNote, noteDataDict))) {
+
             updateModifiedDate()
         }
     }
@@ -208,6 +214,7 @@ class NoteViewActivity : AppCompatActivity() {
                     backButtonIV)
 
                 closeNote = true
+
                 commitNoteChanges()
 
                 finish()
@@ -241,7 +248,6 @@ class NoteViewActivity : AppCompatActivity() {
                 GeneralButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
                     saveButtonIV)
 
-                runningManualSave = true
                 commitNoteChanges()
 
                 val noteDataDict =
@@ -249,18 +255,12 @@ class NoteViewActivity : AppCompatActivity() {
                         noteViewBinding.noteEditContentET, noteViewBinding.modifiedDateTV,
                         noteViewBinding.pinButtonIV)
 
-                if (existingNoteClicked) {
-
-                    if (!(noteSaveHelper.noteHasNotChanged(retrievedNote, noteDataDict))) {
-                        GeneralUIHelper.displayFeedbackToast(this@NoteViewActivity,
-                            "Changes Saved", false)
-                    } else {
-                        GeneralUIHelper.displayFeedbackToast(this@NoteViewActivity,
-                            "Up to date", false)
-                    }
+                if (!(noteSaveHelper.noteHasNotChanged(retrievedNote, noteDataDict))) {
+                    GeneralUIHelper.displayFeedbackToast(this@NoteViewActivity,
+                        "Changes Saved", false)
                 } else {
                     GeneralUIHelper.displayFeedbackToast(this@NoteViewActivity,
-                            "Please exit note to save & Try again", false)
+                        "Up to date", false)
                 }
             }
 
@@ -269,7 +269,6 @@ class NoteViewActivity : AppCompatActivity() {
                 GeneralButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
                     saveCloseButtonIV)
 
-                runningManualSave = true
                 closeNote = true
 
                 commitNoteChanges()
@@ -317,13 +316,39 @@ class NoteViewActivity : AppCompatActivity() {
                     pinStateFeedback, false)
             }
 
-            deleteNoteConfirmed.observe(this@NoteViewActivity){ shouldDelete ->
+            dialogConfirmStatus.observe(this@NoteViewActivity){ status ->
 
-                if (shouldDelete) {
+                if (status == true && existingNoteClicked) {
                     noteAppSharedViewModel.deleteNote(noteID)
-                    setDeleteNoteConfirmed(false)
+                    setDialogConfirmStatus(false)
+                }
+
+                if (status == true && !existingNoteClicked && newNoteBackup.value != null) {
+                    noteAppSharedViewModel.deleteNote(newNoteBackup.value!!.noteID)
+                    setNewNoteBackup(null)
+                    setDialogConfirmStatus(false)
                 }
             }
+
+            newNoteBackup.observe(this@NoteViewActivity) { note ->
+
+                updateRetrievedNote()
+                if (note != null) setCurrentOpenNoteID(note.noteID)
+            }
+
+            runningAutoSave.observe(this@NoteViewActivity) { isTrue ->
+
+                val noteDataDict =
+                    noteSaveHelper.getNoteDataDict(noteViewBinding.noteTitleET,
+                        noteViewBinding.noteEditContentET, noteViewBinding.modifiedDateTV,
+                        noteViewBinding.pinButtonIV)
+
+                if (isTrue && !(noteSaveHelper.noteHasNotChanged(retrievedNote, noteDataDict))) {
+                    GeneralUIHelper.displayFeedbackToast(this@NoteViewActivity,
+                        "Auto saved", false)
+                }
+            }
+
         }
 
     }
@@ -335,6 +360,12 @@ class NoteViewActivity : AppCompatActivity() {
             noteContentIsEditing.observe(this@NoteViewActivity){ isTrue ->
 
                 noteViewBinding.noteEditContentET.isCursorVisible = isTrue
+
+                if (isTrue) {
+                    noteSaveHelper.runAutoSave { commitNoteChanges() }
+                } else {
+                    noteSaveHelper.stopAutoSave()
+                }
             }
 
             shouldUpdateModifiedDate.observe(this@NoteViewActivity) { shouldUpdate ->
@@ -355,7 +386,9 @@ class NoteViewActivity : AppCompatActivity() {
 
         noteAppSharedViewModel.noteWasCreated.observe(this){ isTrue ->
 
-            if (isTrue && closeNote) {
+            val runningAutoSave = noteAppSharedViewModel.runningAutoSave.value!!
+
+            if (isTrue && closeNote && !runningAutoSave) {
 
                 GeneralUIHelper.closeActivityWithFeedback("Note Created", this,
                     this, true)
@@ -364,7 +397,9 @@ class NoteViewActivity : AppCompatActivity() {
 
         noteAppSharedViewModel.noteWasUpdated.observe(this){ isTrue ->
 
-            if (isTrue && closeNote) {
+            val runningAutoSave = noteAppSharedViewModel.runningAutoSave.value!!
+
+            if (isTrue && closeNote && !runningAutoSave) {
 
                 GeneralUIHelper.closeActivityWithFeedback("Note Updated", this,
                     this, true)

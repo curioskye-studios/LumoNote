@@ -50,4 +50,8 @@ class NoteRepository (context: Context) : Repository {
         return dbConnection.getNotesByPinnedStatus(getUnpinned)
     }
 
+    fun getLastInsertedNote(): Note? {
+
+        return dbConnection.getLastInsertedNote()
+    }
 }

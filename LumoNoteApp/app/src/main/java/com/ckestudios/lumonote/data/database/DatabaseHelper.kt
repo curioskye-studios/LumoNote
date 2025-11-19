@@ -121,6 +121,17 @@ class DatabaseHelper(context: Context) :
         }
     }
 
+    fun getLastInsertedNote(): Note? {
+        return try {
+            readableDatabase.use { db ->
+                noteDatabaseHelper.getLastInsertedNote(db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error getting last added tag", e)
+            null
+        }
+    }
+
     fun getNotesByDate(date: String): List<Note> {
         return try {
             readableDatabase.use { db ->
@@ -197,6 +208,17 @@ class DatabaseHelper(context: Context) :
         } catch (e: Exception) {
             Log.e("DatabaseHelper", "Error getting all tags", e)
             emptyList()
+        }
+    }
+
+    fun getLastInsertedTag(): Tag? {
+        return try {
+            readableDatabase.use { db ->
+                tagDatabaseHelper.getLastInsertedTag(db)
+            }
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error getting last added tag", e)
+            null
         }
     }
 

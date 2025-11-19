@@ -72,7 +72,7 @@ class ConfirmationDialogFragment(private val viewSharedModel: ViewModel,
 
             if (viewSharedModel is NoteAppSharedViewModel) {
 
-                viewSharedModel.setDeleteNoteConfirmed(true)
+                viewSharedModel.setDialogConfirmStatus(true)
             } else if (viewSharedModel is TagAppSharedViewModel) {
 
                 viewSharedModel.setDeleteTagConfirmed(true)

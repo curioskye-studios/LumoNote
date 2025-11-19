@@ -87,8 +87,6 @@ class TagInputFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        noteID = noteAppSharedViewModel.currentOpenNoteID.value!!
-
         GeneralUIHelper.changeViewVisibility(tagInputViewBinding.tagSelectorSectionRL, false)
 
         setupAdaptersDisplay()
@@ -98,6 +96,8 @@ class TagInputFragment : Fragment() {
         setOnClickListeners()
 
         observeTagAppVMValues()
+
+        observeNoteAppVMValues()
     }
 
 
@@ -281,6 +281,17 @@ class TagInputFragment : Fragment() {
                     !isTrue)
                 GeneralUIHelper.changeViewVisibility(tagInputViewBinding.noTagsAvailableMsgTV,
                     isTrue)
+            }
+        }
+    }
+
+    private fun observeNoteAppVMValues() {
+
+        noteAppSharedViewModel.apply {
+
+            currentOpenNoteID.observe(viewLifecycleOwner) { openNoteID ->
+
+                noteID = openNoteID
             }
         }
     }

@@ -70,6 +70,37 @@ class NoteDatabaseHelper(
         return notesList
     }
 
+    // Retrieve last inserted note safely
+    fun getLastInsertedNote(db: SQLiteDatabase): Note? {
+
+        var note: Note? = null
+        var cursor: Cursor? = null
+
+        try {
+            val query = "SELECT * FROM $noteTableName ORDER BY $noteIDColumn DESC LIMIT 1"
+            cursor = db.rawQuery(query, null)
+
+            if (cursor.moveToFirst()) {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
+                val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
+                val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
+                val spans = cursor.getString(cursor.getColumnIndexOrThrow(noteSpansColumn))
+                val created = cursor.getString(cursor.getColumnIndexOrThrow(noteCreatedColumn))
+                val modified = cursor.getString(cursor.getColumnIndexOrThrow(noteModifiedColumn))
+                val pinned = cursor.getString(cursor.getColumnIndexOrThrow(notePinnedColumn))
+
+                note = Note(id, title, content, spans, created, modified, pinned.toBoolean())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cursor?.close()
+            db.close()
+        }
+
+        return note
+    }
+
     // Retrieve notes by pinned status safely
     fun getNotesByPinnedStatus(getUnpinned: Boolean, db: SQLiteDatabase): List<Note> {
 

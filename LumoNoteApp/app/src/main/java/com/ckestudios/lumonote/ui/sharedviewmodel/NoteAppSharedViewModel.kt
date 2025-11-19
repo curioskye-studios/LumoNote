@@ -24,11 +24,15 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
     private val _notesOnDate = MutableLiveData<List<Note>>()
     val notesOnDate: LiveData<List<Note>> = _notesOnDate
 
-    private val _deleteNoteConfirmed = MutableLiveData(false)
-    val deleteNoteConfirmed: LiveData<Boolean> = _deleteNoteConfirmed
+    private val _dialogConfirmStatus = MutableLiveData(false)
+    val dialogConfirmStatus: LiveData<Boolean> = _dialogConfirmStatus
+    private val _newNoteBackup = MutableLiveData<Note?>(null)
+    val newNoteBackup: LiveData<Note?> = _newNoteBackup
 
     private val _notifyRefresh = MutableLiveData<Boolean>()
     val notifyRefresh: LiveData<Boolean> = _notifyRefresh
+    private val _runningAutoSave = MutableLiveData(false)
+    val runningAutoSave: LiveData<Boolean> = _runningAutoSave
 
     private val _isNewNote = MutableLiveData<Boolean>()
     val isNewNote: LiveData<Boolean> = _isNewNote
@@ -78,9 +82,19 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
         _notifyRefresh.value = shouldRefresh
     }
 
-    fun setDeleteNoteConfirmed(shouldDelete: Boolean) {
-        _deleteNoteConfirmed.value = shouldDelete
+    fun setRunningAutoSave(autoSaving: Boolean) {
+        _runningAutoSave.postValue(autoSaving)
     }
+
+
+    fun setDialogConfirmStatus(status: Boolean) {
+        _dialogConfirmStatus.value = status
+    }
+
+    fun setNewNoteBackup(note: Note?) {
+        _newNoteBackup.value = note
+    }
+
 
     fun getNote(noteID: Int) : Note? {
 
@@ -96,21 +110,25 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
         setNoteWasDeleted(false)
     }
 
-    fun saveNote(note: Note) {
+
+    fun saveNote(note: Note, shouldUseAsync: Boolean) {
 
         if (isNewNote.value == true) {
 
-            Log.d("noteDataDate", note.noteModifiedDate)
-
             noteRepository.insertItem(note)
 
-            setNoteWasCreated(true)
+            Log.d("SaveDebug", "getLastInsertedNote(): ${noteRepository.getLastInsertedNote()}")
+            setNewNoteBackup(noteRepository.getLastInsertedNote())
+
+            if (shouldUseAsync) setNoteWasCreatedAsync(true)
+            else setNoteWasCreated(true)
 
         } else {
 
             noteRepository.updateItem(note)
 
-            setNoteWasUpdated(true)
+            if (shouldUseAsync) setNoteWasUpdatedAsync(true)
+            else setNoteWasUpdated(true)
         }
     }
 
@@ -141,14 +159,30 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
         _isNewNote.value = isNew
     }
 
+    fun setIsNewNoteAsync(isNew: Boolean) {
+        // Use liveData.postValue(value) instead of liveData.value = value.
+        // It's called asynchronous.
+        _isNewNote.postValue(isNew)
+    }
+
+
     private fun setNoteWasCreated(flag: Boolean) {
         _noteWasCreated.value = flag
         _noteWasUpdated.value = !flag
     }
+    private fun setNoteWasCreatedAsync(flag: Boolean) {
+        _noteWasCreated.postValue(flag)
+        _noteWasUpdated.postValue(!flag)
+    }
+
 
     private fun setNoteWasUpdated(flag: Boolean) {
         _noteWasUpdated.value = flag
         _noteWasCreated.value = !flag
+    }
+    private fun setNoteWasUpdatedAsync(flag: Boolean) {
+        _noteWasUpdated.postValue(flag)
+        _noteWasCreated.postValue(!flag)
     }
 
     private fun setNoteWasDeleted(flag: Boolean){

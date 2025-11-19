@@ -50,4 +50,9 @@ class TagRepository (private val context: Context) : Repository {
         dbConnection.deleteTag(itemID)
     }
 
+    fun getLastInsertedTag(): Tag? {
+
+        return dbConnection.getLastInsertedTag()
+    }
+
 }

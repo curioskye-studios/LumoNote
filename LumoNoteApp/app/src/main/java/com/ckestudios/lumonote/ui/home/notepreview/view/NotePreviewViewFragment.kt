@@ -324,7 +324,7 @@ class NotePreviewViewFragment : Fragment() {
                     Log.d("NoteFrag", "$noteData")
 
                     setIsNewNote(false)
-                    saveNote(noteData)
+                    saveNote(noteData, false)
 
                     setCurrentPreviewNoteID(-1)
                 }
