@@ -13,6 +13,7 @@ import kotlin.concurrent.timer
 
 class NoteSaveHelper (private val noteAppSharedViewModel: NoteAppSharedViewModel) {
 
+
     private var autoSaveTimer: Timer? = null
 
     fun runAutoSave(onTimerEndFunction: () -> Unit){
@@ -106,8 +107,7 @@ class NoteSaveHelper (private val noteAppSharedViewModel: NoteAppSharedViewModel
 
             if (noteHasNotChanged(retrievedNote, noteDataDict)) return
 
-            if (runningAutoSave) noteAppSharedViewModel.setIsNewNoteAsync(false)
-            else noteAppSharedViewModel.setIsNewNote(false)
+            noteAppSharedViewModel.setIsNewNoteAsync(false)
 
             val updatedNote = Note(
                 retrievedNote.noteID,

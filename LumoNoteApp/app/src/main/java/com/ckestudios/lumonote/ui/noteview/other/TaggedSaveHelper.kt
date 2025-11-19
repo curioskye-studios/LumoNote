@@ -2,11 +2,9 @@ package com.ckestudios.lumonote.ui.noteview.other
 
 import android.util.Log
 import com.ckestudios.lumonote.data.models.Tag
-import com.ckestudios.lumonote.ui.sharedviewmodel.TagAppSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.TaggedAppSharedViewModel
 
-class TaggedSaveHelper(private val taggedAppSharedViewModel: TaggedAppSharedViewModel,
-    private val tagAppSharedViewModel: TagAppSharedViewModel) {
+class TaggedSaveHelper(private val taggedAppSharedViewModel: TaggedAppSharedViewModel) {
 
     fun commitNoteTags(newTags: List<Tag>, noteID: Int) {
 
