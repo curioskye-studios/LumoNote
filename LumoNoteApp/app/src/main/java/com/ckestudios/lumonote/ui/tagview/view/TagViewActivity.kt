@@ -9,6 +9,7 @@ import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.models.Tag
 import com.ckestudios.lumonote.data.repository.TagRepository
 import com.ckestudios.lumonote.databinding.ActivityTagViewBinding
+import com.ckestudios.lumonote.ui.other.ConfirmationDialogFragment
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.TagAppSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
@@ -21,6 +22,8 @@ class TagViewActivity : AppCompatActivity() {
     private lateinit var tagEditDisplayAdapter: TagEditDisplayAdapter
 
     private lateinit var tagAppSharedViewModel: TagAppSharedViewModel
+
+    private var tagIDToDelete: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -51,7 +54,12 @@ class TagViewActivity : AppCompatActivity() {
             onClickDeleteFunction = {
                 tagID ->
 
-                tagAppSharedViewModel.deleteTag(tagID)
+                tagIDToDelete = tagID
+
+                ConfirmationDialogFragment(tagAppSharedViewModel,
+                    "Are you sure you want to delete this tag? It cannot be undone.",
+                    "Yes, Delete")
+                    .show(supportFragmentManager, "confirmNoteDialog")
             },
 
             onClickSaveFunction = {
@@ -201,6 +209,14 @@ class TagViewActivity : AppCompatActivity() {
 
                     GeneralUIHelper.displayFeedbackToast(this@TagViewActivity,
                         "Empty tag(s) deleted", false)
+                }
+            }
+
+            deleteTagConfirmed.observe(this@TagViewActivity){ shouldDelete ->
+
+                if (shouldDelete) {
+                    tagAppSharedViewModel.deleteTag(tagIDToDelete)
+                    setDeleteTagConfirmed(false)
                 }
             }
 

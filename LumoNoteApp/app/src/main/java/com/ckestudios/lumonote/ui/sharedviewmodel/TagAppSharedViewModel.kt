@@ -15,6 +15,9 @@ class TagAppSharedViewModel(application: Application, private val tagRepository:
     private val _tags = MutableLiveData<List<Tag>>()
     val tags: LiveData<List<Tag>> = _tags
 
+    private val _deleteTagConfirmed = MutableLiveData(false)
+    val deleteTagConfirmed: LiveData<Boolean> = _deleteTagConfirmed
+
     private val _notifyRefresh = MutableLiveData<Boolean>()
     val notifyRefresh: LiveData<Boolean> = _notifyRefresh
 
@@ -113,6 +116,10 @@ class TagAppSharedViewModel(application: Application, private val tagRepository:
     private fun setNotifyRefresh(shouldRefresh: Boolean) {
 
         _notifyRefresh.value = shouldRefresh
+    }
+
+    fun setDeleteTagConfirmed(shouldDelete: Boolean) {
+        _deleteTagConfirmed.value = shouldDelete
     }
 
 

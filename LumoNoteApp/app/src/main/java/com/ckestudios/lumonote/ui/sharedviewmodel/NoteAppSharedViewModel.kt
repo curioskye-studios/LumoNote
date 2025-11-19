@@ -24,6 +24,9 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
     private val _notesOnDate = MutableLiveData<List<Note>>()
     val notesOnDate: LiveData<List<Note>> = _notesOnDate
 
+    private val _deleteNoteConfirmed = MutableLiveData(false)
+    val deleteNoteConfirmed: LiveData<Boolean> = _deleteNoteConfirmed
+
     private val _notifyRefresh = MutableLiveData<Boolean>()
     val notifyRefresh: LiveData<Boolean> = _notifyRefresh
 
@@ -34,7 +37,7 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
     val noteWasCreated: LiveData<Boolean> = _noteWasCreated
     private val _noteWasUpdated = MutableLiveData<Boolean>()
     val noteWasUpdated: LiveData<Boolean> = _noteWasUpdated
-    private val _noteWasDeleted= MutableLiveData<Boolean>()
+    private val _noteWasDeleted = MutableLiveData<Boolean>()
     val noteWasDeleted: LiveData<Boolean> = _noteWasDeleted
 
     private val _currentNotePinned = MutableLiveData<Boolean>()
@@ -73,6 +76,10 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
 
     fun setNotifyRefresh(shouldRefresh: Boolean) {
         _notifyRefresh.value = shouldRefresh
+    }
+
+    fun setDeleteNoteConfirmed(shouldDelete: Boolean) {
+        _deleteNoteConfirmed.value = shouldDelete
     }
 
     fun getNote(noteID: Int) : Note? {

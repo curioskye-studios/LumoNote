@@ -134,7 +134,7 @@ class StyleFormatFragment: Fragment() {
 
                 setOnLongClickListener {
 
-                    CustomBulletInputFragment().show(parentFragmentManager, "customBulletDialog")
+                    CustomBulletDialogFragment().show(parentFragmentManager, "customBulletDialog")
 
                     updateBulletedActive()
 

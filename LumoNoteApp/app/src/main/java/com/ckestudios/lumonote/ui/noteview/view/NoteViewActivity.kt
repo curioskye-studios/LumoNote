@@ -12,6 +12,7 @@ import com.ckestudios.lumonote.databinding.ActivityNoteViewBinding
 import com.ckestudios.lumonote.ui.noteview.other.NoteSaveHelper
 import com.ckestudios.lumonote.ui.noteview.viewmodel.EditContentSharedViewModel
 import com.ckestudios.lumonote.ui.noteview.viewmodel.InputSharedViewModel
+import com.ckestudios.lumonote.ui.other.ConfirmationDialogFragment
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
@@ -206,7 +207,7 @@ class NoteViewActivity : AppCompatActivity() {
                 GeneralButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
                     backButtonIV)
 
-                runningManualSave = true
+                closeNote = true
                 commitNoteChanges()
 
                 finish()
@@ -218,7 +219,10 @@ class NoteViewActivity : AppCompatActivity() {
                 GeneralButtonIVHelper.playSelectionIndication(this@NoteViewActivity,
                     deleteButtonIV)
 
-                noteAppSharedViewModel.deleteNote(noteID)
+                ConfirmationDialogFragment(noteAppSharedViewModel,
+                    "Are you sure you want to delete this note? It cannot be undone.",
+                    "Yes, Delete")
+                    .show(supportFragmentManager, "confirmNoteDialog")
             }
 
 
@@ -279,7 +283,6 @@ class NoteViewActivity : AppCompatActivity() {
                     // Custom logic for back button press
                     override fun handleOnBackPressed() {
 
-                        runningManualSave = true
                         closeNote = true
 
                         commitNoteChanges()
@@ -313,6 +316,14 @@ class NoteViewActivity : AppCompatActivity() {
                 GeneralUIHelper.displayFeedbackToast(this@NoteViewActivity,
                     pinStateFeedback, false)
             }
+
+            deleteNoteConfirmed.observe(this@NoteViewActivity){ shouldDelete ->
+
+                if (shouldDelete) {
+                    noteAppSharedViewModel.deleteNote(noteID)
+                    setDeleteNoteConfirmed(false)
+                }
+            }
         }
 
     }
@@ -344,7 +355,7 @@ class NoteViewActivity : AppCompatActivity() {
 
         noteAppSharedViewModel.noteWasCreated.observe(this){ isTrue ->
 
-            if (isTrue && runningManualSave && closeNote) {
+            if (isTrue && closeNote) {
 
                 GeneralUIHelper.closeActivityWithFeedback("Note Created", this,
                     this, true)
@@ -353,7 +364,7 @@ class NoteViewActivity : AppCompatActivity() {
 
         noteAppSharedViewModel.noteWasUpdated.observe(this){ isTrue ->
 
-            if (isTrue && runningManualSave && closeNote) {
+            if (isTrue && closeNote) {
 
                 GeneralUIHelper.closeActivityWithFeedback("Note Updated", this,
                     this, true)
