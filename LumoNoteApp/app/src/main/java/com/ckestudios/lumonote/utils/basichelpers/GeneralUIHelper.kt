@@ -2,7 +2,10 @@ package com.ckestudios.lumonote.utils.basichelpers
 
 import android.app.Activity
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
+import android.os.Handler
+import android.os.Looper
 import android.text.SpannableStringBuilder
 import android.view.View
 import android.view.Window
@@ -16,9 +19,11 @@ import com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
 
 object GeneralUIHelper {
 
-    fun getResourceDrawable(context: Context, drawable: Int, customColor: Int): Drawable? {
+    fun getResourceDrawable(context: Context, drawable: Int, customColor: Int?): Drawable? {
 
         val retrievedDrawable = ContextCompat.getDrawable(context, drawable)
+
+        if  (customColor == null) return retrievedDrawable
 
         // Wrap and mutate so it won't affect other uses of the same drawable
         val tintedDrawable = retrievedDrawable?.mutate()
@@ -40,6 +45,40 @@ object GeneralUIHelper {
             view.visibility = View.GONE
         }
     }
+
+    fun changeViewBackgroundColor(context: Context, view: View, color: Int) {
+
+        view.setBackgroundColor(ContextCompat.getColor(context, color))
+    }
+
+    fun changeViewBackgroundTint(view: View, color: Int) {
+
+        view.backgroundTintList = ColorStateList.valueOf(color)
+
+    }
+
+    fun removeViewBackgroundTint(view: View) {
+
+        view.backgroundTintList = null
+    }
+
+    fun playViewSelectionIndication(context: Context, view: View, defaultColor: Int,
+                                    selectedColor: Int) {
+
+        indicateViewAsSelection(context, view, defaultColor, selectedColor)
+    }
+
+    private fun indicateViewAsSelection(context: Context, view: View, defaultColor: Int,
+                                        selectedColor: Int) {
+
+        Handler(Looper.getMainLooper()).postDelayed({
+
+            changeViewBackgroundColor(context, view, defaultColor)
+        }, 500) // Delay in milliseconds (500ms = 0.5 seconds)
+
+        changeViewBackgroundColor(context, view, selectedColor)
+    }
+
 
     fun openKeyboardForView(window: Window, view: View) {
 

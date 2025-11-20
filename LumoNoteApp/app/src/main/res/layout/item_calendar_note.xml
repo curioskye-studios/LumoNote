@@ -7,20 +7,21 @@
     android:layout_height="wrap_content"
 
     app:cardCornerRadius="30dp"
-    android:layout_marginBottom="16dp"
+    android:layout_marginBottom="20dp"
 
     android:id="@+id/notePreviewCV"
     >
 
 
     <LinearLayout
+        android:id="@+id/notePreviewLL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
         android:background="@color/dark_grey"
         android:orientation="vertical"
 
-        android:paddingTop="19dp"
+        android:paddingTop="20dp"
         android:paddingRight="20dp"
         android:paddingLeft="24dp"
         android:paddingBottom="32dp"

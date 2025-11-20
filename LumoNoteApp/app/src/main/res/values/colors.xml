@@ -15,6 +15,10 @@
     <color name="light_grey_3_selected">#2399999D</color>
     <color name="light_grey_3_selected2">#1799999D</color>
 
+    <color name="dark_grey_selected">#2D4D555E</color>
+
+    <color name="gold_selected">#F6D875</color>
+
     <color name="yellow">#FBE134</color>
     <color name="gold">#FFD33C</color>
 

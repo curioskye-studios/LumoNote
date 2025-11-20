@@ -29,10 +29,10 @@ object GeneralButtonIVHelper {
     }
 
     fun changeBtnBackgroundRes(context: Context, buttonIV: ImageView, drawable: Int,
-                               customColor: Int) {
+                               customColor: Int?) {
 
         buttonIV.background = GeneralUIHelper.getResourceDrawable(context, drawable,
-            customColor)
+                customColor)
     }
 
     fun removeButtonBackground(buttonIV: ImageView) {
@@ -43,11 +43,11 @@ object GeneralButtonIVHelper {
     fun playSelectionIndication(context: Context, buttonIV: ImageView) {
 
         indicateAsSelection(context, buttonIV)
-
-
     }
 
-    fun indicateAsSelection(context: Context, buttonIV: ImageView) {Handler(Looper.getMainLooper()).postDelayed({
+    fun indicateAsSelection(context: Context, buttonIV: ImageView) {
+
+        Handler(Looper.getMainLooper()).postDelayed({
 
         removeAsSelection(buttonIV)
     }, 500) // Delay in milliseconds (500ms = 0.5 seconds)
@@ -58,6 +58,40 @@ object GeneralButtonIVHelper {
     fun removeAsSelection(buttonIV: ImageView) {
 
         removeButtonBackground(buttonIV)
+    }
+
+
+    fun playSelectionIndicationTint(buttonIV: ImageView, tint: Int) {
+
+        indicateAsSelectionTint(buttonIV, tint)
+    }
+
+    fun indicateAsSelectionTint(buttonIV: ImageView, tint: Int) {
+
+        Handler(Looper.getMainLooper()).postDelayed({
+
+            GeneralUIHelper.removeViewBackgroundTint(buttonIV)
+        }, 500) // Delay in milliseconds (500ms = 0.5 seconds)
+
+        GeneralUIHelper.changeViewBackgroundTint(buttonIV, tint)
+    }
+
+
+    fun playSelectionIndicationRes(context: Context, buttonIV: ImageView, defaultDrawable: Int,
+                                   selectedDrawable: Int) {
+
+        indicateAsSelectionRes(context, buttonIV, defaultDrawable, selectedDrawable)
+    }
+
+    fun indicateAsSelectionRes(context: Context, buttonIV: ImageView, defaultDrawable: Int,
+                               selectedDrawable: Int) {
+
+        Handler(Looper.getMainLooper()).postDelayed({
+
+            changeBtnBackgroundRes(context, buttonIV, defaultDrawable, null)
+        }, 500) // Delay in milliseconds (500ms = 0.5 seconds)
+
+        changeBtnBackgroundRes(context, buttonIV, selectedDrawable, null)
     }
 
 

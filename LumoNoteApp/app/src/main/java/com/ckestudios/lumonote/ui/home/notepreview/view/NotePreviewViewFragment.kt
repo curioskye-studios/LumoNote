@@ -3,6 +3,8 @@ package com.ckestudios.lumonote.ui.home.notepreview.view
 import android.app.Application
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.data.repository.NoteRepository
 import com.ckestudios.lumonote.data.repository.TagRepository
@@ -39,9 +42,9 @@ class NotePreviewViewFragment : Fragment() {
     // The "!!" means it assumes _notePrevViewBinding is not null between onCreateView & onDestroyView
     private val notePrevViewBinding get() = _notePrevViewBinding!!
 
-    private lateinit var unpinnedNotePrevAdapter: UnpinnedNotePrevAdapter
+    private lateinit var unpinnedNotePrevAdapter: NotePreviewAdapter
     private lateinit var tagDisplayAdapter: TagDisplayAdapter
-    private lateinit var pinnedNotePrevAdapter: PinnedNotePrevAdapter
+    private lateinit var pinnedNotePrevAdapter: NotePreviewAdapter
 
     private lateinit var notePrevViewModel: NotePrevViewModel
     private lateinit var tagAppSharedViewModel: TagAppSharedViewModel
@@ -129,35 +132,33 @@ class NotePreviewViewFragment : Fragment() {
 
     private fun initializeAdapters() {
 
-        unpinnedNotePrevAdapter = UnpinnedNotePrevAdapter (
+        unpinnedNotePrevAdapter = NotePreviewAdapter (
 
             setNoteIDToOpen =
-                { noteID ->
-
-                    // unpinnedNotePrevAdapter takes in a function as a parameter
-                    // this is the functionality assigned whenever this runs in the adapter
-                    openNoteViewActivity(noteID)
-                },
+            { noteID ->
+                // this is the functionality assigned whenever this runs in the adapter
+                openNoteViewActivity(noteID)
+            },
             whenCurrentNotePinClicked =
-                { isPinned, currentNoteID ->
+            { isPinned, currentNoteID ->
 
-                    noteAppSharedViewModel.setCurrentPreviewNoteID(currentNoteID)
-                    noteAppSharedViewModel.updatePreviewPinStatus(isPinned)
-                }
+                noteAppSharedViewModel.setCurrentPreviewNoteID(currentNoteID)
+                noteAppSharedViewModel.updatePreviewPinStatus(isPinned)
+            }
         )
 
-        pinnedNotePrevAdapter = PinnedNotePrevAdapter(
+        pinnedNotePrevAdapter = NotePreviewAdapter (
 
             setNoteIDToOpen =
-                { noteID ->
-                    openNoteViewActivity(noteID)
-                },
+            { noteID ->
+                openNoteViewActivity(noteID)
+            },
             whenCurrentNotePinClicked =
-                { isPinned, currentNoteID ->
+            { isPinned, currentNoteID ->
 
-                    noteAppSharedViewModel.setCurrentPreviewNoteID(currentNoteID)
-                    noteAppSharedViewModel.updatePreviewPinStatus(isPinned)
-                }
+                noteAppSharedViewModel.setCurrentPreviewNoteID(currentNoteID)
+                noteAppSharedViewModel.updatePreviewPinStatus(isPinned)
+            }
         )
 
 
@@ -213,7 +214,14 @@ class NotePreviewViewFragment : Fragment() {
             createButtonIV.setOnClickListener {
 
                 val intent = Intent(requireContext(), NoteViewActivity::class.java)
-                startActivity(intent)
+
+                GeneralButtonIVHelper.playSelectionIndicationRes(requireContext(), createButtonIV,
+                    R.drawable.gold_fab, R.drawable.gold_fab_selected)
+
+                Handler(Looper.getMainLooper()).postDelayed({
+
+                    startActivity(intent)
+                }, 600) // Delay in milliseconds (500ms = 0.5 seconds)
             }
 
             tagEditButtonIV.setOnClickListener {

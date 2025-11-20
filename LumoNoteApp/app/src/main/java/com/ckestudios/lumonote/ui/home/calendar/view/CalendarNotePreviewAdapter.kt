@@ -1,13 +1,18 @@
 package com.ckestudios.lumonote.ui.home.calendar.view
 
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.ckestudios.lumonote.R
 import com.ckestudios.lumonote.data.models.Note
+import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.state.SpanProcessor
 
 
 // Inherits from RecyclerView.Adapter to allow definition of recycler view behaviour
@@ -21,6 +26,7 @@ class CalendarNotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit)
     class CalendarNotePreviewViewHolder (calendarNotePreviewView: View) : RecyclerView.ViewHolder(calendarNotePreviewView) {
 
         val noteCardPreview: CardView = calendarNotePreviewView.findViewById(R.id.notePreviewCV)
+        val noteLinearLayout: LinearLayout = calendarNotePreviewView.findViewById(R.id.notePreviewLL)
         val titlePreview: TextView = calendarNotePreviewView.findViewById(R.id.titlePreviewTV)
         val contentPreview: TextView = calendarNotePreviewView.findViewById(R.id.contentPreviewTV)
     }
@@ -51,9 +57,24 @@ class CalendarNotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit)
         holder.titlePreview.text = note.noteTitle
         holder.contentPreview.text = note.noteContent
 
+        val showTitleView = note.noteTitle.isNotEmpty()
+        GeneralUIHelper.changeViewVisibility(holder.titlePreview, showTitleView)
+
+        val showContentView = note.noteContent.isNotEmpty()
+        GeneralUIHelper.changeViewVisibility(holder.contentPreview, showContentView)
+
+        SpanProcessor.reapplySpansTV(note.noteSpans, holder.contentPreview)
+        GeneralUIHelper.replaceTextViewObjectChars(holder.contentPreview)
+
         holder.noteCardPreview.setOnClickListener {
 
-            setNoteIDToOpen(note.noteID)
+            GeneralUIHelper.playViewSelectionIndication(holder.itemView.context,
+                holder.noteLinearLayout, R.color.dark_grey, R.color.dark_grey_selected)
+
+            Handler(Looper.getMainLooper()).postDelayed({
+
+                setNoteIDToOpen(note.noteID)
+            }, 600) // Delay in milliseconds (500ms = 0.5 seconds)
         }
     }
 
