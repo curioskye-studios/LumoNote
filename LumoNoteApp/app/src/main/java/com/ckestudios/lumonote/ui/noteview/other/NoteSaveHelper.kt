@@ -89,7 +89,7 @@ class NoteSaveHelper (private val noteAppSharedViewModel: NoteAppSharedViewModel
             false
         )
 
-        noteAppSharedViewModel.saveNote(newNote, false)
+        noteAppSharedViewModel.saveNote(newNote)
     }
 
 
@@ -119,7 +119,7 @@ class NoteSaveHelper (private val noteAppSharedViewModel: NoteAppSharedViewModel
                 noteDataDict["pinned"] as Boolean
             )
 
-            noteAppSharedViewModel.saveNote(updatedNote, runningAutoSave)
+            noteAppSharedViewModel.saveNote(updatedNote)
         }
 
     }

@@ -156,7 +156,7 @@ class ActionPerformer(private val editTextView: EditText) {
         val imageSpan = CustomImageSpan(imageBitmap)
         val objectCharacter = '\uFFFC'
 
-        val imageText = SpannableStringBuilder("$objectCharacter ")
+        val imageText = SpannableStringBuilder("$objectCharacter")
 
         // Apply the CustomImageSpan to the object character
         imageText.setSpan(

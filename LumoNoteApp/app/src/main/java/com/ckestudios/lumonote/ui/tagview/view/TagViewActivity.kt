@@ -36,8 +36,8 @@ class TagViewActivity : AppCompatActivity() {
 
         val tagRepository = TagRepository(this) // DB
 
-        tagAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(tagRepository))
-            .get(TagAppSharedViewModel::class.java)
+        tagAppSharedViewModel = ViewModelProvider(this,
+            AppSharedViewFactory(application, tagRepository)).get(TagAppSharedViewModel::class.java)
 
 
         setupAdapterDisplay()

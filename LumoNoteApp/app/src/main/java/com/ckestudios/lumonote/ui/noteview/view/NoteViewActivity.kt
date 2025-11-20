@@ -51,7 +51,7 @@ class NoteViewActivity : AppCompatActivity() {
 
         // Set up view models
         val noteRepository = NoteRepository(this)
-        val appSharedViewFactory = AppSharedViewFactory(noteRepository)
+        val appSharedViewFactory = AppSharedViewFactory(application, noteRepository)
 
         noteAppSharedViewModel = ViewModelProvider(this, appSharedViewFactory)
             .get(NoteAppSharedViewModel::class.java)
@@ -199,7 +199,6 @@ class NoteViewActivity : AppCompatActivity() {
             // Display the modified date as current date
             noteViewBinding.modifiedDateTV.text = GeneralDateHelper.formatDate(LocalDate.now())
 
-            // set isPinned to false
             noteViewBinding.pinButtonIV.tag = false
         }
     }

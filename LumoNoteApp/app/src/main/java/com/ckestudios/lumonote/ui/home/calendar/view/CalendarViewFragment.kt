@@ -1,5 +1,6 @@
 package com.ckestudios.lumonote.ui.home.calendar.view
 
+import android.app.Application
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -50,17 +51,19 @@ class CalendarViewFragment : Fragment() {
 
         super.onCreate(savedInstanceState)
 
+        val app: Application = requireActivity().application
+
         val noteRepository = NoteRepository(requireContext()) // DB
         val tagRepository = TagRepository(requireContext())
         val taggedRepository = TaggedRepository(requireContext())
 
         // Custom ViewModelProviders know how to build viewmodels w/ dbconnection dependency
-        noteAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(noteRepository))
-            .get(NoteAppSharedViewModel::class.java)
-        tagAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(tagRepository))
-            .get(TagAppSharedViewModel::class.java)
-        taggedAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(taggedRepository))
-            .get(TaggedAppSharedViewModel::class.java)
+        noteAppSharedViewModel = ViewModelProvider(this,
+            AppSharedViewFactory(app, noteRepository)).get(NoteAppSharedViewModel::class.java)
+        tagAppSharedViewModel = ViewModelProvider(this,
+            AppSharedViewFactory(app, tagRepository)).get(TagAppSharedViewModel::class.java)
+        taggedAppSharedViewModel = ViewModelProvider(this,
+            AppSharedViewFactory(app, taggedRepository)).get(TaggedAppSharedViewModel::class.java)
 
         calendarViewModel = ViewModelProvider(this).get(CalendarViewModel::class.java)
     }

@@ -1,5 +1,6 @@
 package com.ckestudios.lumonote.ui.noteview.view.taginput
 
+import android.app.Application
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -55,18 +56,20 @@ class TagInputFragment : Fragment() {
         inputSharedViewModel =
             ViewModelProvider(requireActivity()).get(InputSharedViewModel::class.java)
 
+        val app: Application = requireActivity().application
+
         val tagRepository = TagRepository(requireContext()) // DB
         val taggedRepository = TaggedRepository(requireContext()) // DB
         val noteRepository = NoteRepository(requireContext()) // DB
 
         tagAppSharedViewModel = ViewModelProvider(requireActivity(),
-            AppSharedViewFactory(tagRepository)).get(TagAppSharedViewModel::class.java)
+            AppSharedViewFactory(app, tagRepository)).get(TagAppSharedViewModel::class.java)
         taggedAppSharedViewModel = ViewModelProvider(requireActivity(),
-            AppSharedViewFactory(taggedRepository)).get(TaggedAppSharedViewModel::class.java)
+            AppSharedViewFactory(app, taggedRepository)).get(TaggedAppSharedViewModel::class.java)
         noteAppSharedViewModel = ViewModelProvider(requireActivity(),
-            AppSharedViewFactory(noteRepository)).get(NoteAppSharedViewModel::class.java)
+            AppSharedViewFactory(app, noteRepository)).get(NoteAppSharedViewModel::class.java)
 
-        taggedSaveHelper = TaggedSaveHelper(taggedAppSharedViewModel, tagAppSharedViewModel)
+        taggedSaveHelper = TaggedSaveHelper(taggedAppSharedViewModel)
     }
 
     // Called when the Fragment creates its view

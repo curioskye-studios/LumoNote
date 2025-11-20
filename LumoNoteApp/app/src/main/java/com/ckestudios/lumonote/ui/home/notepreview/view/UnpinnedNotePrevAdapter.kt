@@ -64,6 +64,8 @@ class UnpinnedNotePrevAdapter(private val setNoteIDToOpen: (Int) -> Unit,
         GeneralUIHelper.changeViewVisibility(holder.contentPreview, showContentView)
 
         SpanProcessor.reapplySpansTV(note.noteSpans, holder.contentPreview)
+        GeneralUIHelper.replaceTextViewObjectChars(holder.contentPreview)
+
         holder.pinPreview.tag = note.notePinned
         GeneralButtonIVHelper.updatePinHighlight(holder.pinPreview, holder.pinPreview.context,
             R.drawable.selected_background)
@@ -100,5 +102,7 @@ class UnpinnedNotePrevAdapter(private val setNoteIDToOpen: (Int) -> Unit,
         notesList.addAll(newNotes)
         notifyDataSetChanged()
     }
+
+
 
 }

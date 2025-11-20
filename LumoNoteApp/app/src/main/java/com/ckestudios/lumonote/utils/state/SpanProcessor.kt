@@ -1,5 +1,6 @@
 package com.ckestudios.lumonote.utils.state
 
+import android.content.Context
 import android.graphics.Typeface
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -15,14 +16,13 @@ import com.ckestudios.lumonote.ui.noteview.other.ChecklistSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
 import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralImageHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 object SpanProcessor {
 
     fun extractSpans(editTextView: EditText) : String {
-
-        val actionPerformer = ActionPerformer(editTextView)
 
         var spanString = ""
         val spanEntries = mutableListOf<String>()
@@ -41,7 +41,7 @@ object SpanProcessor {
 
             if (spanStart == null || spanEnd == null) continue
 
-            val spanEntry = formatSpanEntry(span, spanStart, spanEnd)
+            val spanEntry = formatSpanEntry(span, spanStart, spanEnd, editTextView.context)
 
             if (spanEntry == "") continue
             Log.d("SaveSpans", "spanEntryExtract: $spanEntry")
@@ -57,7 +57,7 @@ object SpanProcessor {
         return spanString
     }
 
-    private fun formatSpanEntry(span: Any, spanStart: Int, spanEnd: Int) : String {
+    private fun formatSpanEntry(span: Any, spanStart: Int, spanEnd: Int, context: Context) : String {
 
         return when (span) {
 
@@ -88,8 +88,13 @@ object SpanProcessor {
             }
 
             is CustomImageSpan -> {
-//                "[span: ${SpanType.IMAGE_SPAN.spanName}, start: $spanStart, end: $spanEnd]"
-                ""
+                val filePath =
+                    GeneralImageHelper.saveImageToInternalStorage(context, span.getBitmap())
+
+                Log.d("SaveSpans", "filePath: $filePath")
+
+                "[span: ${SpanType.IMAGE_SPAN.spanName}, start: $spanStart, end: $spanEnd, " +
+                        "path: $filePath]"
             }
 
             is RelativeSizeSpan -> {
@@ -127,6 +132,7 @@ object SpanProcessor {
                     SpanType.UNDERLINE_SPAN.spanName -> SpanType.UNDERLINE_SPAN
                     SpanType.CHECKLIST_SPAN.spanName -> SpanType.CHECKLIST_SPAN
                     SpanType.BULLET_SPAN.spanName -> SpanType.BULLET_SPAN
+                    SpanType.IMAGE_SPAN.spanName -> SpanType.IMAGE_SPAN
                     SpanType.SIZE_SPAN.spanName -> SpanType.SIZE_SPAN
                     else -> null
                 }
@@ -161,9 +167,15 @@ object SpanProcessor {
                 }
             }
 
-            if (spanRecordDict.containsKey("path")) {
+            if (spanRecordDict.containsKey("path") ) {
 
+                val bitmap =
+                    GeneralImageHelper.loadImageFromInternalStorage(spanRecordDict["path"].toString())
 
+                if (bitmap != null) {
+                    actionPerformer.addImageSpan(spanStart, spanEnd, editTextView, bitmap)
+                }
+                continue
             }
 
             if (spanRecordDict.containsKey("size")) {
@@ -252,7 +264,7 @@ object SpanProcessor {
     }
 
 
-    private fun convertSpanDataToList(spanDataString: String) : List<String> {
+    fun convertSpanDataToList(spanDataString: String) : List<String> {
 
         val spanRecordList =
             spanDataString.removeSurrounding("[", "]").split("], [")
@@ -272,7 +284,7 @@ object SpanProcessor {
         return formattedSpanRecords
     }
 
-    private fun getSpanRecordInfoPairs(spanRecord: String) : List<Pair<String, *>> {
+    fun getSpanRecordInfoPairs(spanRecord: String) : List<Pair<String, *>> {
 
         // like "span: ${SpanType.UNDERLINE_SPAN.spanName}, start: $spanStart, end: $spanEnd"
 

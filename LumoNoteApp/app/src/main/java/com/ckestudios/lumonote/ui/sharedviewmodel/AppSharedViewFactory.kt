@@ -13,7 +13,8 @@ import com.ckestudios.lumonote.data.repository.TaggedRepository
 // (a Repository), and ViewModelProvider by default only knows how to create ViewModels
 // with empty constructors.
 class AppSharedViewFactory(
-    private val repository: Repository  // Factory holds onto the dependency
+    private val application: Application, // Pass in the actual Application
+    private val repository: Repository   // Factory holds onto the dependency
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -33,19 +34,19 @@ class AppSharedViewFactory(
             // We already checked isAssignableFrom, so at runtime this cast cannot fail.
             // This is the standard pattern recommended in Android's docs.
             @Suppress("UNCHECKED_CAST")
-            return NoteAppSharedViewModel(Application(), repository as NoteRepository) as T
+            return NoteAppSharedViewModel(application, repository as NoteRepository) as T
         }
 
         if (modelClass.isAssignableFrom(TagAppSharedViewModel::class.java)) {
 
             @Suppress("UNCHECKED_CAST")
-            return TagAppSharedViewModel(Application(), repository as TagRepository) as T
+            return TagAppSharedViewModel(application, repository as TagRepository) as T
         }
 
         if (modelClass.isAssignableFrom(TaggedAppSharedViewModel::class.java)) {
 
             @Suppress("UNCHECKED_CAST")
-            return TaggedAppSharedViewModel(Application(), repository as TaggedRepository) as T
+            return TaggedAppSharedViewModel(application, repository as TaggedRepository) as T
         }
 
         // If some other ViewModel type is requested, we throw an error.
@@ -53,4 +54,3 @@ class AppSharedViewFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-

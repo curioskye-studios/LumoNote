@@ -1,5 +1,6 @@
 package com.ckestudios.lumonote.ui.home.notepreview.view
 
+import android.app.Application
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -66,19 +67,19 @@ class NotePreviewViewFragment : Fragment() {
 
         notePrevViewModel = ViewModelProvider(this).get(NotePrevViewModel::class.java)
 
+        val app: Application = requireActivity().application
+
         val noteRepository = NoteRepository(requireContext()) // DB
         val tagRepository = TagRepository(requireContext())
         val taggedRepository = TaggedRepository(requireContext())
 
         // Custom ViewModelProviders know how to build viewmodels w/ dbconnection dependency
-        noteAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(noteRepository))
-            .get(NoteAppSharedViewModel::class.java)
-
-        tagAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(tagRepository))
-            .get(TagAppSharedViewModel::class.java)
-
-        taggedAppSharedViewModel = ViewModelProvider(this, AppSharedViewFactory(taggedRepository))
-            .get(TaggedAppSharedViewModel::class.java)
+        noteAppSharedViewModel = ViewModelProvider(this,
+            AppSharedViewFactory(app, noteRepository)).get(NoteAppSharedViewModel::class.java)
+        tagAppSharedViewModel = ViewModelProvider(this,
+            AppSharedViewFactory(app, tagRepository)).get(TagAppSharedViewModel::class.java)
+        taggedAppSharedViewModel = ViewModelProvider(this,
+            AppSharedViewFactory(app, taggedRepository)).get(TaggedAppSharedViewModel::class.java)
     }
 
 
@@ -324,7 +325,7 @@ class NotePreviewViewFragment : Fragment() {
                     Log.d("NoteFrag", "$noteData")
 
                     setIsNewNote(false)
-                    saveNote(noteData, false)
+                    saveNote(noteData)
 
                     setCurrentPreviewNoteID(-1)
                 }

@@ -3,8 +3,10 @@ package com.ckestudios.lumonote.utils.basichelpers
 import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.text.SpannableStringBuilder
 import android.view.View
 import android.view.Window
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -82,6 +84,26 @@ object GeneralUIHelper {
     fun intToPx(num: Int, context: Context): Int {
 
         return (num * context.resources.displayMetrics.density).toInt()
+    }
+
+
+    fun replaceTextViewObjectChars(textView: TextView) {
+
+        val spannable = SpannableStringBuilder(textView.text)
+
+        val objectChar = "\uFFFC"
+        val cameraEmoji = "\uD83D\uDCF8"
+
+        var index = spannable.indexOf(objectChar)
+
+        while (index != -1) {
+
+            val end = index + objectChar.length
+            spannable.replace(index, end, cameraEmoji)
+            index = spannable.indexOf(objectChar, index + cameraEmoji.length)
+        }
+
+        textView.text = spannable
     }
 
 }

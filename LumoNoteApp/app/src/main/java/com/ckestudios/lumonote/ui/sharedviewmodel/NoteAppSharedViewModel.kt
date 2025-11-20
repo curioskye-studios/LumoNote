@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.data.repository.NoteRepository
 import com.ckestudios.lumonote.utils.basichelpers.GeneralDateHelper
+import com.ckestudios.lumonote.utils.basichelpers.GeneralImageHelper
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.Date
@@ -111,7 +113,7 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
     }
 
 
-    fun saveNote(note: Note, shouldUseAsync: Boolean) {
+    fun saveNote(note: Note) {
 
         if (isNewNote.value == true) {
 
@@ -120,15 +122,18 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
             Log.d("SaveDebug", "getLastInsertedNote(): ${noteRepository.getLastInsertedNote()}")
             setNewNoteBackup(noteRepository.getLastInsertedNote())
 
-            if (shouldUseAsync) setNoteWasCreatedAsync(true)
-            else setNoteWasCreated(true)
+            setNoteWasCreatedAsync(true)
 
         } else {
 
             noteRepository.updateItem(note)
 
-            if (shouldUseAsync) setNoteWasUpdatedAsync(true)
-            else setNoteWasUpdated(true)
+            setNoteWasUpdatedAsync(true)
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val context = getApplication<Application>().applicationContext
+            GeneralImageHelper.removeUnusedImageFiles(noteRepository.getItems(), context)
         }
     }
 
