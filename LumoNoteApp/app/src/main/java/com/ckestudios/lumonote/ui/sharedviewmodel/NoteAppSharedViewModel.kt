@@ -57,6 +57,11 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
     private val _currentOpenNoteID = MutableLiveData(-1)
     val currentOpenNoteID: LiveData<Int> = _currentOpenNoteID
 
+    private val _shouldDiscardEmptyNotes = MutableLiveData(false)
+    val shouldDiscardEmptyNotes: LiveData<Boolean> = _shouldDiscardEmptyNotes
+    private val _emptyNoteDiscarded = MutableLiveData(false)
+    val emptyNoteDiscarded: LiveData<Boolean> = _emptyNoteDiscarded
+
 
     init {
 
@@ -70,6 +75,9 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
 
         viewModelScope.launch {
             _notes.value = noteRepository.getItems()
+            Log.d("SettingsDeBug", "shouldDiscardEmptyNotes: ${shouldDiscardEmptyNotes.value}")
+
+            if (shouldDiscardEmptyNotes.value == true) removeEmptyNotes(notes.value!!)
         }
     }
 
@@ -79,6 +87,25 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
             _notesOnDate.value = noteRepository.getNotesByDate(date.toString())
         }
     }
+
+    private fun removeEmptyNotes(notes: List<Note>) {
+
+        for (note in notes) {
+
+            Log.d("SettingsDeBug", "note.noteID: ${note.noteID}")
+            Log.d("SettingsDeBug", "note.noteTitle == \"\": ${note.noteTitle == ""}")
+            Log.d("SettingsDeBug", "note.noteContent == \"\": ${note.noteContent == ""}")
+
+            if (note.noteTitle == "" && note.noteContent == "") {
+                noteRepository.deleteItem(note.noteID)
+                _emptyNoteDiscarded.value = true
+            }
+        }
+
+        _notes.value = noteRepository.getItems()
+        _emptyNoteDiscarded.value = false
+    }
+
 
     fun setNotifyRefresh(shouldRefresh: Boolean) {
         _notifyRefresh.value = shouldRefresh
@@ -137,10 +164,6 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
         }
     }
 
-    fun getNotesByPinnedStatus(getUnpinned: Boolean): List<Note> {
-
-        return noteRepository.getNotesByPinnedStatus(getUnpinned)
-    }
 
     fun updateCurrentPinStatus(isPinned: Boolean) {
         _currentNotePinned.value = isPinned
@@ -192,6 +215,11 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
 
     private fun setNoteWasDeleted(flag: Boolean){
         _noteWasDeleted.value = flag
+    }
+
+
+    fun setShouldDiscardEmptyNotes(discard: Boolean){
+        _shouldDiscardEmptyNotes.value = discard
     }
 
 }

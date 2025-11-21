@@ -191,6 +191,8 @@
                 android:fontFamily="@font/inter"
                 android:hint="Title"
 
+                android:imeOptions="flagNoExtractUi"
+
                 android:paddingTop="20dp"
                 android:paddingRight="10dp"
                 android:paddingBottom="17dp"
@@ -216,6 +218,7 @@
                 android:gravity="start|top"
                 android:hint="Make a note..."
                 android:inputType="textMultiLine"
+                android:imeOptions="flagNoExtractUi"
 
                 android:lineSpacingMultiplier="1.1"
                 android:minHeight="48dp"

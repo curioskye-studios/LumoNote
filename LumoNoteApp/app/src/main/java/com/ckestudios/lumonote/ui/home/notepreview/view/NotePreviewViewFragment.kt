@@ -77,11 +77,11 @@ class NotePreviewViewFragment : Fragment() {
         val taggedRepository = TaggedRepository(requireContext())
 
         // Custom ViewModelProviders know how to build viewmodels w/ dbconnection dependency
-        noteAppSharedViewModel = ViewModelProvider(this,
+        noteAppSharedViewModel = ViewModelProvider(requireActivity(),
             AppSharedViewFactory(app, noteRepository)).get(NoteAppSharedViewModel::class.java)
-        tagAppSharedViewModel = ViewModelProvider(this,
+        tagAppSharedViewModel = ViewModelProvider(requireActivity(),
             AppSharedViewFactory(app, tagRepository)).get(TagAppSharedViewModel::class.java)
-        taggedAppSharedViewModel = ViewModelProvider(this,
+        taggedAppSharedViewModel = ViewModelProvider(requireActivity(),
             AppSharedViewFactory(app, taggedRepository)).get(TaggedAppSharedViewModel::class.java)
     }
 
@@ -120,6 +120,14 @@ class NotePreviewViewFragment : Fragment() {
         noteAppSharedViewModel.loadAllNotes()
         tagAppSharedViewModel.loadAllTags()
     }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+
+        // Fragment became visible
+        noteAppSharedViewModel.loadAllNotes()
+    }
+
 
 
     // Called when the view is destroyed (e.g. when navigating away)
@@ -342,6 +350,14 @@ class NotePreviewViewFragment : Fragment() {
 
                 setNotifyRefresh(true)
                 setNotifyRefresh(false)
+            }
+
+            emptyNoteDiscarded.observe(viewLifecycleOwner) { wasDiscarded ->
+
+                if (wasDiscarded) {
+                    GeneralUIHelper.displayFeedbackToast(requireContext(),
+                        "Empty note(s) discarded", false)
+                }
             }
 
         }

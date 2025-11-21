@@ -11,15 +11,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ckestudios.lumonote.data.repository.NoteRepository
 import com.ckestudios.lumonote.data.repository.TagRepository
-import com.ckestudios.lumonote.data.repository.TaggedRepository
 import com.ckestudios.lumonote.databinding.FragmentCalendarViewBinding
 import com.ckestudios.lumonote.ui.home.calendar.viewmodel.CalendarViewModel
 import com.ckestudios.lumonote.ui.noteview.view.NoteViewActivity
-import com.ckestudios.lumonote.ui.noteview.view.taginput.TagInputDisplayAdapter
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.TagAppSharedViewModel
-import com.ckestudios.lumonote.ui.sharedviewmodel.TaggedAppSharedViewModel
 import com.ckestudios.lumonote.utils.basichelpers.GeneralDateHelper
 import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
 import java.time.LocalDate
@@ -39,12 +36,10 @@ class CalendarViewFragment : Fragment() {
     private val calendarViewBinding get() = _calendarViewBinding!!
 
     private lateinit var calendarNotePreviewAdapter: CalendarNotePreviewAdapter
-    private  lateinit var tagInputDisplayAdapter: TagInputDisplayAdapter
 
     private lateinit var calendarViewModel: CalendarViewModel
     private lateinit var noteAppSharedViewModel: NoteAppSharedViewModel
     private lateinit var tagAppSharedViewModel: TagAppSharedViewModel
-    private lateinit var taggedAppSharedViewModel: TaggedAppSharedViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,15 +50,12 @@ class CalendarViewFragment : Fragment() {
 
         val noteRepository = NoteRepository(requireContext()) // DB
         val tagRepository = TagRepository(requireContext())
-        val taggedRepository = TaggedRepository(requireContext())
 
         // Custom ViewModelProviders know how to build viewmodels w/ dbconnection dependency
-        noteAppSharedViewModel = ViewModelProvider(this,
+        noteAppSharedViewModel = ViewModelProvider(requireActivity(),
             AppSharedViewFactory(app, noteRepository)).get(NoteAppSharedViewModel::class.java)
-        tagAppSharedViewModel = ViewModelProvider(this,
+        tagAppSharedViewModel = ViewModelProvider(requireActivity(),
             AppSharedViewFactory(app, tagRepository)).get(TagAppSharedViewModel::class.java)
-        taggedAppSharedViewModel = ViewModelProvider(this,
-            AppSharedViewFactory(app, taggedRepository)).get(TaggedAppSharedViewModel::class.java)
 
         calendarViewModel = ViewModelProvider(this).get(CalendarViewModel::class.java)
     }
@@ -105,6 +97,13 @@ class CalendarViewFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
+        noteAppSharedViewModel.loadAllNotesOnDate(calendarViewModel.selectedDate.value as LocalDate)
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+
+        // Fragment became visible
         noteAppSharedViewModel.loadAllNotesOnDate(calendarViewModel.selectedDate.value as LocalDate)
     }
 
@@ -163,12 +162,15 @@ class CalendarViewFragment : Fragment() {
 
     private fun observeNoteAppVMValues() {
 
-        noteAppSharedViewModel.notesOnDate.observe(viewLifecycleOwner) { notesOnDate ->
+        noteAppSharedViewModel.apply {
 
-            calendarNotePreviewAdapter.refreshData(notesOnDate)
+            notesOnDate.observe(viewLifecycleOwner) { notesOnDate ->
 
-            calendarViewModel.setDateHasNotes(notesOnDate.isNotEmpty())
+                calendarNotePreviewAdapter.refreshData(notesOnDate)
 
+                calendarViewModel.setDateHasNotes(notesOnDate.isNotEmpty())
+
+            }
         }
     }
 
