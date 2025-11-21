@@ -13,7 +13,7 @@ class TagRepository (private val context: Context) : Repository {
 
         try {
 
-            dbConnection.insertTag(Tag(1, "All Notes"))
+            dbConnection.insertTag(Tag(0, "All Notes"))
         }
 
         catch (e: Exception) {}

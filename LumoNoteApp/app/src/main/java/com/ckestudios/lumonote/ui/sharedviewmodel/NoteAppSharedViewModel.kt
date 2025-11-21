@@ -7,8 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.data.repository.NoteRepository
-import com.ckestudios.lumonote.utils.basichelpers.GeneralDateHelper
-import com.ckestudios.lumonote.utils.basichelpers.GeneralImageHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralDateHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralImageHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate

@@ -1,4 +1,4 @@
-package com.ckestudios.lumonote.ui.home.settings
+package com.ckestudios.lumonote.ui.home.settings.view
 
 import android.app.Application
 import android.content.Context

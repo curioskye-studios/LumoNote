@@ -2,12 +2,11 @@ package com.ckestudios.lumonote.utils.textformatting
 
 import android.text.Editable
 import android.text.Spanned
-import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.BulletType
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
-import com.ckestudios.lumonote.utils.state.ActionHelper
+import com.ckestudios.lumonote.utils.helpers.ActionHelper
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 import com.ckestudios.lumonote.utils.state.StateManager
 

@@ -6,7 +6,7 @@ import android.text.Spanned
 import android.text.style.UnderlineSpan
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
-import com.ckestudios.lumonote.utils.state.ActionHelper
+import com.ckestudios.lumonote.utils.helpers.ActionHelper
 import com.ckestudios.lumonote.utils.state.SpanStateWatcher
 import com.ckestudios.lumonote.utils.state.StateManager
 

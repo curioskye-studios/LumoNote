@@ -12,8 +12,8 @@ import com.ckestudios.lumonote.databinding.ActivityTagViewBinding
 import com.ckestudios.lumonote.ui.other.ConfirmationDialogFragment
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.TagAppSharedViewModel
-import com.ckestudios.lumonote.utils.basichelpers.GeneralButtonIVHelper
-import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralButtonIVHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
 
 class TagViewActivity : AppCompatActivity() {
 

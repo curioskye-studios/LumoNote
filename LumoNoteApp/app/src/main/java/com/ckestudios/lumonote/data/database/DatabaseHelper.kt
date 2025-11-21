@@ -45,8 +45,11 @@ class DatabaseHelper(context: Context) :
         TAGGED_TABLE_NAME, TAGGED_TAGID_COLUMN, TAGGED_NOTEID_COLUMN
     )
 
+
     override fun onCreate(db: SQLiteDatabase?) {
+
         try {
+
             db?.execSQL(
                 "CREATE TABLE $NOTE_TABLE_NAME (" +
                         "$NOTE_ID_COLUMN INTEGER PRIMARY KEY, " +
@@ -72,13 +75,17 @@ class DatabaseHelper(context: Context) :
                         "FOREIGN KEY($TAGGED_TAGID_COLUMN) REFERENCES $TAG_TABLE_NAME($TAG_ID_COLUMN), " +
                         "FOREIGN KEY($TAGGED_NOTEID_COLUMN) REFERENCES $NOTE_TABLE_NAME($NOTE_ID_COLUMN))"
             )
-        } catch (e: Exception) {
+        }
+
+        catch (e: Exception) {
             Log.e("DatabaseHelper", "Error creating tables", e)
         }
     }
 
     override fun onConfigure(db: SQLiteDatabase?) {
+
         try {
+
             super.onConfigure(db)
             db?.setForeignKeyConstraintsEnabled(true)
         } catch (e: Exception) {
@@ -87,7 +94,9 @@ class DatabaseHelper(context: Context) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+
         try {
+
             db?.execSQL("DROP TABLE IF EXISTS $TAGGED_TABLE_NAME")
             db?.execSQL("DROP TABLE IF EXISTS $TAG_TABLE_NAME")
             db?.execSQL("DROP TABLE IF EXISTS $NOTE_TABLE_NAME")
@@ -101,7 +110,10 @@ class DatabaseHelper(context: Context) :
 
     // --- NOTE FUNCTIONS ---
     fun insertNote(note: Note) {
+
         try {
+
+            // .use automatically closes database
             writableDatabase.use { db ->
                 noteDatabaseHelper.insertNote(note, db)
             }
@@ -111,51 +123,65 @@ class DatabaseHelper(context: Context) :
     }
 
     fun getAllNotes(): List<Note> {
+
         return try {
+
             readableDatabase.use { db ->
                 noteDatabaseHelper.getAllNotes(db)
             }
         } catch (e: Exception) {
+
             Log.e("DatabaseHelper", "Error getting all notes", e)
             emptyList()
         }
     }
 
     fun getLastInsertedNote(): Note? {
+
         return try {
+
             readableDatabase.use { db ->
                 noteDatabaseHelper.getLastInsertedNote(db)
             }
         } catch (e: Exception) {
+
             Log.e("DatabaseHelper", "Error getting last added tag", e)
             null
         }
     }
 
     fun getNotesByDate(date: String): List<Note> {
+
         return try {
+
             readableDatabase.use { db ->
                 noteDatabaseHelper.getNotesByDate(date, db)
             }
         } catch (e: Exception) {
+
             Log.e("DatabaseHelper", "Error getting notes by date", e)
             emptyList()
         }
     }
 
     fun getNotesByPinnedStatus(getUnpinned: Boolean): List<Note> {
+
         return try {
+
             readableDatabase.use { db ->
                 noteDatabaseHelper.getNotesByPinnedStatus(getUnpinned, db)
             }
         } catch (e: Exception) {
+
             Log.e("DatabaseHelper", "Error getting notes by pinned status", e)
             emptyList()
         }
     }
 
     fun updateNote(note: Note) {
+
         try {
+
             writableDatabase.use { db ->
                 noteDatabaseHelper.updateNote(note, db)
             }
@@ -165,19 +191,25 @@ class DatabaseHelper(context: Context) :
     }
 
     fun getNoteByID(noteID: Int): Note? {
+
         return try {
+
             readableDatabase.use { db ->
                 noteDatabaseHelper.getNoteByID(noteID, db)
             }
         } catch (e: Exception) {
+
             Log.e("DatabaseHelper", "Error getting note by ID", e)
             null
         }
     }
 
     fun deleteNote(noteID: Int) {
+
         try {
+
             deleteTaggedByNoteID(noteID)
+
             writableDatabase.use { db ->
                 noteDatabaseHelper.deleteNote(noteID, db)
             }
@@ -191,7 +223,9 @@ class DatabaseHelper(context: Context) :
 
     // --- TAG FUNCTIONS ---
     fun insertTag(tag: Tag) {
+
         try {
+
             writableDatabase.use { db ->
                 tagDatabaseHelper.insertTag(tag, db)
             }
@@ -201,29 +235,37 @@ class DatabaseHelper(context: Context) :
     }
 
     fun getAllTags(): List<Tag> {
+
         return try {
+
             readableDatabase.use { db ->
                 tagDatabaseHelper.getAllTags(db)
             }
         } catch (e: Exception) {
+
             Log.e("DatabaseHelper", "Error getting all tags", e)
             emptyList()
         }
     }
 
     fun getLastInsertedTag(): Tag? {
+
         return try {
+
             readableDatabase.use { db ->
                 tagDatabaseHelper.getLastInsertedTag(db)
             }
         } catch (e: Exception) {
+
             Log.e("DatabaseHelper", "Error getting last added tag", e)
             null
         }
     }
 
     fun updateTag(tag: Tag) {
+
         try {
+
             writableDatabase.use { db ->
                 tagDatabaseHelper.updateTag(tag, db)
             }
@@ -233,19 +275,25 @@ class DatabaseHelper(context: Context) :
     }
 
     fun getTagByID(tagID: Int): Tag? {
+
         return try {
+
             readableDatabase.use { db ->
                 tagDatabaseHelper.getTagByID(tagID, db)
             }
         } catch (e: Exception) {
+
             Log.e("DatabaseHelper", "Error getting tag by ID", e)
             null
         }
     }
 
     fun deleteTag(tagID: Int) {
+
         try {
+
             deleteTaggedByTagID(tagID)
+
             writableDatabase.use { db ->
                 tagDatabaseHelper.deleteTag(tagID, db)
             }
@@ -259,7 +307,9 @@ class DatabaseHelper(context: Context) :
 
     // --- TAGGED FUNCTIONS ---
     fun insertTagged(tagID: Int, noteID: Int) {
+
         try {
+
             writableDatabase.use { db ->
                 taggedDatabaseHelper.insertTagged(tagID, noteID, db)
             }
@@ -269,7 +319,9 @@ class DatabaseHelper(context: Context) :
     }
 
     fun deleteTagged(tagID: Int, noteID: Int) {
+
         try {
+
             writableDatabase.use { db ->
                 taggedDatabaseHelper.deleteTagged(tagID, noteID, db)
             }
@@ -279,7 +331,9 @@ class DatabaseHelper(context: Context) :
     }
 
     fun deleteTaggedByTagID(tagID: Int) {
+
         try {
+
             writableDatabase.use { db ->
                 taggedDatabaseHelper.deleteTaggedByTagID(tagID, db)
             }
@@ -289,7 +343,9 @@ class DatabaseHelper(context: Context) :
     }
 
     fun deleteTaggedByNoteID(noteID: Int) {
+
         try {
+
             writableDatabase.use { db ->
                 taggedDatabaseHelper.deleteTaggedByNoteID(noteID, db)
             }
@@ -299,26 +355,37 @@ class DatabaseHelper(context: Context) :
     }
 
     fun getTagsByNoteID(noteID: Int): List<Tag> {
+
         return try {
+
             readableDatabase.use { db ->
+
                 val tagIDs = taggedDatabaseHelper.getTagsByNoteID(noteID, db)
+
                 tagIDs.mapNotNull { id -> getTagByID(id) }
             }
         } catch (e: Exception) {
+
             Log.e("DatabaseHelper", "Error getting tags by note ID", e)
             emptyList()
         }
     }
 
     fun getNotesByTagID(tagID: Int): List<Note> {
+
         return try {
+
             readableDatabase.use { db ->
+
                 val noteIDs = taggedDatabaseHelper.getNotesByTagID(tagID, db)
+
                 noteIDs.mapNotNull { id -> getNoteByID(id) }
             }
         } catch (e: Exception) {
+
             Log.e("DatabaseHelper", "Error getting notes by tag ID", e)
             emptyList()
         }
     }
+
 }

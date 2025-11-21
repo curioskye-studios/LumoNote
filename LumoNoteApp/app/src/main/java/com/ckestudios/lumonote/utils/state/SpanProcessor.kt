@@ -14,9 +14,9 @@ import com.ckestudios.lumonote.data.models.TextSize
 import com.ckestudios.lumonote.ui.noteview.other.ChecklistSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomBulletSpan
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
-import com.ckestudios.lumonote.utils.basichelpers.BasicUtilityHelper
-import com.ckestudios.lumonote.utils.basichelpers.GeneralImageHelper
-import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
+import com.ckestudios.lumonote.utils.helpers.BasicUtilityHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralImageHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralTextHelper
 import com.ckestudios.lumonote.utils.textformatting.UnderlineTextFormatter
 
 object SpanProcessor {

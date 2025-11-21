@@ -17,8 +17,8 @@ import com.ckestudios.lumonote.ui.noteview.view.NoteViewActivity
 import com.ckestudios.lumonote.ui.sharedviewmodel.AppSharedViewFactory
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
 import com.ckestudios.lumonote.ui.sharedviewmodel.TagAppSharedViewModel
-import com.ckestudios.lumonote.utils.basichelpers.GeneralDateHelper
-import com.ckestudios.lumonote.utils.basichelpers.GeneralUIHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralDateHelper
+import com.ckestudios.lumonote.utils.helpers.GeneralUIHelper
 import java.time.LocalDate
 import java.util.Date
 

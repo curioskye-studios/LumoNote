@@ -1,8 +1,7 @@
-package com.ckestudios.lumonote.utils.state
+package com.ckestudios.lumonote.utils.helpers
 
 import com.ckestudios.lumonote.data.models.Action
 import com.ckestudios.lumonote.data.models.SpanType
-import com.ckestudios.lumonote.utils.basichelpers.GeneralTextHelper
 
 object ActionHelper {
 

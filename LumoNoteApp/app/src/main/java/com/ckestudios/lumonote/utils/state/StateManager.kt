@@ -5,6 +5,7 @@ import android.widget.EditText
 import com.ckestudios.lumonote.data.models.Action
 import com.ckestudios.lumonote.data.models.ActionType
 import com.ckestudios.lumonote.data.models.SpanType
+import com.ckestudios.lumonote.utils.helpers.ActionHelper
 
 class StateManager(private val editTextView: EditText) {
 

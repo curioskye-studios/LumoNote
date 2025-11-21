@@ -18,6 +18,7 @@ class NoteDatabaseHelper(
 
     // Insert a new note safely
     fun insertNote(note: Note, db: SQLiteDatabase) {
+
         val values = ContentValues().apply {
             put(noteTitleColumn, note.noteTitle)
             put(noteContentColumn, note.noteContent)
@@ -31,13 +32,12 @@ class NoteDatabaseHelper(
             db.insertOrThrow(noteTableName, null, values)
         } catch (e: Exception) {
             e.printStackTrace()
-        } finally {
-            db.close()
         }
     }
 
     // Retrieve all notes safely
     fun getAllNotes(db: SQLiteDatabase): List<Note> {
+
         val notesList = mutableListOf<Note>()
         var cursor: Cursor? = null
 
@@ -46,7 +46,9 @@ class NoteDatabaseHelper(
             cursor = db.rawQuery(query, null)
 
             if (cursor.moveToFirst()) {
+
                 do {
+
                     val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
                     val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
                     val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
@@ -58,13 +60,17 @@ class NoteDatabaseHelper(
                     notesList.add(
                         Note(id, title, content, spans, created, modified, pinned.toBoolean())
                     )
+
                 } while (cursor.moveToNext())
+
             }
-        } catch (e: Exception) {
+
+        }
+
+        catch (e: Exception) {
             e.printStackTrace()
         } finally {
             cursor?.close()
-            db.close()
         }
 
         return notesList
@@ -81,6 +87,7 @@ class NoteDatabaseHelper(
             cursor = db.rawQuery(query, null)
 
             if (cursor.moveToFirst()) {
+
                 val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
                 val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
                 val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
@@ -91,11 +98,12 @@ class NoteDatabaseHelper(
 
                 note = Note(id, title, content, spans, created, modified, pinned.toBoolean())
             }
-        } catch (e: Exception) {
+        }
+
+        catch (e: Exception) {
             e.printStackTrace()
         } finally {
             cursor?.close()
-            db.close()
         }
 
         return note
@@ -112,7 +120,9 @@ class NoteDatabaseHelper(
             cursor = db.rawQuery(query, arrayOf(getUnpinned.toString()))
 
             if (cursor.moveToFirst()) {
+
                 do {
+
                     val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
                     val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
                     val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
@@ -125,12 +135,14 @@ class NoteDatabaseHelper(
                         Note(id, title, content, spans, created, modified, pinned.toBoolean())
                     )
                 } while (cursor.moveToNext())
+
             }
-        } catch (e: Exception) {
+        }
+
+        catch (e: Exception) {
             e.printStackTrace()
         } finally {
             cursor?.close()
-            db.close()
         }
 
         return notesList
@@ -147,7 +159,9 @@ class NoteDatabaseHelper(
             cursor = db.rawQuery(query, arrayOf(date))
 
             if (cursor.moveToFirst()) {
+
                 do {
+
                     val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
                     val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
                     val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
@@ -160,12 +174,14 @@ class NoteDatabaseHelper(
                         Note(id, title, content, spans, created, modified, pinned.toBoolean())
                     )
                 } while (cursor.moveToNext())
+
             }
-        } catch (e: Exception) {
+        }
+
+        catch (e: Exception) {
             e.printStackTrace()
         } finally {
             cursor?.close()
-            db.close()
         }
 
         return notesList
@@ -173,6 +189,7 @@ class NoteDatabaseHelper(
 
     // Update an existing note safely
     fun updateNote(note: Note, db: SQLiteDatabase) {
+
         val values = ContentValues().apply {
             put(noteTitleColumn, note.noteTitle)
             put(noteContentColumn, note.noteContent)
@@ -188,13 +205,12 @@ class NoteDatabaseHelper(
             db.update(noteTableName, values, whereClause, whereArgs)
         } catch (e: Exception) {
             e.printStackTrace()
-        } finally {
-            db.close()
         }
     }
 
     // Get a specific note by ID safely (returns null if not found)
     fun getNoteByID(noteID: Int, db: SQLiteDatabase): Note? {
+
         var note: Note? = null
         var cursor: Cursor? = null
 
@@ -203,6 +219,7 @@ class NoteDatabaseHelper(
             cursor = db.rawQuery(query, arrayOf(noteID.toString()))
 
             if (cursor.moveToFirst()) {
+
                 val id = cursor.getInt(cursor.getColumnIndexOrThrow(noteIDColumn))
                 val title = cursor.getString(cursor.getColumnIndexOrThrow(noteTitleColumn))
                 val content = cursor.getString(cursor.getColumnIndexOrThrow(noteContentColumn))
@@ -213,11 +230,12 @@ class NoteDatabaseHelper(
 
                 note = Note(id, title, content, spans, created, modified, pinned.toBoolean())
             }
-        } catch (e: Exception) {
+        }
+
+        catch (e: Exception) {
             e.printStackTrace()
         } finally {
             cursor?.close()
-            db.close()
         }
 
         return note
@@ -225,6 +243,7 @@ class NoteDatabaseHelper(
 
     // Delete a specific note safely
     fun deleteNote(noteID: Int, db: SQLiteDatabase) {
+
         val whereClause = "$noteIDColumn = ?"
         val whereArgs = arrayOf(noteID.toString())
 
@@ -232,8 +251,7 @@ class NoteDatabaseHelper(
             db.delete(noteTableName, whereClause, whereArgs)
         } catch (e: Exception) {
             e.printStackTrace()
-        } finally {
-            db.close()
         }
     }
+
 }

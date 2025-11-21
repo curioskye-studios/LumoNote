@@ -1,4 +1,4 @@
-package com.ckestudios.lumonote.ui.noteview.other
+package com.ckestudios.lumonote.utils.helpers
 
 import com.ckestudios.lumonote.data.models.Tag
 import com.ckestudios.lumonote.ui.sharedviewmodel.TaggedAppSharedViewModel

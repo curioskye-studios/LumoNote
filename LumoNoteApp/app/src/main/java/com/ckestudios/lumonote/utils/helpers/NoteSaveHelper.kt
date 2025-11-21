@@ -1,11 +1,10 @@
-package com.ckestudios.lumonote.ui.noteview.other
+package com.ckestudios.lumonote.utils.helpers
 
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import com.ckestudios.lumonote.data.models.Note
 import com.ckestudios.lumonote.ui.sharedviewmodel.NoteAppSharedViewModel
-import com.ckestudios.lumonote.utils.basichelpers.GeneralDateHelper
 import com.ckestudios.lumonote.utils.state.SpanProcessor
 import java.time.LocalDate
 import java.util.Timer

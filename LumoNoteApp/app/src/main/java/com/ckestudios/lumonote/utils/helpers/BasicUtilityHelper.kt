@@ -1,4 +1,4 @@
-package com.ckestudios.lumonote.utils.basichelpers
+package com.ckestudios.lumonote.utils.helpers
 
 object BasicUtilityHelper {
 

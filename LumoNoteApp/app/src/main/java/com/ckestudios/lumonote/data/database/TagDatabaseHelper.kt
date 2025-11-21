@@ -13,6 +13,7 @@ class TagDatabaseHelper(
 
     // Handles insertion of new tags into the database
     fun insertTag(tag: Tag, db: SQLiteDatabase) {
+
         val values = ContentValues().apply {
             put(tagNameColumn, tag.tagName)
         }
@@ -21,13 +22,13 @@ class TagDatabaseHelper(
             db.insertOrThrow(tagTableName, null, values)
         } catch (e: Exception) {
             e.printStackTrace()
-        } finally {
-            db.close()
         }
+
     }
 
     // Retrieve all tags in the database safely
     fun getAllTags(db: SQLiteDatabase): List<Tag> {
+
         val tagsList = mutableListOf<Tag>()
         var cursor: Cursor? = null
 
@@ -36,17 +37,24 @@ class TagDatabaseHelper(
             cursor = db.rawQuery(query, null)
 
             if (cursor.moveToFirst()) {
-                do {
+
+                 do {
+
                     val id = cursor.getInt(cursor.getColumnIndexOrThrow(tagIDColumn))
                     val name = cursor.getString(cursor.getColumnIndexOrThrow(tagNameColumn))
+
                     tagsList.add(Tag(id, name))
+
                 } while (cursor.moveToNext())
+
             }
-        } catch (e: Exception) {
+
+        }
+
+        catch (e: Exception) {
             e.printStackTrace()
         } finally {
             cursor?.close()
-            db.close()
         }
 
         return tagsList
@@ -63,15 +71,18 @@ class TagDatabaseHelper(
             cursor = db.rawQuery(query, null)
 
             if (cursor.moveToFirst()) {
+
                 val id = cursor.getInt(cursor.getColumnIndexOrThrow(tagIDColumn))
                 val name = cursor.getString(cursor.getColumnIndexOrThrow(tagNameColumn))
+
                 tag = Tag(id, name)
             }
-        } catch (e: Exception) {
+        }
+
+        catch (e: Exception) {
             e.printStackTrace()
         } finally {
             cursor?.close()
-            db.close()
         }
 
         return tag
@@ -79,6 +90,7 @@ class TagDatabaseHelper(
 
     // Update a tag in the database safely
     fun updateTag(tag: Tag, db: SQLiteDatabase) {
+
         val values = ContentValues().apply {
             put(tagNameColumn, tag.tagName)
         }
@@ -90,13 +102,12 @@ class TagDatabaseHelper(
             db.update(tagTableName, values, whereClause, whereArgs)
         } catch (e: Exception) {
             e.printStackTrace()
-        } finally {
-            db.close()
         }
     }
 
     // Get a specific tag by ID safely (returns null if not found)
     fun getTagByID(tagID: Int, db: SQLiteDatabase): Tag? {
+
         var tag: Tag? = null
         var cursor: Cursor? = null
 
@@ -105,15 +116,18 @@ class TagDatabaseHelper(
             cursor = db.rawQuery(query, arrayOf(tagID.toString()))
 
             if (cursor.moveToFirst()) {
+
                 val id = cursor.getInt(cursor.getColumnIndexOrThrow(tagIDColumn))
                 val name = cursor.getString(cursor.getColumnIndexOrThrow(tagNameColumn))
+
                 tag = Tag(id, name)
             }
-        } catch (e: Exception) {
+        }
+
+        catch (e: Exception) {
             e.printStackTrace()
         } finally {
             cursor?.close()
-            db.close()
         }
 
         return tag
@@ -121,6 +135,7 @@ class TagDatabaseHelper(
 
     // Remove a specific tag safely
     fun deleteTag(tagID: Int, db: SQLiteDatabase) {
+
         val whereClause = "$tagIDColumn = ?"
         val whereArgs = arrayOf(tagID.toString())
 
@@ -128,8 +143,7 @@ class TagDatabaseHelper(
             db.delete(tagTableName, whereClause, whereArgs)
         } catch (e: Exception) {
             e.printStackTrace()
-        } finally {
-            db.close()
         }
     }
+
 }
