@@ -11,6 +11,6 @@ object CustomBulletResource {
     fun setCustomBullet(bullet: String) {
 
         customBullet.value = bullet
-        Log.d("textformatfrag", "bullet: $bullet")
+//        Log.d("textformatfrag", "bullet: $bullet")
     }
 }

@@ -179,8 +179,8 @@ class TagInputFragment : Fragment() {
             tagInputSelectorAdapter.setSelectedTagsList(loadedTagIDs)
             tagAppSharedViewModel.setCurrentNoteTagsSelected(loadedTags)
 
-            Log.d("TagDebug", "loadedTags: ${loadedTags}.")
-            Log.d("TagDebug", "loadedTagIDs: ${loadedTagIDs}.")
+//            Log.d("TagDebug", "loadedTags: ${loadedTags}.")
+//            Log.d("TagDebug", "loadedTagIDs: ${loadedTagIDs}.")
         }
     }
 

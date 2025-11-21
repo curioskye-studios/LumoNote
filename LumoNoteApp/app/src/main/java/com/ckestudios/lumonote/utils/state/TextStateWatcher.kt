@@ -4,7 +4,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import com.ckestudios.lumonote.data.models.Action
 import com.ckestudios.lumonote.data.models.ActionPerformed
 import com.ckestudios.lumonote.data.models.ActionType
@@ -61,7 +60,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
             startOfChanges = false
         }
 
-        Log.d("TextWatcher", "Before: $text (start=$start, count=$count, after=$after)")
+//        Log.d("TextWatcher", "Before: $text (start=$start, count=$count, after=$after)")
     }
 
     override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {
@@ -71,7 +70,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
         // reset batch timer on keystroke
         startSaveChangesTimer()
 
-        Log.d("TextWatcher", "On: (start=$start, before=$before, count=$count)")
+//        Log.d("TextWatcher", "On: (start=$start, before=$before, count=$count)")
     }
 
     override fun afterTextChanged(newText: Editable?) {
@@ -85,7 +84,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
             }
         }
 
-        Log.d("TextWatcher", "After: $afterText")
+//        Log.d("TextWatcher", "After: $afterText")
     }
 
 
@@ -129,8 +128,8 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
         val oldText = beforeText
         val newText = afterText
 
-        Log.d("TextWatcher", "oldText: $oldText")
-        Log.d("TextWatcher", "newText: $newText")
+//        Log.d("TextWatcher", "oldText: $oldText")
+//        Log.d("TextWatcher", "newText: $newText")
 
         // if nothing changed
         if (oldText == newText || beforeTextIsOriginalText()) {
@@ -144,8 +143,8 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
         val oldTextSegment = getOldTextSegment(changeStart, oldText, newText)
         val newTextSegment = getNewTextSegment(changeStart, oldText, newText)
 
-        Log.d("TextWatcher", "Diff → start=$changeStart, oldSeg='$oldTextSegment', " +
-                "newSeg='$newTextSegment'")
+//        Log.d("TextWatcher", "Diff → start=$changeStart, oldSeg='$oldTextSegment', " +
+//                "newSeg='$newTextSegment'")
 
         processTextChange(changeStart, oldText, newText, oldTextSegment, newTextSegment)
 
@@ -161,8 +160,8 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
         val objectChar = '\uFFFC'
         val oldObjCharCount = oldText.filter { it == objectChar}.length
         val newObjCharCount = newText.filter { it == objectChar}.length
-        Log.d("TextWatcher", "oldObjCharCount: $oldObjCharCount")
-        Log.d("TextWatcher", "newObjCharCount: $newObjCharCount")
+//        Log.d("TextWatcher", "oldObjCharCount: $oldObjCharCount")
+//        Log.d("TextWatcher", "newObjCharCount: $newObjCharCount")
 
         var actionPerformed: ActionPerformed? = null
         var actionType: ActionType? = null
@@ -186,7 +185,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
                 end = newImageCharPos + 1
                 actionInfo = objectChar.toString()
 
-                Log.d("TextWatcher", "ADD IMAGE: '$objectChar' at $newImageCharPos")
+//                Log.d("TextWatcher", "ADD IMAGE: '$objectChar' at $newImageCharPos")
             }
 
             // NEWLINE → user only changed a newline
@@ -202,7 +201,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
                 end = diffStart + 1
                 actionInfo = "\n"
 
-                Log.d("TextWatcher", "NEWLINE ${if (isAdd) "ADD" else "REMOVE"} at $diffStart")
+//                Log.d("TextWatcher", "NEWLINE ${if (isAdd) "ADD" else "REMOVE"} at $diffStart")
             }
 
             // ADD → user inserted text
@@ -216,7 +215,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
                 end = changeStart + newTextSegment.length
                 actionInfo = newTextSegment
 
-                Log.d("TextWatcher", "ADD: '$newTextSegment' at $changeStart")
+//                Log.d("TextWatcher", "ADD: '$newTextSegment' at $changeStart")
             }
 
             // REMOVE → user deleted text
@@ -230,7 +229,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
                 end = changeStart + oldTextSegment.length
                 actionInfo = oldTextSegment
 
-                Log.d("TextWatcher", "REMOVE: '$oldTextSegment' at $changeStart")
+//                Log.d("TextWatcher", "REMOVE: '$oldTextSegment' at $changeStart")
             }
 
             // REPLACE → user replaced text segment
@@ -247,8 +246,8 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
                     replaceMultipartIdentifier, changeStart, changeStart + newTextSegment.length,
                     newTextSegment)
 
-                Log.d("TextWatcher", "REPLACE: '$oldTextSegment' → '$newTextSegment' at " +
-                        "$changeStart")
+//                Log.d("TextWatcher", "REPLACE: '$oldTextSegment' → '$newTextSegment' at " +
+//                        "$changeStart")
             }
 
         }
@@ -310,7 +309,7 @@ class TextStateWatcher(private val editTextView: CustomSelectionET,
             }
         }
 
-        Log.d("TextWatcher", "changeStart smallerTextSize: '$maxToCompare'")
+//        Log.d("TextWatcher", "changeStart smallerTextSize: '$maxToCompare'")
 
         return maxToCompare
     }

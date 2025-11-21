@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -78,7 +77,7 @@ class SettingsViewFragment : Fragment() {
 
         removeEmptyNotes = userSharedPreferences.getBoolean("removeEmptyNotes", false)
 
-        Log.d("SettingsDeBug", "removeEmptyNotes: $removeEmptyNotes")
+//        Log.d("SettingsDeBug", "removeEmptyNotes: $removeEmptyNotes")
 
         noteAppSharedViewModel.setShouldDiscardEmptyNotes(removeEmptyNotes)
     }
@@ -87,7 +86,7 @@ class SettingsViewFragment : Fragment() {
 
         settingsViewBinding.apply {
 
-            noteCreationSwitchSM.isChecked = removeEmptyNotes
+            removeEmptyNoteSwitchSM.isChecked = removeEmptyNotes
         }
     }
 
@@ -99,7 +98,7 @@ class SettingsViewFragment : Fragment() {
             apply()
         }
 
-        Log.d("SettingsDeBug", "removeEmptyNotes: $removeEmptyNotes")
+//        Log.d("SettingsDeBug", "removeEmptyNotes: $removeEmptyNotes")
 
         noteAppSharedViewModel.setShouldDiscardEmptyNotes(removeEmptyNotes)
     }
@@ -108,7 +107,7 @@ class SettingsViewFragment : Fragment() {
 
         settingsViewBinding.apply {
 
-            noteCreationSwitchSM.setOnCheckedChangeListener { _, isChecked ->
+            removeEmptyNoteSwitchSM.setOnCheckedChangeListener { _, isChecked ->
 
                 removeEmptyNotes = isChecked
                 updatePreferences()

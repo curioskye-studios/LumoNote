@@ -23,7 +23,7 @@ object GeneralDateHelper {
         val formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy")
         val currentDate = date.format(formatter)
 
-        Log.d("FormatDate", currentDate)
+//        Log.d("FormatDate", currentDate)
 
         // Extract the date from current date, fix it, replace with fixed version
 
@@ -49,7 +49,7 @@ object GeneralDateHelper {
         // Replace original "08," with "8,"
         val fixedCurrentDate = currentDate.replace(regex, fixedMonth)
 
-        Log.d("FormatDate", fixedCurrentDate)
+//        Log.d("FormatDate", fixedCurrentDate)
 
 
         val weekDay: DayOfWeek = date.dayOfWeek
@@ -63,11 +63,11 @@ object GeneralDateHelper {
 
     fun convertFormattedDateToLocalDate(dateString: String): LocalDate? {
 
-        Log.d("ParseDate", dateString)
+//        Log.d("ParseDate", dateString)
 
         // Remove weekday ("Tue, ")
         val cleaned = dateString.substringAfter(", ").trim()
-        Log.d("ParseDate", "After removing weekday: $cleaned")
+//        Log.d("ParseDate", "After removing weekday: $cleaned")
 
         // Regex to capture: MonthName Day, Year
         val regex = """([A-Za-z]+)\s(\d{1,2}),\s(\d{4})""".toRegex()
@@ -80,7 +80,7 @@ object GeneralDateHelper {
 
         val (monthName, dayStr, yearStr) = match.destructured
 
-        Log.d("ParseDate", "Month: $monthName, Day: $dayStr, Year: $yearStr")
+//        Log.d("ParseDate", "Month: $monthName, Day: $dayStr, Year: $yearStr")
 
         // Convert month name -> month number
         val month = try {
@@ -94,7 +94,7 @@ object GeneralDateHelper {
         val year = yearStr.toInt()
 
         val result = LocalDate.of(year, month, day)
-        Log.d("ParseDate", "Parsed LocalDate: $result")
+//        Log.d("ParseDate", "Parsed LocalDate: $result")
 
         return result
     }

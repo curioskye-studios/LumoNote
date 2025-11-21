@@ -3,7 +3,6 @@ package com.ckestudios.lumonote.utils.textformatting
 import android.text.Editable
 import android.text.style.CharacterStyle
 import android.text.style.StyleSpan
-import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
@@ -48,7 +47,7 @@ object TextFormatterHelper {
 
 
         // Print the extracted occurrences
-        paragraphIndices.forEach { Log.d("bullettextformatter", "occurrence: $it") }
+//        paragraphIndices.forEach { Log.d("bullettextformatter", "occurrence: $it") }
 
         return paragraphIndices
     }
@@ -140,7 +139,7 @@ object TextFormatterHelper {
                 if (prevSpanEnd >= currentSpanStart && (prevSpanStart != -1 ||
                             prevSpanEnd != -1)) {
 
-                    Log.d("SpanWatcher", "Previous spanIndex overlaps.")
+//                    Log.d("SpanWatcher", "Previous spanIndex overlaps.")
 
                     applyFormattingFunction(prevSpanStart, currentSpanEnd)
 
@@ -166,7 +165,7 @@ object TextFormatterHelper {
                 if (nextSpanStart <= currentSpanEnd && (nextSpanStart != -1 ||
                             nextSpanEnd != -1)) {
 
-                    Log.d("SpanWatcher", "Next spanIndex overlaps.")
+//                    Log.d("SpanWatcher", "Next spanIndex overlaps.")
 
                     applyFormattingFunction(currentSpanStart, nextSpanEnd)
 
@@ -196,8 +195,8 @@ object TextFormatterHelper {
 
         if (currentSpanEnd == currentSpanStart) {
 
-            Log.d("SpanWatcher",
-                "removed empty span from $currentSpanStart to $currentSpanEnd")
+//            Log.d("SpanWatcher",
+//                "removed empty span from $currentSpanStart to $currentSpanEnd")
 
             etvSpannableContent.removeSpan(currentSpan)
         }

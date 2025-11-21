@@ -1,7 +1,6 @@
 package com.ckestudios.lumonote.ui.noteview.view
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -181,7 +180,7 @@ class NoteViewActivity : AppCompatActivity() {
             val convertedDate = LocalDate.parse(retrievedNote!!.noteModifiedDate);
             val retrievedNoteDate = GeneralDateHelper.formatDate(convertedDate)
 
-            Log.d("noteData", retrievedNote!!.notePinned.toString())
+//            Log.d("noteData", retrievedNote!!.notePinned.toString())
 
             // Populate the view note activity UI w/ the pre-existing note data
             noteViewBinding.modifiedDateTV.text = retrievedNoteDate

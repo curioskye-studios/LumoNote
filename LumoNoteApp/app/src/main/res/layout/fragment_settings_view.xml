@@ -47,7 +47,7 @@
 
 
     <RelativeLayout
-        android:id="@+id/noteCreationSectionRL"
+        android:id="@+id/setPreferencesSectionRL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="12dp"
@@ -55,10 +55,8 @@
 
         android:layout_below="@id/settingsTopBarCL">
 
-
-
         <RelativeLayout
-            android:id="@+id/noteCreationLabelRL"
+            android:id="@+id/notePrefSectionRL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -77,7 +75,7 @@
             >
 
             <TextView
-                android:id="@+id/noteCreationLabelTV"
+                android:id="@+id/notePrefSectionLblTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
@@ -91,12 +89,13 @@
             </TextView>
 
             <RelativeLayout
+                android:id="@+id/removeEmptyNotesRL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/noteCreationLabelTV">
+                android:layout_below="@id/notePrefSectionLblTV">
 
                 <TextView
-                    android:id="@+id/noteCreationDescTV"
+                    android:id="@+id/removeEmptyNotesDescTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="false"
@@ -107,14 +106,14 @@
                     android:layout_alignParentStart="true"
                     android:text="Automatically discard empty notes"
                     android:textColor="@color/light_grey_2"
-                    android:layout_toLeftOf="@id/noteCreationSwitchSM"
+                    android:layout_toLeftOf="@id/removeEmptyNoteSwitchSM"
                     android:textStyle="bold"
                     android:textSize="14sp"
                     >
                 </TextView>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/noteCreationSwitchSM"
+                    android:id="@+id/removeEmptyNoteSwitchSM"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"

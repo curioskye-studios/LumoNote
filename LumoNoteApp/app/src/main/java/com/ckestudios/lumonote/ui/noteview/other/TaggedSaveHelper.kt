@@ -1,6 +1,5 @@
 package com.ckestudios.lumonote.ui.noteview.other
 
-import android.util.Log
 import com.ckestudios.lumonote.data.models.Tag
 import com.ckestudios.lumonote.ui.sharedviewmodel.TaggedAppSharedViewModel
 
@@ -10,8 +9,8 @@ class TaggedSaveHelper(private val taggedAppSharedViewModel: TaggedAppSharedView
 
         val oldTags = taggedAppSharedViewModel.getTagsByNoteID(noteID)
 
-        Log.d("TagDebug", "oldTags: ${oldTags}.")
-        Log.d("TagDebug", "newTags: ${newTags}.")
+//        Log.d("TagDebug", "oldTags: ${oldTags}.")
+//        Log.d("TagDebug", "newTags: ${newTags}.")
 
         if (newTags == oldTags) return
 
@@ -27,7 +26,7 @@ class TaggedSaveHelper(private val taggedAppSharedViewModel: TaggedAppSharedView
 
             if (!tagExists || oldTags.isEmpty()) {
 
-                Log.d("TagDebug", "${tag.tagName} added.")
+//                Log.d("TagDebug", "${tag.tagName} added.")
                 taggedAppSharedViewModel.insertTagged(tag.tagID, noteID)
             }
         }
@@ -41,7 +40,7 @@ class TaggedSaveHelper(private val taggedAppSharedViewModel: TaggedAppSharedView
 
             if (tagWasRemoved || newTags.isEmpty()) {
 
-                Log.d("TagDebug", "${tag.tagName} removed.")
+//                Log.d("TagDebug", "${tag.tagName} removed.")
                 taggedAppSharedViewModel.deleteTagged(tag.tagID, noteID)
             }
         }

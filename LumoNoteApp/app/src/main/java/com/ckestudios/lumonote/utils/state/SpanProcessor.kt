@@ -6,7 +6,6 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
-import android.util.Log
 import android.widget.EditText
 import android.widget.TextView
 import com.ckestudios.lumonote.data.models.BulletType
@@ -44,7 +43,7 @@ object SpanProcessor {
             val spanEntry = formatSpanEntry(span, spanStart, spanEnd, editTextView.context)
 
             if (spanEntry == "") continue
-            Log.d("SaveSpans", "spanEntryExtract: $spanEntry")
+//            Log.d("SaveSpans", "spanEntryExtract: $spanEntry")
 
             spanEntries.add(spanEntry)
         }
@@ -52,7 +51,7 @@ object SpanProcessor {
         if (spanEntries.isEmpty()) return ""
 
         spanString = spanEntries.joinToString(", ", prefix = "[", postfix = "]")
-        Log.d("SaveSpans", "spanString: $spanString")
+//        Log.d("SaveSpans", "spanString: $spanString")
 
         return spanString
     }
@@ -91,7 +90,7 @@ object SpanProcessor {
                 val filePath =
                     GeneralImageHelper.saveImageToInternalStorage(context, span.getBitmap())
 
-                Log.d("SaveSpans", "filePath: $filePath")
+//                Log.d("SaveSpans", "filePath: $filePath")
 
                 "[span: ${SpanType.IMAGE_SPAN.spanName}, start: $spanStart, end: $spanEnd, " +
                         "path: $filePath]"
@@ -155,13 +154,12 @@ object SpanProcessor {
                         else -> null
                     }
 
-                Log.d("SaveSpans", "spanStart: $spanStart")
-                Log.d("SaveSpans", "spanEnd: $spanEnd")
+//                Log.d("SaveSpans", "spanStart: $spanStart")
+//                Log.d("SaveSpans", "spanEnd: $spanEnd")
 
                 if (bulletType == BulletType.CUSTOM) {
                     customBullet = spanRecordDict["bullet"].toString()
 
-                    Log.d("SaveSpans", "point 1")
                     actionPerformer.addCustomBullet(spanStart, spanEnd, editTextView, customBullet)
                     continue
                 }
@@ -191,7 +189,7 @@ object SpanProcessor {
                 continue
             }
 
-            Log.d("SaveSpans", "spanRecordETV: $spanRecord")
+//            Log.d("SaveSpans", "spanRecordETV: $spanRecord")
 
             actionPerformer.addBasicSpan(spanType, spanStart, spanEnd, editTextView)
         }
@@ -208,7 +206,7 @@ object SpanProcessor {
 
             val entryInfoList = getSpanRecordInfoPairs(entry)
 
-            Log.d("SaveSpans", "entryInfoList: $entryInfoList")
+//            Log.d("SaveSpans", "entryInfoList: $entryInfoList")
 
             var spanType: SpanType? = null
             var spanStart: Int? = null
@@ -229,7 +227,8 @@ object SpanProcessor {
                     "end" -> spanEnd = (entryInfo.second as String).toInt()
                 }
 
-                Log.d("SaveSpans", "entryInfo: $spanType, $spanStart, $spanEnd")
+//                Log.d("SaveSpans", "entryInfo: $spanType, $spanStart, $spanEnd")
+
                 if (spanType == null || spanStart == null || spanEnd == null) continue
 
                 val setSpan: Any? = when (spanType) {
@@ -273,7 +272,7 @@ object SpanProcessor {
 
         for (spanRecord in spanRecordList) {
 
-            Log.d("SaveSpans", "unformattedSpanRecord: $spanRecord")
+//            Log.d("SaveSpans", "unformattedSpanRecord: $spanRecord")
 
             val formattedSpanRecord  =
                 GeneralTextHelper.removeCharsFromString(spanRecord, listOf("[", "]"))

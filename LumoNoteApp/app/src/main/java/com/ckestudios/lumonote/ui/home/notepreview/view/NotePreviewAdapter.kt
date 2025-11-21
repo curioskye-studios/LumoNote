@@ -2,7 +2,6 @@ package com.ckestudios.lumonote.ui.home.notepreview.view
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -91,7 +90,7 @@ class NotePreviewAdapter(private val setNoteIDToOpen: (Int) -> Unit,
 
             val pinnedFlag = holder.pinPreview.tag as Boolean
 
-            Log.d("NoteFrag", "pinnedFlag: $pinnedFlag")
+//            Log.d("NoteFrag", "pinnedFlag: $pinnedFlag")
 
             holder.pinPreview.tag = !pinnedFlag
 

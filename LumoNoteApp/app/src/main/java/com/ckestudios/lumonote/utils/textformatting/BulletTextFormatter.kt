@@ -73,8 +73,8 @@ class BulletTextFormatter(override val editTextView: EditText,
         val bulletSpans =
             getSelectionSpans(selectStart, selectEnd)
 
-        Log.d("bullettextformatter", "bulletSpans.isEmpty():" +
-                "${bulletSpans.isEmpty()}")
+//        Log.d("bullettextformatter", "bulletSpans.isEmpty():" +
+//                "${bulletSpans.isEmpty()}")
 
         if (bulletSpans.isEmpty()) {
 

@@ -4,7 +4,6 @@ import android.text.Editable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.UnderlineSpan
-import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.SpanType
 import com.ckestudios.lumonote.utils.state.ActionHelper
@@ -165,7 +164,7 @@ class UnderlineTextFormatter(override val editTextView: EditText,
         val underlineSpans =
             etvSpannableContent.getSpans(selectStart, selectEnd, CustomUnderlineSpan::class.java)
 
-        Log.d("underlineSpans", underlineSpans.contentToString())
+//        Log.d("underlineSpans", underlineSpans.contentToString())
 
 
         if (underlineSpans.isEmpty()) return false

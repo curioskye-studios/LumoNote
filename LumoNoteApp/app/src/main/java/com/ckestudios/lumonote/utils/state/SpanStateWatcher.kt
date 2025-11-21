@@ -2,7 +2,6 @@ package com.ckestudios.lumonote.utils.state
 
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
-import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.Action
 import com.ckestudios.lumonote.data.models.ActionPerformed
@@ -65,7 +64,7 @@ class SpanStateWatcher(private val editTextView: EditText,
 
         stateManager.addToUndo(action)
 
-        Log.d("SpanWatcher", "${spanType.spanName} added to $spanStart-$spanEnd")
+//        Log.d("SpanWatcher", "${spanType.spanName} added to $spanStart-$spanEnd")
     }
 
     fun <T> removeStyleSpan(targetSpan: T, spanType: SpanType, isNormalization: Boolean,
@@ -113,7 +112,7 @@ class SpanStateWatcher(private val editTextView: EditText,
 
                 spansToRemove.add(span)
 
-                Log.d("SpanWatcher", "${spanType.spanName} removed from $spanStart-$spanEnd")
+//                Log.d("SpanWatcher", "${spanType.spanName} removed from $spanStart-$spanEnd")
             }
         }
 
@@ -139,7 +138,7 @@ class SpanStateWatcher(private val editTextView: EditText,
 
         stateManager.addToUndo(action)
 
-        Log.d("SpanWatcher", "custombullet added to $spanStart-$spanEnd")
+//        Log.d("SpanWatcher", "custombullet added to $spanStart-$spanEnd")
     }
 
     fun removeCustomBulletSpan(targetSpan: CustomBulletSpan, multipartIdentifier: String?) {
@@ -172,7 +171,7 @@ class SpanStateWatcher(private val editTextView: EditText,
 
                 spansToRemove.add(span)
 
-                Log.d("SpanWatcher", "custombullet removed from $spanStart-$spanEnd")
+//                Log.d("SpanWatcher", "custombullet removed from $spanStart-$spanEnd")
             }
         }
 

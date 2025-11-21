@@ -1,7 +1,6 @@
 package com.ckestudios.lumonote.ui.sharedviewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -75,7 +74,7 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
 
         viewModelScope.launch {
             _notes.value = noteRepository.getItems()
-            Log.d("SettingsDeBug", "shouldDiscardEmptyNotes: ${shouldDiscardEmptyNotes.value}")
+//            Log.d("SettingsDeBug", "shouldDiscardEmptyNotes: ${shouldDiscardEmptyNotes.value}")
 
             if (shouldDiscardEmptyNotes.value == true) removeEmptyNotes(notes.value!!)
         }
@@ -91,10 +90,6 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
     private fun removeEmptyNotes(notes: List<Note>) {
 
         for (note in notes) {
-
-            Log.d("SettingsDeBug", "note.noteID: ${note.noteID}")
-            Log.d("SettingsDeBug", "note.noteTitle == \"\": ${note.noteTitle == ""}")
-            Log.d("SettingsDeBug", "note.noteContent == \"\": ${note.noteContent == ""}")
 
             if (note.noteTitle == "" && note.noteContent == "") {
                 noteRepository.deleteItem(note.noteID)
@@ -121,7 +116,7 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
     }
 
     fun setNewNoteBackup(note: Note?) {
-        _newNoteBackup.value = note
+        _newNoteBackup.postValue(note)
     }
 
 
@@ -146,7 +141,7 @@ class NoteAppSharedViewModel(application: Application, private val noteRepositor
 
             noteRepository.insertItem(note)
 
-            Log.d("SaveDebug", "getLastInsertedNote(): ${noteRepository.getLastInsertedNote()}")
+//            Log.d("SaveDebug", "getLastInsertedNote(): ${noteRepository.getLastInsertedNote()}")
             setNewNoteBackup(noteRepository.getLastInsertedNote())
 
             setNoteWasCreatedAsync(true)

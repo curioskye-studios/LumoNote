@@ -39,7 +39,7 @@ class ActionStateStack {
 
         stack.add(action)
 
-        Log.d("TextWatcher", "stack: ${stack.onEach { action.toString() }}")
+//        Log.d("TextWatcher", "stack: ${stack.onEach { action.toString() }}")
     }
 
     fun clearStack() {

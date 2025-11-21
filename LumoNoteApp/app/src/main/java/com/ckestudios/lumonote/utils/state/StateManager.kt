@@ -1,7 +1,6 @@
 package com.ckestudios.lumonote.utils.state
 
 import android.graphics.Bitmap
-import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.Action
 import com.ckestudios.lumonote.data.models.ActionType
@@ -26,7 +25,7 @@ class StateManager(private val editTextView: EditText) {
 
         imageCache[identifier] = Triple(image, start, end)
 
-        Log.d("SpanWatcher", "imageCache: ${imageCache.keys}")
+//        Log.d("SpanWatcher", "imageCache: ${imageCache.keys}")
     }
 
     fun removeImageFromCache(imageIdentifier: String) {
@@ -41,7 +40,7 @@ class StateManager(private val editTextView: EditText) {
 
         customBulletCache[identifier] = customBullet
 
-        Log.d("SpanWatcher", "customBulletCache: ${customBulletCache.keys}")
+//        Log.d("SpanWatcher", "customBulletCache: ${customBulletCache.keys}")
     }
 
     fun removeBulletFromCache(bulletIdentifier: String) {
@@ -143,8 +142,8 @@ class StateManager(private val editTextView: EditText) {
             undoStack.pushActionToStack(checklistUndoSpan)
         }
 
-        Log.d("SpanWatcher", "undoAdd: $undoAction")
-        Log.d("SpanWatcher", "undoStack: ${undoStack.getStackContents()}")
+//        Log.d("SpanWatcher", "undoAdd: $undoAction")
+//        Log.d("SpanWatcher", "undoStack: ${undoStack.getStackContents()}")
     }
 
 
@@ -165,7 +164,7 @@ class StateManager(private val editTextView: EditText) {
         var topAction = stack.getTopActionOfStack()
 
         val logText = if (isUndo) "undo" else "redo"
-        Log.d("SpanWatcher", "$logText: $topAction")
+//        Log.d("SpanWatcher", "$logText: $topAction")
 
 
         if (topAction == null) return
@@ -179,7 +178,7 @@ class StateManager(private val editTextView: EditText) {
 
             topAction = stack.getTopActionOfStack()
 
-            Log.d("SpanWatcher", "${logText}NextPart: $topAction")
+//            Log.d("SpanWatcher", "${logText}NextPart: $topAction")
 
             if (topAction == null) return
 

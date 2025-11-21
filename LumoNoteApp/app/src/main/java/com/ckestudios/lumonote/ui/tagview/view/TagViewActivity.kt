@@ -67,15 +67,17 @@ class TagViewActivity : AppCompatActivity() {
 
                 val oldTag = tagAppSharedViewModel.getTag(tagID)
 
+                if (tagNameIsTaken(tagID, tagName)) {
+
+                    GeneralUIHelper.displayFeedbackToast( this,
+                        "Not saved, tag name already exists", false)
+
+                    return@TagEditDisplayAdapter
+                }
+
                 if (tagName == "") {
                     GeneralUIHelper.displayFeedbackToast( this,
                         "Empty tag will be deleted", false)
-                }
-
-                if (tagNameIsTaken(tagName)) {
-                    GeneralUIHelper.displayFeedbackToast( this,
-                        "Tag name already exists", false)
-                    return@TagEditDisplayAdapter
                 }
 
                 if (oldTag.tagName != tagName) {
@@ -91,12 +93,19 @@ class TagViewActivity : AppCompatActivity() {
         tagViewBinding.tagsHolderRV.adapter = tagEditDisplayAdapter
     }
 
-    private fun tagNameIsTaken(newTagName: String): Boolean {
+    private fun tagNameIsTaken(tagID: Int, newTagName: String): Boolean {
 
         val tags = tagAppSharedViewModel.tags.value!!
         val existingTagNames = tags.map { it.tagName }
 
-        return newTagName in existingTagNames
+        val matchingTagNamePos = existingTagNames.indexOf(newTagName)
+        val isTheSameTag =
+            if (matchingTagNamePos == -1) false
+            else {
+                tags[matchingTagNamePos].tagID == tagID
+            }
+
+        return newTagName in existingTagNames && !isTheSameTag
     }
 
     private fun newTagAlreadyCreated(): Boolean {

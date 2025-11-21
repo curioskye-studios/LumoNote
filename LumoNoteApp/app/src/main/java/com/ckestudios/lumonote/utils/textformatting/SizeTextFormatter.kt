@@ -3,7 +3,6 @@ package com.ckestudios.lumonote.utils.textformatting
 import android.text.Editable
 import android.text.Spanned
 import android.text.style.RelativeSizeSpan
-import android.util.Log
 import android.widget.EditText
 import com.ckestudios.lumonote.data.models.TextSize
 
@@ -81,15 +80,15 @@ class SizeTextFormatter(override val editTextView: EditText,
 
             for (index in paragraphIndices.indices){
 
-                Log.d("sizetextformatter", "index: $index")
+//                Log.d("sizetextformatter", "index: $index")
 
                 if (index + 1 <= paragraphIndices.size - 1) {
 
                     val applyStart = paragraphIndices[index]
                     val applyEnd = paragraphIndices[index + 1]
 
-                    Log.d("sizetextformatter", "applyStart: $applyStart")
-                    Log.d("sizetextformatter", "applyEnd: $applyEnd")
+//                    Log.d("sizetextformatter", "applyStart: $applyStart")
+//                    Log.d("sizetextformatter", "applyEnd: $applyEnd")
 
                     if (shouldApply) {
 
