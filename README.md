@@ -10,11 +10,17 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 ![Formatting Demo](Demos/formatting_demo.gif)
 
+
 - Change Header Sizes
 - ☑️ To-Do Checklists  
 - ↩️ Undo & Redo  
 - 📌 Pin Notes  
 - 🏷 Tag Notes  
+
+
+## Possible Future Features
+
+- Temp
 
 ---
 
