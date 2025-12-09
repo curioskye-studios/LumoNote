@@ -6,7 +6,7 @@ LumoNote combines key features from your favorite note-taking apps (like Google 
 ---
 
 ## Current Features
-- 📝 Basic Text Formatting (**Bold, *Italics*, <u>Underline</u>**)  
+- 📝 Basic Text Formatting (**Bold**, *Italics*, <u>Underline</u>)  
 - ☑️ To-Do Checklists  
 - ↩️ Undo & Redo  
 - 📌 Pin Notes  
