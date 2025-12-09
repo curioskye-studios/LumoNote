@@ -1,12 +1,13 @@
 # LumoNote  
 
 **Illuminate your thoughts, to-dos, and ideas with LumoNote.**  
-LumoNote combines key features from your favorite note-taking apps (like Google Keep) into a simple and lightweight experience.  
+LumoNote combines key features from your favorite note-taking apps like Google Keep into a simple and lightweight experience.  
 
 ---
 
 ## Current Features
 - 📝 Basic Text Formatting (**Bold**, *Italics*, <u>Underline</u>)  
+- Change Header Sizes
 - ☑️ To-Do Checklists  
 - ↩️ Undo & Redo  
 - 📌 Pin Notes  
