@@ -4,6 +4,7 @@
 
 LumoNote combines key features from your favorite note-taking apps like Google Keep into a simple lightweight experience.  
 
+
 ---
 
 ## Main Features
@@ -47,7 +48,8 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 ![Tagging Demo](Demos/tagging_demo.gif)
 
 
-**(Note: Everything shown above is subject to change!)**
+🚨**(Note: Everything shown above is subject to change!)**
+
 
 ---
 
@@ -59,10 +61,11 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 3. Tap **Install**  
 4. Enjoy!   
 
+
 ---
 
 ## Build from Source  
-If you’d like to try running or modifying LumoNote yourself:  
+**If you’d like to try running or modifying LumoNote yourself:**  
 
 - Download the project from above, or
 
