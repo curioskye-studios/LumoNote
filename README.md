@@ -38,7 +38,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 - 📌 Pin Notes  
 
-
+![Pinning Demo](Demos/pinning_demo.gif)
 
 
 - 🏷 Tag Notes  
