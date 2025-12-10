@@ -16,11 +16,11 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 - 📒 Add Normal & Custom Bullets
 
-
+![Bullet Demo](Demos/bullet_demo.gif)
 
 - 🖼️ Add an Image
 
-
+![Image Demo](Demos/image_demo.gif)
 
 - ☑️ Add To-Do Checklists  
 
