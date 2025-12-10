@@ -6,7 +6,9 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.noteview.EditInputFragment">
+    android:clickable="true"
+
+    tools:context=".ui.noteview.view.notecontentinput.EditInputFragment">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,37 +18,28 @@
         android:background="@drawable/grey_toolbar"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
+        android:paddingTop="5.5dp"
+        android:paddingBottom="5.5dp"
         app:layout_constraintBottom_toBottomOf="parent"
 
         app:layout_constraintStart_toStartOf="parent">
 
-        <ImageView
-            android:id="@+id/colorButtonIV"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:paddingTop="12dp"
-            android:paddingRight="12dp"
-            android:paddingBottom="12dp"
 
-            android:src="@drawable/baseline_color_lens_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            app:tint="@color/light_grey_1" />
 
         <ImageView
             android:id="@+id/checkListButtonIV"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentStart="true"
-            android:padding="12dp"
+            android:paddingLeft="7.5dp"
+            android:paddingRight="7.5dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
 
-            android:src="@drawable/baseline_checklist_24"
+            android:src="@drawable/check_box_24px"
+
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/imageButtonIV"
-            app:layout_constraintStart_toEndOf="@+id/colorButtonIV"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.5"
             app:tint="@color/light_grey_1" />
@@ -56,9 +49,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:padding="12dp"
+            android:padding="7.5dp"
 
             android:src="@drawable/image_arrow_up_24px"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/textFormatButtonIV"
             app:layout_constraintStart_toEndOf="@+id/checkListButtonIV"
@@ -71,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:padding="12dp"
+            android:padding="8dp"
 
             android:src="@drawable/baseline_text_fields_24"
 
@@ -88,7 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:padding="12dp"
+            android:padding="8dp"
 
             android:src="@drawable/undo_24px"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -104,9 +98,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:paddingLeft="12dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="12dp"
+            android:padding="8dp"
 
             android:src="@drawable/redo_24px"
             app:layout_constraintBottom_toBottomOf="parent"

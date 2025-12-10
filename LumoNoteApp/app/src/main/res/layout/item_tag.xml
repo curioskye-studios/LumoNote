@@ -14,6 +14,17 @@
     android:id="@+id/tagItemCV"
     >
 
+    <TextView
+        android:id="@+id/tagIdTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@color/dark_grey"
+        android:visibility="gone">
+
+    </TextView>
+
+
 
     <LinearLayout
         android:id="@+id/tagItemLayoutLL"

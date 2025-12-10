@@ -1,0 +1,251 @@
+package com.ckestudios.lumonote.utils.textformatting
+
+import android.text.Editable
+import android.text.style.CharacterStyle
+import android.text.style.StyleSpan
+import android.widget.EditText
+import com.ckestudios.lumonote.data.models.SpanType
+import com.ckestudios.lumonote.ui.noteview.other.CustomImageSpan
+import com.ckestudios.lumonote.utils.state.SpanStateWatcher
+
+object TextFormatterHelper {
+
+    fun getSelectionParagraphIndices(editTextView: EditText) : MutableList<Int>{
+
+        val etvContentString = editTextView.text.toString()
+
+        val paragraphIndices = mutableListOf<Int>()
+
+        val firstAndLastIndices = getCurrentLineIndices(editTextView)
+
+        val firstNewLineIndex = firstAndLastIndices.first
+        val lastNewLineIndex = firstAndLastIndices.second
+
+        val selectionAsString =
+            etvContentString.subSequence(firstNewLineIndex, lastNewLineIndex).toString()
+
+        // Create a Regex object and index offset
+        val regex = Regex("\n")
+        val offsetToMatchOrgIndex: Int = firstNewLineIndex
+
+        // Add offset to all occurrence indices between first and last
+        val matchesIndices = regex.findAll(selectionAsString).map {
+            it.range.first + offsetToMatchOrgIndex
+        }.toList()
+
+
+        // Populate indices
+        paragraphIndices.add(firstNewLineIndex)
+        for (index in matchesIndices) {
+
+            if (index != firstNewLineIndex && index != lastNewLineIndex) {
+
+                paragraphIndices.add(index)
+            }
+        }
+        paragraphIndices.add(lastNewLineIndex)
+
+
+        // Print the extracted occurrences
+//        paragraphIndices.forEach { Log.d("bullettextformatter", "occurrence: $it") }
+
+        return paragraphIndices
+    }
+
+
+    fun getCurrentLineIndices(editTextView: EditText): Pair<Int, Int> {
+
+        val selectStart = editTextView.selectionStart
+        val selectEnd = editTextView.selectionEnd
+        val etvContentString = editTextView.text.toString()
+        val editTextViewEnd = editTextView.text.length
+
+        // Subtract 1 so the search starts before the inserted "\n", not after the
+        // cursor jump on pressing Enter
+        val newLinePosBeforeSelection = etvContentString.lastIndexOf("\n",
+            selectStart - 1)
+        val newLinePosAfterSelection = etvContentString.indexOf("\n",
+            selectEnd)
+
+        val skipNewLineSpace = 1
+
+        // Exclude newline char itself to indicate current line
+        val firstIndex =
+            if (newLinePosBeforeSelection != -1)  newLinePosBeforeSelection + skipNewLineSpace
+            else 0
+        val lastIndex =
+            if (newLinePosAfterSelection != -1) newLinePosAfterSelection
+            else editTextViewEnd
+
+        return Pair(firstIndex, lastIndex)
+    }
+
+
+    fun fixLineHeight(editTextView: EditText) {
+
+        val lineSpaceMultiplier = 1.1f
+
+        val oldSelectionStart = editTextView.selectionStart
+        val oldSelectionEnd = editTextView.selectionEnd
+
+        editTextView.setLineSpacing(0f, 1f)
+
+        // Re-assign to trigger span re-evaluation
+        editTextView.text = editTextView.text
+
+        editTextView.invalidate()
+        editTextView.requestLayout()
+
+        editTextView.setLineSpacing(0f, lineSpaceMultiplier)
+
+        if (oldSelectionStart == -1 || oldSelectionEnd == -1) return
+
+        // Restore selection
+        editTextView.setSelection(oldSelectionStart, oldSelectionEnd)
+    }
+
+
+
+    fun sortSpans(spans: Array<out Any>, etvSpannableContent: Editable): Array<Any> {
+
+        return spans.sortedBy { etvSpannableContent.getSpanStart(it) }.toTypedArray()
+    }
+
+
+    fun fixOverlappingSpans(sortedSpans: Array<Any>, etvSpannableContent: Editable,
+                            spanStateWatcher: SpanStateWatcher, multipartIdentifier: String?,
+                            spanType: SpanType, applyFormattingFunction: (Int, Int) -> Unit) {
+
+        for (spanIndex in sortedSpans.indices) {
+
+            val currentSpanStart =
+                etvSpannableContent.getSpanStart(sortedSpans[spanIndex])
+            val currentSpanEnd =
+                etvSpannableContent.getSpanEnd(sortedSpans[spanIndex])
+
+            val previousSpanIndex =
+                if (spanIndex > 0) spanIndex - 1 else null
+            val nextSpanIndex =
+                if (spanIndex < sortedSpans.size - 1) spanIndex + 1 else null
+
+
+            if (previousSpanIndex != null) {
+
+                val prevSpanStart =
+                    etvSpannableContent.getSpanStart(sortedSpans[previousSpanIndex])
+                val prevSpanEnd =
+                    etvSpannableContent.getSpanEnd(sortedSpans[previousSpanIndex])
+
+                if (prevSpanEnd >= currentSpanStart && (prevSpanStart != -1 ||
+                            prevSpanEnd != -1)) {
+
+//                    Log.d("SpanWatcher", "Previous spanIndex overlaps.")
+
+                    applyFormattingFunction(prevSpanStart, currentSpanEnd)
+
+                    val isNormalization = multipartIdentifier != null
+
+                    spanStateWatcher.removeStyleSpan(sortedSpans[previousSpanIndex], spanType,
+                        isNormalization, multipartIdentifier)
+                    spanStateWatcher.removeStyleSpan(sortedSpans[spanIndex], spanType,
+                        isNormalization, multipartIdentifier)
+
+                    etvSpannableContent.removeSpan(sortedSpans[previousSpanIndex])
+                    etvSpannableContent.removeSpan(sortedSpans[spanIndex])
+                }
+            }
+
+            if (nextSpanIndex != null) {
+
+                val nextSpanStart =
+                    etvSpannableContent.getSpanStart(sortedSpans[nextSpanIndex])
+                val nextSpanEnd =
+                    etvSpannableContent.getSpanEnd(sortedSpans[nextSpanIndex])
+
+                if (nextSpanStart <= currentSpanEnd && (nextSpanStart != -1 ||
+                            nextSpanEnd != -1)) {
+
+//                    Log.d("SpanWatcher", "Next spanIndex overlaps.")
+
+                    applyFormattingFunction(currentSpanStart, nextSpanEnd)
+
+                    val isNormalization = multipartIdentifier != null
+
+                    spanStateWatcher.removeStyleSpan(sortedSpans[spanIndex], spanType,
+                        isNormalization, multipartIdentifier)
+                    spanStateWatcher.removeStyleSpan(sortedSpans[nextSpanIndex], spanType,
+                        isNormalization, multipartIdentifier)
+
+                    etvSpannableContent.removeSpan(sortedSpans[spanIndex])
+                    etvSpannableContent.removeSpan(sortedSpans[nextSpanIndex])
+                }
+            }
+
+            if (currentSpanStart != -1 && currentSpanEnd != -1) {
+
+                // remove empty spans
+                removeIfEmptySpan(currentSpanEnd, currentSpanStart, sortedSpans[spanIndex],
+                    etvSpannableContent)
+            }
+        }
+    }
+
+    private fun removeIfEmptySpan(currentSpanEnd: Int, currentSpanStart: Int,
+                                  currentSpan: Any, etvSpannableContent: Editable) {
+
+        if (currentSpanEnd == currentSpanStart) {
+
+//            Log.d("SpanWatcher",
+//                "removed empty span from $currentSpanStart to $currentSpanEnd")
+
+            etvSpannableContent.removeSpan(currentSpan)
+        }
+    }
+
+    fun clearBasicFormatting(selectStart: Int, selectEnd: Int, etvSpannableContent: Editable) {
+
+        val allStyleSpans =
+            etvSpannableContent.getSpans(selectStart, selectEnd,
+                StyleSpan::class.java)
+
+        val allUnderlineSpans =
+            etvSpannableContent.getSpans(selectStart, selectEnd,
+                UnderlineTextFormatter.CustomUnderlineSpan::class.java)
+
+        val list = mutableListOf<CharacterStyle>()
+        list.addAll(allStyleSpans)
+        list.addAll(allUnderlineSpans)
+
+        val allSpans = list.toTypedArray()
+
+        if (allSpans.isNotEmpty()) {
+
+            for (span in allSpans) {
+                etvSpannableContent.removeSpan(span)
+            }
+        }
+    }
+
+
+    fun checkIfCurrentLineHasText(editTextView: EditText) : Boolean {
+
+        val etvContentString = editTextView.text.toString()
+
+        val (lineStart, lineEnd) = getCurrentLineIndices(editTextView)
+
+        val lineContent = etvContentString.substring(lineStart, lineEnd)
+
+        return lineContent.trim().isNotEmpty()
+    }
+
+    fun checkIfCurrentLineHasImage(editTextView: EditText) : Boolean {
+
+        val (lineStart, lineEnd) = getCurrentLineIndices(editTextView)
+
+        val spans =
+            editTextView.text.getSpans(lineStart, lineEnd, CustomImageSpan::class.java)
+
+        return spans.isNotEmpty()
+    }
+
+}

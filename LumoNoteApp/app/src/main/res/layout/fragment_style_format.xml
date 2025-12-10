@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    tools:context=".ui.noteview.view.notecontentinput.StyleFormatFragment"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:clickable="true"
+
+    android:background="@drawable/grey_toolbar_right"
+    android:paddingStart="3dp"
+    android:paddingEnd="15dp"
+    android:paddingTop="4.5dp"
+    android:paddingBottom="4.5dp"
+    >
+
+    <ImageView
+        android:id="@+id/bulletButtonIV"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:paddingTop="9dp"
+        android:paddingBottom="8dp"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+
+        android:src="@drawable/baseline_format_list_bulleted_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/clearFormatsButtonIV"
+        app:tint="@color/light_grey_1" />
+
+
+    <ImageView
+        android:id="@+id/clearFormatsButtonIV"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:paddingTop="11dp"
+        android:paddingBottom="8dp"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+
+        android:src="@drawable/baseline_format_clear_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/boldButtonIV"
+        app:layout_constraintStart_toEndOf="@id/bulletButtonIV"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        app:tint="@color/light_grey_1" />
+
+
+    <ImageView
+        android:id="@+id/boldButtonIV"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:paddingTop="10dp"
+        android:paddingBottom="7dp"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+
+        android:src="@drawable/baseline_format_bold_24"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/italicsButtonIV"
+        app:layout_constraintStart_toEndOf="@id/clearFormatsButtonIV"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        app:tint="@color/light_grey_1" />
+
+
+    <ImageView
+        android:id="@+id/italicsButtonIV"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:paddingTop="11dp"
+        android:paddingBottom="7dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+
+        android:src="@drawable/baseline_format_italic_24"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/underlineButtonIV"
+        app:layout_constraintStart_toEndOf="@id/boldButtonIV"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        app:tint="@color/light_grey_1" />
+
+    <ImageView
+        android:id="@+id/underlineButtonIV"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:paddingTop="11dp"
+        android:paddingBottom="9dp"
+        android:paddingStart="6dp"
+        android:paddingEnd="5dp"
+
+
+        android:src="@drawable/baseline_format_underlined_24"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/italicsButtonIV"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        app:tint="@color/light_grey_1" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -24,10 +24,11 @@
 
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:paddingLeft="24dp"
+            android:paddingLeft="11dp"
             android:paddingTop="12dp"
-            android:paddingRight="0dp"
+            android:paddingRight="12dp"
             android:paddingBottom="12dp"
+            android:layout_marginStart="12dp"
 
             android:src="@drawable/baseline_arrow_back_24"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -44,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginRight="8dp"
-            android:padding="12dp"
+            android:padding="13.5dp"
 
             android:src="@drawable/baseline_delete_24"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -56,11 +57,12 @@
         <ImageView
             android:id="@+id/replaceButtonIV"
             android:layout_width="wrap_content"
+            android:visibility="gone"
 
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginRight="8dp"
-            android:padding="12dp"
+            android:padding="13.5dp"
 
             android:src="@drawable/baseline_find_replace_24"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -75,8 +77,8 @@
 
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="16dp"
-            android:padding="12dp"
+            android:layout_marginEnd="8dp"
+            android:padding="13.5dp"
 
             android:src="@drawable/baseline_push_pin_24"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -91,10 +93,24 @@
 
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:paddingLeft="0dp"
-            android:paddingTop="10dp"
-            android:paddingRight="24dp"
-            android:paddingBottom="12dp"
+            android:padding="13.5dp"
+            android:layout_marginEnd="8dp"
+
+            android:src="@drawable/baseline_save_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/saveCloseButtonIV"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            app:tint="@color/light_grey_1" />
+
+        <ImageView
+            android:id="@+id/saveCloseButtonIV"
+            android:layout_width="wrap_content"
+
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:padding="9.5dp"
+            android:layout_marginEnd="8dp"
 
             android:src="@drawable/baseline_check_24"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -110,8 +126,6 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingLeft="24dp"
-        android:paddingRight="10dp"
         android:scrollbars="none"
 
         app:layout_constraintBottom_toBottomOf="parent"
@@ -131,11 +145,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter"
-                android:paddingTop="3dp"
 
+                android:paddingTop="3dp"
                 android:paddingRight="10dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="10dp"
+
                 android:text="Last Edited:"
-                android:textColor="@color/light_grey_3"
+                android:textColor="@color/light_grey_2"
                 android:textSize="13sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -151,6 +168,9 @@
 
                 android:paddingTop="3dp"
                 android:paddingRight="10dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="10dp"
+
                 android:textColor="@color/gold"
                 android:textColorHint="@color/gold"
                 android:textSize="14sp"
@@ -161,7 +181,7 @@
             </TextView>
 
 
-            <com.example.lumonote.ui.noteview.SelectableEditText
+            <com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
                 android:id="@+id/noteTitleET"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -170,10 +190,15 @@
                 android:focusableInTouchMode="true"
                 android:fontFamily="@font/inter"
                 android:hint="Title"
-                android:paddingTop="20dp"
 
+                android:imeOptions="flagNoExtractUi"
+
+                android:paddingTop="20dp"
                 android:paddingRight="10dp"
                 android:paddingBottom="17dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="10dp"
+
                 android:textColor="@color/light_grey_1"
                 android:textColorHint="@color/light_grey_3"
                 android:textSize="22sp"
@@ -181,29 +206,50 @@
 
                 app:layout_constraintTop_toBottomOf="@+id/modifiedDateTV" />
 
-            <com.example.lumonote.ui.noteview.SelectableEditText
-                android:id="@+id/noteContentET"
+            <com.ckestudios.lumonote.ui.noteview.other.CustomSelectionET
+                android:id="@+id/noteEditContentET"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+
                 android:background="@android:color/transparent"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:fontFamily="@font/inter"
                 android:gravity="start|top"
                 android:hint="Make a note..."
-
                 android:inputType="textMultiLine"
-                android:lineSpacingMultiplier="1.2"
+                android:imeOptions="flagNoExtractUi"
+
+                android:lineSpacingMultiplier="1.1"
                 android:minHeight="48dp"
+
                 android:paddingRight="10dp"
-                android:paddingBottom="150dp"
+                android:paddingBottom="90dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="10dp"
+
                 android:textColor="@color/light_grey_1"
+                android:textColorHighlight="@color/light_grey_3"
                 android:textColorHint="@color/light_grey_3"
+                android:textIsSelectable="true"
                 android:textSize="15sp"
 
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/noteTitleET"
-                tools:layout_editor_absoluteX="32dp" />
+                app:layout_constraintTop_toBottomOf="@+id/noteTitleET" />
+
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/tagSectionFC"
+                    android:name="com.ckestudios.lumonote.ui.noteview.view.taginput.TagInputFragment"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="150dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/noteEditContentET" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -212,12 +258,12 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/formatTextSectionFC"
-        android:name="com.example.lumonote.ui.noteview.TextFormatFragment"
+        android:name="com.ckestudios.lumonote.ui.noteview.view.notecontentinput.TextFormatFragment"
         android:layout_width="0dp"
-        android:layout_height="45dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="6dp"
         app:layout_constraintWidth_max="550dp"
 
         app:layout_constraintBottom_toTopOf="@+id/editSectionFC"
@@ -228,7 +274,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/editSectionFC"
-        android:name="com.example.lumonote.ui.noteview.EditInputFragment"
+        android:name="com.ckestudios.lumonote.ui.noteview.view.notecontentinput.EditInputFragment"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"

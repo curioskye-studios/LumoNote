@@ -8,10 +8,11 @@
 
     android:background="@color/black"
     android:orientation="vertical"
+    android:clickable="true"
 
     android:id="@+id/notePreviewViewRL"
 
-    tools:context=".ui.home.notepreview.NotePreviewViewFragment">
+    tools:context=".ui.home.notepreview.view.NotePreviewViewFragment">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -44,6 +45,110 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+    <RelativeLayout
+        android:id="@+id/setPreferencesSectionRL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+
+        android:layout_below="@id/settingsTopBarCL">
+
+        <RelativeLayout
+            android:id="@+id/notePrefSectionRL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+
+            android:paddingStart="24dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="20dp"
+
+            android:fontFamily="@font/inter"
+
+            android:textColor="@color/light_grey_1"
+            android:textSize="20dp"
+
+            android:background="@drawable/calendar_background"
+            >
+
+            <TextView
+                android:id="@+id/notePrefSectionLblTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:fontFamily="@font/inter"
+                android:layout_alignParentTop="true"
+                android:text="Note Preferences"
+                android:textColor="@color/gold"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                >
+            </TextView>
+
+            <RelativeLayout
+                android:id="@+id/removeEmptyNotesRL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/notePrefSectionLblTV">
+
+                <TextView
+                    android:id="@+id/removeEmptyNotesDescTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+
+                    android:fontFamily="@font/inter"
+                    android:layout_marginBottom="16dp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true"
+                    android:text="Automatically discard empty notes"
+                    android:textColor="@color/light_grey_2"
+                    android:layout_toLeftOf="@id/removeEmptyNoteSwitchSM"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    >
+                </TextView>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/removeEmptyNoteSwitchSM"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:checked="false"
+
+                    app:thumbTint="@color/gold"
+                    app:trackTint="@color/light_grey_3"
+
+                    android:layout_alignParentEnd="true"/>
+
+            </RelativeLayout>
+
+
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/creatorLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:fontFamily="@font/inter"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="16dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:text="Developed By CurioSkye Studios"
+        android:textColor="@color/light_grey_3"
+        android:textStyle="bold"
+        android:textSize="20dp"
+        >
+    </TextView>
 
 
 </RelativeLayout>

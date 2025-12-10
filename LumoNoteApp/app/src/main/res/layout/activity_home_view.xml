@@ -33,7 +33,11 @@
             android:id="@+id/notesViewIV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+
             android:src="@drawable/note_stack_24px"
 
             app:layout_constraintBottom_toBottomOf="parent"
@@ -47,7 +51,11 @@
             android:id="@+id/calendarViewIV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+
             android:src="@drawable/baseline_calendar_month_24"
 
             app:layout_constraintBottom_toBottomOf="parent"
@@ -62,9 +70,13 @@
             android:id="@+id/settingsViewIV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
 
             android:src="@drawable/baseline_settings_24"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/calendarViewIV"
