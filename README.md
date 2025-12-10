@@ -10,11 +10,9 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 ![Formatting Demo](Demos/formatting_demo.gif)
 
-
 - 🅰️ Change Header Sizes
 
 ![Heading Demo](Demos/heading_demo.gif)
-
 
 - 📒 Add Normal & Custom Bullets
 
@@ -26,7 +24,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 - ☑️ Add To-Do Checklists  
 
-
+![Checklist Demo](Demos/checklist_demo.gif)
 
 - ↩️ Undo & Redo Changes
 
@@ -37,6 +35,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 
 - 🏷 Tag Notes  
+
 
 
 (All features subject to change as the application evolves)
