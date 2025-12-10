@@ -64,8 +64,11 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 ## Build from Source  
 If you’d like to try running or modifying LumoNote yourself:  
 
-- Download the project or Clone it using the command below
+- Download the project from above, or
+
+- Clone it using the command below
 ```bash
 git clone https://github.com/curioskye-studios/LumoNote.git
+```
 
-- Open in Android Studio
+- Open the project folder in the Android Studio application
