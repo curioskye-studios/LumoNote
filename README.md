@@ -1,6 +1,6 @@
 # LumoNote  
 
-✨ **Illuminate your thoughts, to-dos, and ideas with LumoNote.**  
+✨ **Illuminate your thoughts, to-dos, and ideas with LumoNote.** ✨ 
 
 LumoNote combines key features from your favorite note-taking apps like Google Keep into a simple lightweight experience.  
 
