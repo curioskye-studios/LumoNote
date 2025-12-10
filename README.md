@@ -43,7 +43,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 - 🏷 Tag Notes  
 
-
+![Tagging Demo](Demos/tagging_demo.gif)
 
 
 (All features subject to change as the application evolves)
