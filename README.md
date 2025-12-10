@@ -54,7 +54,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 ---
 
 ## Install  
-**(apk download available soon!)**
+**(apk download will be made available soon)**
 
 1. Download the `LumoNote.apk` file from the main folder above  
 2. Open it on your Android device  
