@@ -47,11 +47,13 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 ![Tagging Demo](Demos/tagging_demo.gif)
 
 
-(All features subject to change as the application evolves)
+(All features subject to change as the application evolves and is further optimised!)
 
 ---
 
 ## Install  
+(apk download available soon!)
+
 1. Download the `LumoNote.apk` file from the main folder above  
 2. Open it on your Android device  
 3. Tap **Install**  
@@ -59,14 +61,11 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 ---
 
-## Possible Future Features
-
-- Temp 
-
----
-
 ## Build from Source  
 If you’d like to try running or modifying LumoNote yourself:  
 
+- Download the project or Clone it using the command below
 ```bash
 git clone https://github.com/curioskye-studios/LumoNote.git
+
+- Open in Android Studio
