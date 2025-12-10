@@ -33,7 +33,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 - ↩️ Undo & Redo Changes
 
-[Undo & Redo Demo](Demos/undo_redo_demo.gif)
+![Undo & Redo Demo](Demos/undo_redo_demo.gif)
 
 
 - 📌 Pin Notes  
