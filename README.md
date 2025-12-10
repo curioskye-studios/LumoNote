@@ -6,7 +6,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 ---
 
-## Current Features
+## Main Features
 - 📝 Add Text Formatting (**Bold**, *Italics*, Underline)  
 
 ![Formatting Demo](Demos/formatting_demo.gif)
@@ -47,12 +47,12 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 ![Tagging Demo](Demos/tagging_demo.gif)
 
 
-(All features subject to change as the application evolves and is further optimised!)
+**(Note: Everything shown above is subject to change!)**
 
 ---
 
 ## Install  
-(apk download available soon!)
+**(apk download available soon!)**
 
 1. Download the `LumoNote.apk` file from the main folder above  
 2. Open it on your Android device  
