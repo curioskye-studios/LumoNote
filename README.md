@@ -48,7 +48,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 ![Tagging Demo](Demos/tagging_demo.gif)
 
 
-🚨**(Note: Everything shown above is subject to change!)**
+🚨 **(Note: Everything shown above is subject to change!)**
 
 
 ---
@@ -69,7 +69,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 - Download the project from above, or
 
-- Clone it using the command below
+- Clone it using the command below, then
 ```bash
 git clone https://github.com/curioskye-studios/LumoNote.git
 ```
