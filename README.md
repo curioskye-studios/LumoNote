@@ -48,7 +48,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 ![Tagging Demo](Demos/tagging_demo.gif)
 
 
-🚨 **(Note: Everything shown above is subject to change!)**
+🚨 **(Note: Everything shown above is subject to change)**
 
 
 ---
