@@ -16,11 +16,11 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 ![Heading Demo](Demos/heading_demo.gif)
 
 
-- Add Normal & Custom Bullets
+- 📒 Add Normal & Custom Bullets
 
 
 
-- Add an Image
+- 🖼️ Add an Image
 
 
 
@@ -39,11 +39,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 - 🏷 Tag Notes  
 
 
-
-
-## Possible Future Features
-
-- Temp
+(All features subject to change as the application evolves)
 
 ---
 
@@ -55,8 +51,9 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 ---
 
-## Preview  
-*(Add screenshots or GIF demo here — this helps users see what the app looks like)*  
+## Possible Future Features
+
+- Temp 
 
 ---
 
