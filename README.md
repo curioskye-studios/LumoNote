@@ -11,11 +11,33 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 ![Formatting Demo](Demos/formatting_demo.gif)
 
 
-- Change Header Sizes
+- 🅰️ Change Header Sizes
+
+![Heading Demo](Demos/heading_demo.gif)
+
+- Normal & Custom Bullets
+
+
+
+- Add an Image
+
+
+
 - ☑️ To-Do Checklists  
-- ↩️ Undo & Redo  
+
+
+
+- ↩️ Undo & Redo Changes
+
+
+
 - 📌 Pin Notes  
+
+
+
 - 🏷 Tag Notes  
+
+
 
 
 ## Possible Future Features
