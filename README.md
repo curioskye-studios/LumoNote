@@ -6,7 +6,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 ---
 
 ## Current Features
-- 📝 Basic Text Formatting (**Bold**, *Italics*, Underline)  
+- 📝 Add Text Formatting (**Bold**, *Italics*, Underline)  
 
 ![Formatting Demo](Demos/formatting_demo.gif)
 
@@ -15,7 +15,8 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 ![Heading Demo](Demos/heading_demo.gif)
 
-- Normal & Custom Bullets
+
+- Add Normal & Custom Bullets
 
 
 
@@ -23,7 +24,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 
 
-- ☑️ To-Do Checklists  
+- ☑️ Add To-Do Checklists  
 
 
 
