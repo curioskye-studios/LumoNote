@@ -1,3 +1,6 @@
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Status](https://img.shields.io/badge/status-in%20progress-orange)]()
+
 # LumoNote  
 
 ✨ **Illuminate your thoughts, to-dos, and ideas with LumoNote.** ✨ 
@@ -5,6 +8,7 @@
 LumoNote combines key features from your favorite note-taking apps like Google Keep into a simple lightweight experience.  
 
 > 🔧 **Work in Progress:** Features and architecture are actively being developed.
+
 ---
 
 ## Main Features
