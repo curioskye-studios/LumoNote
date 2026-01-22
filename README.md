@@ -13,43 +13,37 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 ## Main Features
 - 📝 Add Text Formatting (**Bold**, *Italics*, Underline)  
-<img src="Demos/formatting_demo.gif" alt="Formatting Demo" width="400" />
+<img src="Demos/formatting_demo.gif" alt="Formatting Demo" width="370" />
 
 
 - 🅰️ Change Header Sizes
-
-![Heading Demo](Demos/heading_demo.gif)
+<img src="Demos/heading_demo.gif" alt="Heading Demo" width="370" />
 
 
 - 📒 Add Normal & Custom Bullets
-
-![Bullet Demo](Demos/bullet_demo.gif)
+<img src="Demos/bullet_demo.gif" alt="Bullet Demo" width="370" />
 
 
 - 🖼️ Add an Image
-
-![Image Demo](Demos/image_demo.gif)
+<img src="Demos/image_demo.gif" alt="Image Demo" width="370" />
 
 
 - ☑️ Add To-Do Checklists  
-
-![Checklist Demo](Demos/checklist_demo.gif)
+<img src="Demos/checklist_demo.gif" alt="Checklist Demo" width="370" />
 
 
 - ↩️ Undo & Redo Changes
-
-![Undo & Redo Demo](Demos/undo_redo_demo.gif)
+<img src="Demos/undo_redo_demo.gif" alt="Undo & Redo Demo" width="370" />
 
 
 - 📌 Pin Notes  
-
-![Pinning Demo](Demos/pinning_demo.gif)
+<img src="Demos/pinning_demo.gif" alt="Pinning Demo" width="370" />
 
 
 - 🏷 Tag Notes  
+<img src="Demos/tagging_demo.gif" alt="Tagging Demo" width="370" />
 
-![Tagging Demo](Demos/tagging_demo.gif)
-
+---
 
 > **🚨 Note: Everything shown above is subject to change**
 
