@@ -13,8 +13,7 @@ LumoNote combines key features from your favorite note-taking apps like Google K
 
 ## Main Features
 - 📝 Add Text Formatting (**Bold**, *Italics*, Underline)  
-
-![Formatting Demo](Demos/formatting_demo.gif)
+<img src="Demos/formatting_demo.gif" alt="Formatting Demo" width="400" />
 
 
 - 🅰️ Change Header Sizes
